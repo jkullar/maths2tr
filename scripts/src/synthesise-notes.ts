@@ -33,6 +33,36 @@ interface SynthesisTarget {
 }
 
 const PLAN: SynthesisTarget[] = [
+  // ── Refresher Week: Single-Variable Calculus Prerequisites ────────────────
+  {
+    output: '0 - CALCULUS PREREQUISITES.md',
+    title: 'SINGLE-VARIABLE CALCULUS PREREQUISITES',
+    sources: [
+      'refresher/Refresher_T1_Refresher_week_-_tutorial_1.md',
+      'refresher/Refresher_T2_Refresher_week_-_tutorial_2.md',
+      'refresher/Refresher_T3_Refresher_week_-_tutorial_3.md',
+      'refresher/Refresher_T4_Refresher_week_-_tutorial_4.md',
+      'refresher/Refresher_T5_Refresher_week_-_tutorial_5.md',
+      'refresher/Refresher_T6_Refresher_week_-_tutorial_6.md',
+    ],
+    crossRefs: [],
+    focusHint: 'Left-hand and right-hand limits, existence of limits, limit laws, continuity at a point, types of discontinuity, floor function, piecewise functions. These are single-variable calculus prerequisites needed before the course begins.',
+  },
+
+  // ── Special Week: Multivariable Limits and Paths ──────────────────────────
+  {
+    output: '17 - MULTIVARIABLE LIMITS AND PATHS.md',
+    title: 'MULTIVARIABLE LIMITS AND PATH TESTS',
+    sources: [
+      'special/MDS2_1_Mathematics_for_Data_Science_II_-_Video_1.md',
+      'special/MDS2_2_Mathematics_for_Data_Science_II_-_Video_2.md',
+      'special/MDS2_3_Mathematics_for_Data_Science_II_-_Video_3.md',
+      'special/MDS2_4_Mathematics_for_Data_Science_II_-_Video_4.md',
+    ],
+    crossRefs: ['13 - MULTIVARIABLE FUNCTIONS', '14 - PARTIAL AND DIRECTIONAL DERIVATIVES'],
+    focusHint: 'Partial derivatives from first principles (definition via limit), multivariable limits via path approach, path test for non-existence of limits, continuity at a point for multivariable functions, directional derivatives for three-variable functions, gradient dot product theorem.',
+  },
+
   // ── W5-W8: Advanced Linear Algebra ────────────────────────────────────────
   {
     output: '8 - LINEAR MAPS.md',
