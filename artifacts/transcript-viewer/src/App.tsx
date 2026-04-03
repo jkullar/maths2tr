@@ -226,7 +226,7 @@ function App() {
                 alt="DytaDex"
                 className="h-6 w-auto"
               />
-              <span className="text-sm font-bold text-[#3ab5b0] tracking-wide hidden sm:block">
+              <span className="text-sm font-bold text-[#3ab5b0] tracking-wide hidden sm:block" style={{ fontFamily: "'Advent Pro', sans-serif" }}>
                 Frontier AI
               </span>
             </button>
