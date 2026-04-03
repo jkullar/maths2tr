@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { ExternalLink, BookOpen, FlaskConical, ChevronDown, ChevronRight, GraduationCap, Search, X, Star } from "lucide-react";
-import curriculumData from "@/data/curriculum.json";
+import curriculumData from "@/data/maths2/curriculum.json";
 import type { CurriculumData, CurriculumConcept, CurriculumWeek } from "@/types";
 import { cn } from "@/lib/utils";
 

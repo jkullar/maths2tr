@@ -1,5 +1,5 @@
 import { BookOpen, ChevronRight, Search } from "lucide-react";
-import transcriptsData from "@/data/transcripts.json";
+import transcriptsData from "@/data/maths2/transcripts.json";
 import type { TranscriptsData } from "@/types";
 import { highlightText } from "@/lib/search";
 

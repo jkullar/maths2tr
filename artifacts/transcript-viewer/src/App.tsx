@@ -3,7 +3,7 @@ import {
   Search, X, Moon, Sun, Menu, ChevronLeft,
   BookOpen, GraduationCap, FileText, Home, ChevronRight,
 } from "lucide-react";
-import transcriptsData from "@/data/transcripts.json";
+import transcriptsData from "@/data/maths2/transcripts.json";
 import type { TranscriptsData, Video, Week } from "@/types";
 import { searchTranscripts } from "@/lib/search";
 import { findVideoByCode, findClosestSegmentIndex } from "@/lib/curriculum";

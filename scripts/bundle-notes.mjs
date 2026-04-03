@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, resolve } from "path";
 
-const NOTES_DIR = resolve("notes");
-const OUT = resolve("artifacts/transcript-viewer/src/data/notes.json");
+const NOTES_DIR = resolve("courses/maths2");
+const OUT = resolve("artifacts/transcript-viewer/src/data/maths2/notes.json");
 
 const SECTIONS = [
   { label: "Refresher Week", ids: [0] },

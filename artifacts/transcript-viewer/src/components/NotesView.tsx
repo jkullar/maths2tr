@@ -5,7 +5,7 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { ChevronRight, Search, X, Play, Pause, Square, Volume2, PlayCircle } from "lucide-react";
-import notesRaw from "@/data/notes.json";
+import notesRaw from "@/data/maths2/notes.json";
 
 interface Note {
   id: string;
