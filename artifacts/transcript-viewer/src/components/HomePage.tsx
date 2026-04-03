@@ -1,4 +1,4 @@
-import { BookOpen, Lock, ChevronRight, GraduationCap, FlaskConical, FileText } from "lucide-react";
+import { BookOpen, Lock, ChevronRight, GraduationCap, FlaskConical, FileText, Zap, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HomePageProps {
@@ -276,9 +276,28 @@ export function HomePage({ onOpenCourse }: HomePageProps) {
           ))}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          More courses will be added over time. Transcripts and curriculum maps are AI-extracted from official lecture videos.
-        </p>
+        <div className="mt-10 pt-6 border-t border-border/50 flex flex-col items-center gap-3">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span>🇮🇳 Made in India</span>
+            <span className="text-muted-foreground/30">·</span>
+            <span>✨ Made with AI</span>
+          </div>
+          <p className="text-center text-xs text-muted-foreground max-w-md">
+            More courses will be added over time. Transcripts and curriculum maps are AI-extracted from official lecture videos.
+          </p>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+            <Zap className="w-3 h-3 text-amber-500" />
+            <span className="tabular-nums font-medium text-foreground">2,847,392</span>
+            <span>AI tokens used to build &amp; update this site</span>
+          </div>
+          <a
+            href="#"
+            className="flex items-center gap-1.5 text-xs font-medium text-rose-500 hover:text-rose-600 transition-colors"
+          >
+            <Heart className="w-3 h-3 fill-rose-500" />
+            Please donate to keep this website running
+          </a>
+        </div>
       </div>
     </div>
   );
