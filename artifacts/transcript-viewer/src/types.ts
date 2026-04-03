@@ -32,3 +32,50 @@ export interface SearchResult {
   week: Week;
   matchingSegments: Array<TranscriptSegment & { segmentIndex: number }>;
 }
+
+export interface CurriculumVideoRef {
+  type: string;
+  code: string;
+  file: string;
+  video_url: string;
+  timestamp: string;
+  deep_link: string;
+  examples_count?: number;
+}
+
+export interface CurriculumProblem {
+  summary: string;
+  concept: string;
+  timestamp: string;
+  deep_link: string;
+}
+
+export interface CurriculumPracticeRef {
+  type: string;
+  code: string;
+  file: string;
+  video_url: string;
+  problems: CurriculumProblem[];
+  problems_count: number;
+}
+
+export interface CurriculumConcept {
+  name: string;
+  introduced_in: CurriculumVideoRef;
+  practiced_in: CurriculumPracticeRef[];
+  is_prerequisite: boolean;
+}
+
+export interface CurriculumWeek {
+  week: string;
+  label: string;
+  theme: string;
+  concepts: CurriculumConcept[];
+}
+
+export interface CurriculumData {
+  generated_at: string;
+  total_concepts: number;
+  total_problems: number;
+  weeks: CurriculumWeek[];
+}

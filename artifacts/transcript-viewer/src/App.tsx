@@ -1,21 +1,25 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
-import { Search, X, Moon, Sun, Menu, ChevronLeft } from "lucide-react";
+import { Search, X, Moon, Sun, Menu, ChevronLeft, BookOpen, GraduationCap } from "lucide-react";
 import transcriptsData from "@/data/transcripts.json";
 import type { TranscriptsData, Video, Week } from "@/types";
 import { searchTranscripts } from "@/lib/search";
+import { findVideoByCode, findClosestSegmentIndex } from "@/lib/curriculum";
 import { Sidebar } from "@/components/Sidebar";
 import { TranscriptView } from "@/components/TranscriptView";
 import { SearchResults } from "@/components/SearchResults";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { CurriculumView } from "@/components/CurriculumView";
 import { cn } from "@/lib/utils";
 
 const data = transcriptsData as unknown as TranscriptsData;
 
+type AppTab = "browse" | "curriculum";
 type ViewMode = "welcome" | "transcript" | "search";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [appTab, setAppTab] = useState<AppTab>("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -61,6 +65,7 @@ function App() {
       setSearchQuery("");
       setDebouncedQuery("");
       setSidebarOpen(false);
+      setAppTab("browse");
     },
     []
   );
@@ -72,6 +77,23 @@ function App() {
       setHighlightSegmentIndex(segmentIndex ?? null);
       setDebouncedQuery("");
       setSearchQuery("");
+    },
+    []
+  );
+
+  const handleNavigateToTranscript = useCallback(
+    (code: string, timestamp: string) => {
+      const found = findVideoByCode(data, code);
+      if (!found) return;
+      const segmentIndex = found.video.available
+        ? findClosestSegmentIndex(found.video, timestamp)
+        : null;
+      setSelectedVideo(found.video);
+      setSelectedWeek(found.week);
+      setHighlightSegmentIndex(segmentIndex);
+      setSearchQuery("");
+      setDebouncedQuery("");
+      setAppTab("browse");
     },
     []
   );
@@ -96,14 +118,46 @@ function App() {
           {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
 
-        <div className="flex-1 max-w-xl relative">
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={() => setAppTab("browse")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 h-8 rounded-md text-xs font-medium transition-colors",
+              appTab === "browse"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            Browse
+          </button>
+          <button
+            onClick={() => setAppTab("curriculum")}
+            className={cn(
+              "flex items-center gap-1.5 px-3 h-8 rounded-md text-xs font-medium transition-colors",
+              appTab === "curriculum"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            Curriculum
+          </button>
+        </div>
+
+        <div className="w-px h-5 bg-border mx-1 flex-shrink-0" />
+
+        <div className="flex-1 max-w-lg relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
           <input
             ref={searchInputRef}
             type="search"
-            placeholder="Search transcripts... (e.g. eigenvalue, gradient)"
+            placeholder="Search transcripts... (e.g. determinant, gradient)"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (e.target.value.trim()) setAppTab("browse");
+            }}
             className="w-full h-8 pl-8 pr-8 rounded-md text-sm bg-muted/60 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
           />
           {searchQuery && (
@@ -132,42 +186,44 @@ function App() {
           />
         )}
 
-        <aside
-          className={cn(
-            "flex-shrink-0 w-64 border-r border-sidebar-border overflow-hidden z-30",
-            "md:flex md:flex-col md:relative md:translate-x-0",
-            sidebarOpen
-              ? "fixed inset-y-0 left-0 top-12 flex flex-col shadow-xl"
-              : "hidden md:flex"
-          )}
-        >
-          <Sidebar
-            weeks={data.weeks}
-            selectedVideoId={selectedVideo?.id ?? null}
-            onSelectVideo={handleSelectVideo}
-            searchQuery={searchQuery}
-          />
-        </aside>
+        {appTab === "browse" && (
+          <aside
+            className={cn(
+              "flex-shrink-0 w-64 border-r border-sidebar-border overflow-hidden z-30",
+              "md:flex md:flex-col md:relative md:translate-x-0",
+              sidebarOpen
+                ? "fixed inset-y-0 left-0 top-12 flex flex-col shadow-xl"
+                : "hidden md:flex"
+            )}
+          >
+            <Sidebar
+              weeks={data.weeks}
+              selectedVideoId={selectedVideo?.id ?? null}
+              onSelectVideo={handleSelectVideo}
+              searchQuery={searchQuery}
+            />
+          </aside>
+        )}
 
         <main className="flex-1 overflow-hidden relative">
-          {viewMode === "welcome" && (
+          {appTab === "curriculum" ? (
+            <CurriculumView onNavigateToTranscript={handleNavigateToTranscript} />
+          ) : viewMode === "welcome" ? (
             <WelcomeScreen data={data} onSearchFocus={focusSearch} />
-          )}
-          {viewMode === "transcript" && selectedVideo && selectedWeek && (
+          ) : viewMode === "transcript" && selectedVideo && selectedWeek ? (
             <TranscriptView
               video={selectedVideo}
               week={selectedWeek}
               searchQuery=""
               highlightSegmentIndex={highlightSegmentIndex}
             />
-          )}
-          {viewMode === "search" && (
+          ) : viewMode === "search" ? (
             <SearchResults
               results={searchResults}
               query={debouncedQuery}
               onSelectVideo={handleSearchResultSelect}
             />
-          )}
+          ) : null}
         </main>
       </div>
     </div>
