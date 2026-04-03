@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import {
   Search, X, Moon, Sun, Menu, ChevronLeft,
-  BookOpen, GraduationCap, FileText, Home, ChevronRight,
+  BookOpen, GraduationCap, FileText, Home, ChevronRight, MessageCircle,
 } from "lucide-react";
 import transcriptsData from "@/data/maths2/transcripts.json";
 import type { TranscriptsData, Video, Week } from "@/types";
@@ -224,6 +224,16 @@ function App() {
           >
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          <a
+            href="https://chat.whatsapp.com/FFjFQZSHYzyLTu4rdLuwGu?mode=gi_t"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-semibold bg-[#25D366] hover:bg-[#1ebe5d] text-white transition-colors flex-shrink-0"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Request Access</span>
+          </a>
         </div>
 
         {appPage === "course" && (
