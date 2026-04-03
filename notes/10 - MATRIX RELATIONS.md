@@ -1,28 +1,24 @@
 # MATRIX EQUIVALENCE, SIMILARITY AND AFFINE MAPS
 
-This file covers three closely related ideas that connect the algebra of matrices to the geometry of linear transformations and solution sets. **Matrix equivalence** captures when two matrices represent the same linear map under (possibly different) changes of basis in the domain and codomain. **Matrix similarity** is the important special case where domain and codomain coincide and we use the *same* change of basis on both sides — this preserves deep structural invariants such as the determinant and eigenvalues. **Affine subspaces** and **affine mappings** extend the language of linear algebra to handle objects (like solution sets of non-homogeneous systems) that are *translates* of vector subspaces. Together, these topics answer the questions: *When do two matrices encode the same underlying transformation? How do we pass between different matrix representations? What geometric object does a general solution set form?*
-
-Prerequisites: [[1 - MATRICES]], [[5 - VECTORS AND SPACES]], [[9 - TRANSFORMATIONS]].
+This file covers three interconnected topics. First, we study **matrix equivalence**, which captures when two matrices represent the same linear transformation under different choices of bases for the domain and codomain. Second, we study **matrix similarity**, the important special case for square matrices where the same basis change is applied on both sides — this preserves deep algebraic invariants such as the determinant, trace, and eigenvalues. Third, we introduce **affine subspaces** and **affine mappings**, which generalise vector subspaces and linear transformations by allowing translations. The central application is that the solution set of any consistent system $Ax = b$ (even when $b \neq 0$) is an affine subspace. These ideas build on the foundations in [[1 - MATRICES]], [[5 - VECTORS AND SPACES]], and [[9 - TRANSFORMATIONS]].
 
 ---
 
-## 1. Equivalence Relations (Review)
+## 1. Equivalence Relations — A Brief Review
 
 Before defining equivalence and similarity of matrices, we recall the abstract notion that underlies both.
 
-### Definition
-
-An **equivalence relation** on a set $S$ is a relation $\sim$ satisfying three axioms:
+**Definition.** A relation $\sim$ on a set $S$ is an **equivalence relation** if it satisfies three properties:
 
 | Property | Statement | Meaning |
 |---|---|---|
 | **Reflexivity** | $a \sim a$ for all $a \in S$ | Every element is related to itself |
-| **Symmetry** | $a \sim b \implies b \sim a$ | The relation is bidirectional |
+| **Symmetry** | $a \sim b \implies b \sim a$ | The relation is mutual |
 | **Transitivity** | $a \sim b$ and $b \sim c \implies a \sim c$ | The relation chains |
 
-An equivalence relation partitions $S$ into disjoint **equivalence classes**: every element belongs to exactly one class, and two elements are in the same class if and only if they are related.
+An equivalence relation partitions $S$ into disjoint **equivalence classes**: the class of $a$ is $[a] = \{b \in S : a \sim b\}$. Two elements share a class precisely when they are related.
 
-> **Clarification:** Both "equivalence of matrices" and "similarity of matrices" are equivalence relations in this abstract sense. We verify the three axioms explicitly for each.
+> **Clarification:** Both "equivalence of matrices" (Section 2) and "similarity of matrices" (Section 3) are equivalence relations on appropriate sets of matrices. They partition those sets into classes of matrices that share common properties (invariants).
 
 ---
 
@@ -30,109 +26,119 @@ An equivalence relation partitions $S$ into disjoint **equivalence classes**: ev
 
 ### Definition
 
-Let $A, B \in \mathbb{R}^{m \times n}$ (both $m \times n$). We say $A$ is **equivalent** to $B$, written $A \sim B$, if there exist invertible matrices $Q \in \mathbb{R}^{m \times m}$ and $P \in \mathbb{R}^{n \times n}$ such that
+Let $A$ and $B$ be $m \times n$ matrices (both of the same size). We say $A$ is **equivalent** to $B$, written $A \sim B$, if there exist invertible matrices $Q \in \mathbb{R}^{m \times m}$ and $P \in \mathbb{R}^{n \times n}$ such that
 
 $$B = QAP.$$
 
-Equivalently, $B$ can be obtained from $A$ by a sequence of elementary row operations (encoded by $Q$) and elementary column operations (encoded by $P$). See [[1 - MATRICES]] for elementary matrices.
+[▶ W7_L1 @ 00:31](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=31)
 
-### Equivalence Is an Equivalence Relation
+Here $P$ is invertible and $n \times n$ (it acts on the right, matching the number of columns of $A$), and $Q$ is invertible and $m \times m$ (it acts on the left, matching the number of rows of $A$).
 
-We verify the three axioms.
+### Interpretation via Row and Column Operations
 
-**Reflexivity.** For any $A \in \mathbb{R}^{m \times n}$,
+Recall from [[1 - MATRICES]] that left-multiplying by an invertible matrix corresponds to a sequence of elementary row operations, and right-multiplying by an invertible matrix corresponds to a sequence of elementary column operations. Therefore:
 
-$$A = I_m \, A \, I_n,$$
+> $A$ is equivalent to $B$ if and only if $B$ can be obtained from $A$ by a finite sequence of elementary row operations followed by a finite sequence of elementary column operations (or vice versa).
 
-where $I_m$ and $I_n$ are the identity matrices of appropriate sizes. Both are invertible, so $A \sim A$.
+### Equivalence of Matrices Is an Equivalence Relation
 
-**Symmetry.** Suppose $A \sim B$, so $B = QAP$ with $Q, P$ invertible. Then
+[▶ W7_L1 @ 03:54](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=234)
 
-$$A = Q^{-1} B \, P^{-1}.$$
+**Theorem.** Matrix equivalence is an equivalence relation on $\mathbb{R}^{m \times n}$.
 
-Since $Q^{-1}$ and $P^{-1}$ are invertible, this shows $B \sim A$.
+**Proof sketch.**
 
-**Transitivity.** Suppose $A \sim B$ and $B \sim C$. Then $B = Q_1 A P_1$ and $C = Q_2 B P_2$. Substituting:
+1. **Reflexivity.** $A = I_m \, A \, I_n$, and both identity matrices are invertible. Hence $A \sim A$.
 
-$$C = Q_2 (Q_1 A P_1) P_2 = (Q_2 Q_1) A (P_1 P_2).$$
+2. **Symmetry.** If $A \sim B$, then $B = QAP$ for invertible $Q, P$. Then
+$$A = Q^{-1} B \, P^{-1},$$
+and $Q^{-1}, P^{-1}$ are invertible, so $B \sim A$.
 
-The products $Q_2 Q_1$ and $P_1 P_2$ are invertible (the product of invertible matrices is invertible), so $A \sim C$.
+3. **Transitivity.** If $B = QAP$ and $C = Q'BP'$, then
+$$C = Q'(QAP)P' = (Q'Q)\,A\,(PP').$$
+Since products of invertible matrices are invertible, $A \sim C$.
 
-Because the relation is symmetric, we may simply say "$A$ and $B$ are equivalent" without specifying direction.
+### Characterisation by Rank
 
-### The Rank Characterisation
+**Theorem.** Two $m \times n$ matrices $A$ and $B$ are equivalent if and only if $\text{rank}(A) = \text{rank}(B)$.
 
-**Theorem.** Two matrices $A, B \in \mathbb{R}^{m \times n}$ are equivalent if and only if $\text{rank}(A) = \text{rank}(B)$.
-
-**Proof sketch.** By performing row and column operations, any $m \times n$ matrix of rank $r$ can be reduced to the **canonical form**
+**Proof sketch ($\Leftarrow$).** If $\text{rank}(A) = r$, then by performing row and column operations we can reduce $A$ to the **canonical form**
 
 $$D_r = \begin{bmatrix} I_r & 0 \\ 0 & 0 \end{bmatrix} \in \mathbb{R}^{m \times n},$$
 
-where $I_r$ is the $r \times r$ identity. If $\text{rank}(A) = \text{rank}(B) = r$, then both $A$ and $B$ are equivalent to $D_r$, and by transitivity, $A \sim B$. Conversely, multiplying by invertible matrices does not change rank (see [[1 - MATRICES]]), so equivalent matrices must share the same rank. $\blacksquare$
+where $I_r$ is the $r \times r$ identity. The same is true for $B$ if $\text{rank}(B) = r$. So both $A$ and $B$ are equivalent to $D_r$, and by transitivity, $A \sim B$.
 
-> **Clarification:** The canonical form $D_r$ is the *simplest* representative of each equivalence class. Every equivalence class is uniquely determined by a single integer $r$ with $0 \le r \le \min(m, n)$.
+**Proof sketch ($\Rightarrow$).** If $B = QAP$ with $Q, P$ invertible, then multiplication by invertible matrices preserves rank (see [[1 - MATRICES]]), so $\text{rank}(B) = \text{rank}(A)$.
 
-### Connection to Linear Transformations
+> **Clarification:** The canonical form $D_r$ is the unique "simplest representative" of each equivalence class. Every $m \times n$ matrix of rank $r$ is equivalent to $D_r$.
 
-Let $T: V \to W$ be a linear transformation. Choose ordered bases $\beta_1$ for $V$ and $\gamma_1$ for $W$; the matrix of $T$ with respect to these bases is $A = [T]_{\beta_1}^{\gamma_1}$. Now choose different ordered bases $\beta_2$ and $\gamma_2$; the matrix becomes $B = [T]_{\beta_2}^{\gamma_2}$. Then
+### Connection to Linear Transformations and Change of Basis
 
-$$B = QAP,$$
+Let $T: V \to W$ be a linear transformation between finite-dimensional vector spaces. Suppose $V$ has two ordered bases $\beta_1, \beta_2$ and $W$ has two ordered bases $\gamma_1, \gamma_2$ (see [[9 - TRANSFORMATIONS]] for matrix representations). Let
+
+$$A = [T]_{\beta_1}^{\gamma_1}, \qquad B = [T]_{\beta_2}^{\gamma_2}$$
+
+be the matrix representations of $T$ with respect to these pairs of bases. Then $A$ and $B$ are equivalent:
+
+$$B = QAP$$
+
+[▶ W7_L1 @ 06:42](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=402)
 
 where:
 
-- $P$ is the **change-of-basis matrix** from $\beta_2$ to $\beta_1$ (express each vector in $\beta_2$ as a linear combination of vectors in $\beta_1$; the coefficients form the columns of $P$),
-- $Q$ is the **change-of-basis matrix** from $\gamma_1$ to $\gamma_2$ (express each vector in $\gamma_1$ as a linear combination of vectors in $\gamma_2$; the coefficients form the columns of $Q$).
+- **$P$** is the **change-of-basis matrix** obtained by expressing each vector of $\beta_2$ as a linear combination of vectors from $\beta_1$. The coefficients of the $j$-th vector of $\beta_2$ form the $j$-th column of $P$.
+- **$Q$** is the matrix obtained by expressing each vector of $\gamma_1$ as a linear combination of vectors from $\gamma_2$. The coefficients of the $j$-th vector of $\gamma_1$ form the $j$-th column of $Q$.
 
-Thus **two matrices are equivalent if and only if they represent the same linear transformation (between possibly different pairs of bases)**.
+### Worked Example: Equivalence via Change of Basis
 
-### Worked Example
+[▶ W7_L1 @ 07:52](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=472)
 
-**Example:** Let $f: \mathbb{R}^3 \to \mathbb{R}^2$ be defined by $f(x, y, z) = (x + y,\; y + z)$.
+**Example.** Let $T: \mathbb{R}^3 \to \mathbb{R}^2$ be defined by $T(x,y,z) = (x+y,\; y+z)$.
 
 Consider the ordered bases:
 
 - $\beta_1 = \{e_1, e_2, e_3\}$ (standard basis of $\mathbb{R}^3$), $\quad \gamma_1 = \{e_1, e_2\}$ (standard basis of $\mathbb{R}^2$).
 - $\beta_2 = \{(1,1,0),\; (0,1,1),\; (0,0,1)\}$, $\quad \gamma_2 = \{(1,0),\; (1,1)\}$.
 
-**Solution — Matrix $A$ (with respect to $\beta_1, \gamma_1$):**
+**Solution.**
 
-$$f(1,0,0) = (1,0) = 1 \cdot e_1 + 0 \cdot e_2$$
-$$f(0,1,0) = (1,1) = 1 \cdot e_1 + 1 \cdot e_2$$
-$$f(0,0,1) = (0,1) = 0 \cdot e_1 + 1 \cdot e_2$$
+**Step 1: Matrix $A = [T]_{\beta_1}^{\gamma_1}$ (standard bases).**
 
-$$A = [f]_{\beta_1}^{\gamma_1} = \begin{bmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix}.$$
+$$T(1,0,0) = (1,0), \quad T(0,1,0) = (1,1), \quad T(0,0,1) = (0,1).$$
 
-**Solution — Matrix $B$ (with respect to $\beta_2, \gamma_2$):**
+Writing these as coordinate vectors with respect to $\gamma_1$ (which is the standard basis, so coordinates are the vectors themselves):
 
-$$f(1,1,0) = (2,1) = 1 \cdot (1,0) + 1 \cdot (1,1)$$
-$$f(0,1,1) = (1,2) = -1 \cdot (1,0) + 2 \cdot (1,1)$$
-$$f(0,0,1) = (0,1) = -1 \cdot (1,0) + 1 \cdot (1,1)$$
+$$A = \begin{bmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix}.$$
 
-$$B = [f]_{\beta_2}^{\gamma_2} = \begin{bmatrix} 1 & -1 & -1 \\ 1 & 2 & 1 \end{bmatrix}.$$
+**Step 2: Matrix $B = [T]_{\beta_2}^{\gamma_2}$.**
 
-**Finding $P$ and $Q$:**
+$$T(1,1,0) = (2,1) = 1 \cdot (1,0) + 1 \cdot (1,1)$$
+$$T(0,1,1) = (1,2) = -1 \cdot (1,0) + 2 \cdot (1,1)$$
+$$T(0,0,1) = (0,1) = -1 \cdot (1,0) + 1 \cdot (1,1)$$
 
-For $P$: express each vector of $\beta_2$ in terms of $\beta_1$ (the standard basis, so coordinates are immediate):
+$$B = \begin{bmatrix} 1 & -1 & -1 \\ 1 & 2 & 1 \end{bmatrix}.$$
+
+**Step 3: Construct $P$ and $Q$.**
+
+For $P$: express $\beta_2$ in terms of $\beta_1$ (standard basis). Since $\beta_1$ is standard, the coordinates are just the vectors themselves:
 
 $$P = \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix}.$$
 
-For $Q$: express each vector of $\gamma_1$ in terms of $\gamma_2$. We need $(1,0)$ and $(0,1)$ in terms of $\{(1,0),\;(1,1)\}$:
+For $Q$: express $\gamma_1$ in terms of $\gamma_2$. We need $(1,0)$ and $(0,1)$ in terms of $\{(1,0), (1,1)\}$:
 
 $$(1,0) = 1 \cdot (1,0) + 0 \cdot (1,1), \qquad (0,1) = -1 \cdot (1,0) + 1 \cdot (1,1).$$
 
 $$Q = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}.$$
 
-**Verification:** Compute $QAP$:
+**Step 4: Verify $B = QAP$.**
 
-$$QAP = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix}.$$
+First compute $QA$:
 
-First, $QA$:
+$$QA = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & -1 \\ 0 & 1 & 1 \end{bmatrix}.$$
 
-$$QA = \begin{bmatrix} 1 & 0 & -1 \\ 0 & 1 & 1 \end{bmatrix}.$$
+Then compute $(QA)P$:
 
-Then $(QA)P$:
-
-$$\begin{bmatrix} 1 & 0 & -1 \\ 0 & 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & -1 & -1 \\ 1 & 2 & 1 \end{bmatrix} = B. \checkmark$$
+$$(QA)P = \begin{bmatrix} 1 & 0 & -1 \\ 0 & 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & -1 & -1 \\ 1 & 2 & 1 \end{bmatrix} = B. \checkmark$$
 
 ---
 
@@ -140,150 +146,160 @@ $$\begin{bmatrix} 1 & 0 & -1 \\ 0 & 1 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 
 
 ### Definition
 
-Let $A, B \in \mathbb{R}^{n \times n}$ (both square, same size). We say $A$ is **similar** to $B$, written $A \sim B$, if there exists an invertible matrix $P \in \mathbb{R}^{n \times n}$ such that
+Let $A$ and $B$ be $n \times n$ (square) matrices. We say $A$ is **similar** to $B$, written $A \sim B$, if there exists an invertible matrix $P \in \mathbb{R}^{n \times n}$ such that
 
 $$B = P^{-1}AP.$$
 
-Equivalently, $A = PBP^{-1}$.
+[▶ W7_L1 @ 16:36](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=996)
 
-> **Clarification:** Similarity is a *special case* of equivalence where $Q = P^{-1}$. This is a much stronger requirement: whereas equivalence allows independent row and column operations, similarity ties them together through a single invertible matrix $P$.
+> **Clarification:** Similarity is a special case of equivalence where both $Q$ and $P$ appear, but now $Q = P^{-1}$. This single constraint ($Q = P^{-1}$) is what makes similarity much more restrictive — and much more useful — than general equivalence.
 
 ### Similarity Is an Equivalence Relation
 
-**Reflexivity.** $A = I^{-1}AI$, so $A$ is similar to itself.
+[▶ W7_L1 @ 17:16](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=1036)
 
-**Symmetry.** Suppose $B = P^{-1}AP$. Multiplying on the left by $P$ and on the right by $P^{-1}$:
+**Theorem.** Matrix similarity is an equivalence relation on $\mathbb{R}^{n \times n}$.
 
-$$A = PBP^{-1} = (P^{-1})^{-1} B (P^{-1}).$$
+**Proof.**
 
-Setting $P' = P^{-1}$ (which is invertible), we get $A = P'^{-1}BP'$, so $B$ is similar to $A$.
+1. **Reflexivity.** $A = I^{-1}AI$. Take $P = I$.
 
-**Transitivity.** Suppose $B = P^{-1}AP$ and $C = Q^{-1}BQ$. Then
+2. **Symmetry.** If $B = P^{-1}AP$, then multiplying on the left by $P$ and on the right by $P^{-1}$:
+$$PBP^{-1} = A, \quad \text{i.e.} \quad A = (P^{-1})^{-1} B (P^{-1}).$$
+Setting $P' = P^{-1}$ (which is invertible), we get $A = P'^{-1}BP'$, so $B \sim A$.
 
+3. **Transitivity.** If $B = P^{-1}AP$ and $C = Q^{-1}BQ$, then
 $$C = Q^{-1}(P^{-1}AP)Q = (PQ)^{-1} A (PQ).$$
+Setting $R = PQ$ (invertible), we get $C = R^{-1}AR$, so $A \sim C$.
 
-Setting $R = PQ$, we get $C = R^{-1}AR$, so $A$ is similar to $C$.
-
-Since the relation is symmetric, we simply say "$A$ and $B$ are **similar matrices**."
+Since similarity is an equivalence relation, we may simply say "$A$ and $B$ are **similar matrices**" without specifying direction.
 
 ### Invariants of Similar Matrices
 
-If $A$ and $B$ are similar, they share all of the following properties:
+[▶ W7_L1 @ 20:18](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=1218)
 
-| Invariant | Reason |
+If $A$ and $B$ are similar, then they share many important properties:
+
+| Invariant | Why it is preserved |
 |---|---|
-| **Rank** | Similar $\implies$ equivalent, and equivalent matrices have the same rank |
-| **Determinant** | $\det(P^{-1}AP) = \det(P^{-1})\det(A)\det(P) = \frac{1}{\det(P)}\det(A)\det(P) = \det(A)$ |
-| **Trace** | $\text{tr}(P^{-1}AP) = \text{tr}(A P P^{-1}) = \text{tr}(A)$ (using the cyclic property of trace) |
-| **Eigenvalues** | The characteristic polynomial is preserved (deeper treatment in a subsequent course) |
-| **Characteristic polynomial** | $\det(B - \lambda I) = \det(P^{-1}AP - \lambda I) = \det(P^{-1}(A - \lambda I)P) = \det(A - \lambda I)$ |
+| **Equivalence** | Similarity implies equivalence (take $Q = P^{-1}$) |
+| **Rank** | Follows from equivalence |
+| **Determinant** | $\det(B) = \det(P^{-1}AP) = \det(P^{-1})\det(A)\det(P) = \frac{1}{\det(P)}\det(A)\det(P) = \det(A)$ |
+| **Trace** | $\text{tr}(B) = \text{tr}(P^{-1}AP) = \text{tr}(A P P^{-1}) = \text{tr}(A)$ (using the cyclic property of trace) |
+| **Characteristic polynomial** | $\det(B - \lambda I) = \det(P^{-1}AP - \lambda I) = \det(P^{-1}(A-\lambda I)P) = \det(A - \lambda I)$ |
+| **Eigenvalues** | Roots of the characteristic polynomial, hence preserved |
+| **Minimal polynomial** | Preserved (proof requires more machinery) |
 
-> **Clarification:** Two matrices can have the same rank, determinant, and trace without being similar. Similarity is a finer relation than having the same individual invariants; the *entire* characteristic polynomial must agree.
+> **Clarification:** Two equivalent matrices need only share the same rank. Similar matrices share *all* the invariants listed above. This is why similarity is the much more important notion for square matrices.
 
-### Connection to Linear Transformations
+### Connection to Linear Transformations: Same Space, Different Bases
 
-Let $T: V \to V$ be a linear transformation (note: the *same* vector space on both sides). Let $\beta$ and $\gamma$ be two ordered bases for $V$. Set
+Let $T: V \to V$ be a linear transformation from a vector space to **itself**. Let $\beta$ and $\gamma$ be two ordered bases for $V$, and let
 
-$$A = [T]_\beta, \qquad B = [T]_\gamma.$$
+$$A = [T]_\beta, \qquad B = [T]_\gamma$$
 
-Then $A$ and $B$ are similar:
+be the matrix representations (note: when domain and codomain are the same space, the same basis is used on both sides). Then $A$ and $B$ are **similar**:
 
-$$B = P^{-1}AP,$$
+$$B = P^{-1}AP$$
 
-where $P$ is the **change-of-basis matrix from $\gamma$ to $\beta$**: the $j$-th column of $P$ is the coordinate vector of the $j$-th element of $\gamma$ expressed in the basis $\beta$.
+[▶ W7_L1 @ 30:57](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=1857)
 
-> **Clarification:** For equivalence (Section 2), we had two potentially different vector spaces $V$ and $W$ with independent basis choices. For similarity, $V = W$ and we use the *same* basis on both sides. This forces $Q = P^{-1}$ rather than allowing $Q$ and $P$ to be unrelated.
+where:
 
-### Constructing $P$ in Practice
+- **$P$** is the **change-of-basis matrix from $\beta$ to $\gamma$**: express each vector of $\gamma$ as a linear combination of vectors from $\beta$; the coefficients form the columns of $P$.
+- **$P^{-1}$** is the change-of-basis matrix from $\gamma$ to $\beta$: express each vector of $\beta$ in terms of $\gamma$.
 
-To find $P$ such that $B = P^{-1}AP$:
+> **Clarification:** For equivalence (Section 2), we had *two independent* invertible matrices $P$ and $Q$ because the domain and codomain could have different bases. For similarity, domain and codomain are the same space $V$, so there is only *one* change of basis — hence only one matrix $P$ appears (and $Q = P^{-1}$).
 
-1. Express each vector of the new basis $\gamma$ as a linear combination of the vectors in the old basis $\beta$.
-2. Place the coefficients as columns: column $j$ of $P$ contains the coordinates of $\gamma_j$ relative to $\beta$.
-3. Compute $P^{-1}$ (by row reduction or the adjugate formula for small matrices).
-4. Verify $P^{-1}AP = B$.
+### Worked Example 1: Diagonalisation in $\mathbb{R}^3$
 
-### Worked Example 1: $\mathbb{R}^3 \to \mathbb{R}^3$
+[▶ W7_L1 @ 22:51](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=1371)
 
-**Example:** Let $f: \mathbb{R}^3 \to \mathbb{R}^3$ be defined by
+**Example.** Let $T: \mathbb{R}^3 \to \mathbb{R}^3$ be defined by
 
-$$f(x, y, z) = (-x + y + z,\; x - y + z,\; x + y - z).$$
+$$T(x,y,z) = (-x+y+z,\; x-y+z,\; x+y-z).$$
 
-**Solution — Matrix $A$ (standard basis $\beta = \{e_1, e_2, e_3\}$):**
+**Solution.**
 
-$$f(e_1) = (-1,1,1), \quad f(e_2) = (1,-1,1), \quad f(e_3) = (1,1,-1).$$
+**Step 1: Matrix $A = [T]_\beta$ with $\beta = \{e_1,e_2,e_3\}$ (standard basis).**
+
+$$T(1,0,0) = (-1,1,1), \quad T(0,1,0) = (1,-1,1), \quad T(0,0,1) = (1,1,-1).$$
 
 $$A = \begin{bmatrix} -1 & 1 & 1 \\ 1 & -1 & 1 \\ 1 & 1 & -1 \end{bmatrix}.$$
 
-**Matrix $B$ (basis $\beta' = \{(1,1,1),\; (-1,1,0),\; (-1,0,1)\}$):**
+**Step 2: Find a basis $\beta'$ under which $T$ acts by scaling.**
 
-$$f(1,1,1) = (1,1,1) = 1 \cdot (1,1,1) + 0 \cdot (-1,1,0) + 0 \cdot (-1,0,1)$$
-$$f(-1,1,0) = (2,-2,0) = 0 \cdot (1,1,1) + (-2) \cdot (-1,1,0) + 0 \cdot (-1,0,1)$$
-$$f(-1,0,1) = (2,0,-2) = 0 \cdot (1,1,1) + 0 \cdot (-1,1,0) + (-2) \cdot (-1,0,1)$$
+Consider $\beta' = \{(1,1,1),\; (-1,1,0),\; (-1,0,1)\}$. Compute:
 
-$$B = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -2 & 0 \\ 0 & 0 & -2 \end{bmatrix}.$$
+$$T(1,1,1) = (-1+1+1,\; 1-1+1,\; 1+1-1) = (1,1,1) = 1 \cdot (1,1,1).$$
 
-This is a **diagonal matrix**! Each basis vector is simply scaled by $f$: the vector $(1,1,1)$ is scaled by $1$, while $(-1,1,0)$ and $(-1,0,1)$ are each scaled by $-2$.
+$$T(-1,1,0) = (1+1+0,\; -1-1+0,\; -1+1-0) = (2,-2,0) = -2 \cdot (-1,1,0).$$
 
-**The change-of-basis matrix $P$:** Express each vector of $\beta'$ in terms of $\beta$ (which is the standard basis, so coordinates are immediate):
+$$T(-1,0,1) = (1+0+1,\; -1-0+1,\; -1+0-1) = (2,0,-2) = -2 \cdot (-1,0,1).$$
+
+Each basis vector is mapped to a scalar multiple of itself! Therefore, the matrix with respect to $\beta'$ is diagonal:
+
+$$B = [T]_{\beta'} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -2 & 0 \\ 0 & 0 & -2 \end{bmatrix}.$$
+
+**Step 3: Construct $P$ and verify $B = P^{-1}AP$.**
+
+$P$ is formed by expressing $\beta'$ in terms of $\beta$ (the standard basis), so the columns are just the vectors of $\beta'$:
 
 $$P = \begin{bmatrix} 1 & -1 & -1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix}.$$
 
-**Computing $P^{-1}$:** By row reduction (or cofactor expansion):
+Computing $P^{-1}$ (e.g. by row reduction of $[P \mid I]$):
 
 $$P^{-1} = \frac{1}{3}\begin{bmatrix} 1 & 1 & 1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{bmatrix}.$$
 
-**Verification:** One can check that
+One can verify by direct multiplication that
 
 $$P^{-1}AP = \frac{1}{3}\begin{bmatrix} 1 & 1 & 1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{bmatrix} \begin{bmatrix} -1 & 1 & 1 \\ 1 & -1 & 1 \\ 1 & 1 & -1 \end{bmatrix} \begin{bmatrix} 1 & -1 & -1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -2 & 0 \\ 0 & 0 & -2 \end{bmatrix} = B. \checkmark$$
 
-### Worked Example 2: $\mathbb{R}^2 \to \mathbb{R}^2$
+Hence $A$ and $B$ are similar. The scalars $1, -2, -2$ on the diagonal of $B$ are the **eigenvalues** of $T$ (and of $A$); they will be studied in depth in a later course. Deeper treatment of eigenvalues appears in courses on spectral theory and data science applications.
 
-**Example:** Let $f: \mathbb{R}^2 \to \mathbb{R}^2$ be defined by $f(x,y) = (2x, y)$.
+### Worked Example 2: A $2 \times 2$ Case
 
-**Solution — Matrix $A$ (basis $\beta = \{(1,0),\;(1,1)\}$):**
+[▶ W7_L1 @ 29:03](https://www.youtube.com/watch?v=ORWbVJ54hW8&t=1743)
 
-$$f(1,0) = (2,0) = 2(1,0) + 0(1,1) \qquad f(1,1) = (2,1) = 1(1,0) + 1(1,1)$$
+**Example.** Let $T: \mathbb{R}^2 \to \mathbb{R}^2$ be defined by $T(x,y) = (2x, y)$.
 
-$$A = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}.$$
+**Solution.**
 
-**Matrix $B$ (standard basis $\beta' = \{e_1, e_2\}$):**
+With $\beta = \{(1,0),\; (1,1)\}$ (non-standard basis):
 
-$$f(1,0) = (2,0), \quad f(0,1) = (0,1).$$
+$$T(1,0) = (2,0) = 2 \cdot (1,0) + 0 \cdot (1,1)$$
+$$T(1,1) = (2,1) = 1 \cdot (1,0) + 1 \cdot (1,1)$$
 
-$$B = \begin{bmatrix} 2 & 0 \\ 0 & 1 \end{bmatrix}.$$
+$$A = [T]_\beta = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}.$$
 
-Again $B$ is diagonal — $f$ scales the standard basis vectors.
+With $\beta' = \{e_1, e_2\}$ (standard basis):
 
-**Change-of-basis matrix $P$:** Express each vector of $\beta'$ in terms of $\beta = \{(1,0),\;(1,1)\}$:
+$$T(1,0) = (2,0), \quad T(0,1) = (0,1).$$
 
-$$(1,0) = 1 \cdot (1,0) + 0 \cdot (1,1), \qquad (0,1) = -1 \cdot (1,0) + 1 \cdot (1,1).$$
+$$B = [T]_{\beta'} = \begin{bmatrix} 2 & 0 \\ 0 & 1 \end{bmatrix}.$$
 
-$$P = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}, \qquad P^{-1} = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}.$$
+The change-of-basis matrix (expressing $\beta'$ in terms of $\beta$, i.e. expressing each standard basis vector as a combination of $\beta$):
+
+$$P = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}, \qquad P^{-1} = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}.$$
 
 **Verification:**
 
-$$P^{-1}AP = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}\begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}\begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 2 & 2 \\ 0 & 1 \end{bmatrix}\begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 2 & 0 \\ 0 & 1 \end{bmatrix} = B. \checkmark$$
+$$P^{-1}AP = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}\begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 2 & 0 \\ 0 & 1 \end{bmatrix} = B. \checkmark$$
 
-### Why Similarity Matters: Diagonalisation
+### Why Similarity Matters
 
-The central motivation for studying similarity is the hope that a given matrix $A$ is similar to a **diagonal matrix** $D$. If $A = PDP^{-1}$, then:
+The key motivation for studying similarity is **diagonalisation**: given a matrix $A$, we seek a basis $\beta'$ such that $[T]_{\beta'} = P^{-1}AP$ is diagonal. A diagonal matrix reveals the geometric action of the transformation — it simply scales along each basis direction. This is the foundation for eigenvalue decomposition, principal component analysis, and many other applications in data science.
 
-- **Powers are easy:** $A^k = PD^kP^{-1}$, and $D^k$ is computed by raising each diagonal entry to the $k$-th power.
-- **Geometric understanding:** The basis $\gamma$ (whose vectors form the columns of $P$) consists of directions that are merely *scaled* by the transformation.
-- **Invariants are visible:** The diagonal entries of $D$ are the **eigenvalues** of $A$ (a concept explored in depth in subsequent courses).
+### Summary Table: Equivalence vs. Similarity
 
-Not every matrix is diagonalisable, but when it is, similarity provides the bridge between the "messy" representation and the "clean" diagonal one.
-
-### Summary: Equivalence vs. Similarity
-
-| | Equivalence | Similarity |
+| | **Matrix Equivalence** | **Matrix Similarity** |
 |---|---|---|
-| **Applies to** | $m \times n$ matrices | $n \times n$ matrices only |
-| **Relation** | $B = QAP$, $\;Q \in GL_m,\; P \in GL_n$ | $B = P^{-1}AP$, $\;P \in GL_n$ |
-| **Basis interpretation** | Different bases for domain and codomain | Same basis change for domain = codomain |
-| **Complete invariant** | Rank | Characteristic polynomial (and more) |
-| **Every class contains** | A canonical form $D_r$ | A diagonal matrix (when diagonalisable) |
+| **Applies to** | $m \times n$ matrices | $n \times n$ (square) matrices |
+| **Relation** | $B = QAP$, with $Q \in \mathrm{GL}_m$, $P \in \mathrm{GL}_n$ | $B = P^{-1}AP$, with $P \in \mathrm{GL}_n$ |
+| **Comes from** | Changing bases independently in domain and codomain | Changing basis in a single space (same basis both sides) |
+| **Canonical form** | $D_r = \begin{bmatrix} I_r & 0 \\ 0 & 0 \end{bmatrix}$ | Diagonal matrix (when diagonalisable) |
+| **Key invariant** | Rank | Rank, determinant, trace, eigenvalues, characteristic polynomial |
+| **Equivalence relation?** | Yes | Yes |
 
 ---
 
@@ -291,103 +307,83 @@ Not every matrix is diagonalisable, but when it is, similarity provides the brid
 
 ### Definition
 
-Let $V$ be a vector space over $\mathbb{R}$. An **affine subspace** of $V$ is a subset $L \subseteq V$ of the form
+[▶ W7_L2 @ 01:11](https://www.youtube.com/watch?v=RUJInY6skG0&t=71)
 
-$$L = v + U = \{v + u : u \in U\},$$
+Let $V$ be a vector space. An **affine subspace** of $V$ is a subset $L \subseteq V$ of the form
 
-where $v \in V$ is a fixed vector and $U \subseteq V$ is a vector subspace. We call $v$ the **support point** (or **translation vector**) and $U$ the **direction space** of $L$.
+$$L = v + U = \{v + u : u \in U\}$$
 
-Geometrically, $L$ is obtained by taking the subspace $U$ and **translating** (shifting) it by $v$.
+where $v \in V$ is a fixed vector and $U$ is a vector subspace of $V$.
 
-> **Clarification:** An affine subspace is generally *not* a subspace (it need not contain the zero vector). It is a subspace if and only if $v \in U$ (equivalently, if and only if $0 \in L$). In particular, every vector subspace is an affine subspace (take $v = 0$).
+We call $v$ a **support point** (or **translation vector**) and $U$ the **direction subspace** of $L$.
 
-### Dimension
+Geometrically, $L$ is obtained by taking the subspace $U$ (which passes through the origin) and **translating** it so that it passes through the point $v$.
 
-The **dimension** of an affine subspace $L = v + U$ is defined to be $\dim(U)$.
+> **Clarification:** An affine subspace is generally **not** a vector subspace — it need not contain the zero vector. However, every vector subspace *is* an affine subspace (take $v = 0$).
 
-### Uniqueness of the Direction Space
+### Dimension of an Affine Subspace
 
-**Theorem.** If $L = v + U = v' + U'$ for vectors $v, v'$ and subspaces $U, U'$, then $U = U'$.
+An affine subspace $L = v + U$ is said to be **$k$-dimensional** if $\dim(U) = k$. [▶ W7_L2 @ 02:20](https://www.youtube.com/watch?v=RUJInY6skG0&t=140)
 
-*Proof sketch.* Since $v, v' \in L$, we have $v' = v + u_1$ for some $u_1 \in U$. Take any $u \in U$; then $v + u \in L = v' + U'$, so $v + u = v' + u'$ for some $u' \in U'$. This gives $u = (v' - v) + u' = u_1 + u'$, hence $u - u_1 = u' \in U'$. Since $u_1 \in U$ and $U$ is a subspace, $u - u_1 \in U$ implies $u' \in U$... Continuing this argument symmetrically shows $U \subseteq U'$ and $U' \subseteq U$, so $U = U'$. $\blacksquare$
+### Uniqueness of the Direction Subspace
 
-> **Clarification:** While the direction space $U$ is unique, the translation vector $v$ is **not** unique: any vector $v' \in L$ can serve as the translation vector (since $L = v' + U$ as well). Specifically, $v$ can be replaced by $v + u$ for any $u \in U$.
+**Theorem.** The direction subspace $U$ of an affine subspace $L$ is unique: if $L = v + U = v' + U'$, then $U = U'$.
+
+[▶ W7_L2 @ 02:30](https://www.youtube.com/watch?v=RUJInY6skG0&t=150)
+
+**Proof sketch.** Since $v' \in L = v + U$, we can write $v' = v + u_1$ for some $u_1 \in U$, so $v' - v = u_1 \in U$. Similarly, since $v \in L = v' + U'$, we get $v - v' \in U'$, hence $v' - v \in U'$ as well.
+
+Now take any $u \in U$. Then $v + u \in L = v' + U'$, so $v + u = v' + u'$ for some $u' \in U'$. This gives $u = (v' - v) + u'$. Since $v' - v \in U'$ and $u' \in U'$, and $U'$ is a subspace, we get $u \in U'$. Hence $U \subseteq U'$. By the symmetric argument, $U' \subseteq U$, so $U = U'$. $\square$
+
+> **Clarification:** While $U$ is unique, the translation vector $v$ is **not** unique. Any $v' \in L$ can serve as a translation vector: if $v' = v + u_0$ with $u_0 \in U$, then $L = v' + U$ as well.
 
 ### Affine Subspaces in $\mathbb{R}^2$
 
-| Dimension | Geometric object | Form |
-|---|---|---|
-| $0$ | Point | $L = \{v\} = v + \{0\}$ |
-| $1$ | Line (possibly not through origin) | $L = v + \text{span}\{w\}$ |
-| $2$ | The entire plane $\mathbb{R}^2$ | $L = \mathbb{R}^2 = 0 + \mathbb{R}^2$ |
+[▶ W7_L2 @ 10:23](https://www.youtube.com/watch?v=RUJInY6skG0&t=623)
 
-**Example (line in $\mathbb{R}^2$):** The line $y = 3x + 2$ is an affine subspace. We write:
+| Type | Dimension | $U$ | $L = v + U$ |
+|---|---|---|---|
+| **Point** | 0 | $\{(0,0)\}$ | $\{v\}$ for any $v \in \mathbb{R}^2$ |
+| **Line** | 1 | A line through the origin | A line (possibly not through the origin) |
+| **Plane** | 2 | $\mathbb{R}^2$ | $\mathbb{R}^2$ |
 
-$$L = (0, 2) + \{(t, 3t) : t \in \mathbb{R}\} = (0,2) + \text{span}\{(1,3)\}.$$
+**Example (Line).** The line $y = mx + c$ is an affine subspace:
 
-Here $v = (0,2)$ and $U = \text{span}\{(1,3)\}$ (the line $y = 3x$ through the origin).
+$$L = (0, c) + \{(t, mt) : t \in \mathbb{R}\} = (0, c) + \text{span}\{(1, m)\}.$$
 
-**Non-example:** The parabola $\{(x, x^2) : x \in \mathbb{R}\}$ is not an affine subspace — it cannot be expressed as a translate of any subspace (it is curved, not flat).
+Here $v = (0,c)$ and $U = \text{span}\{(1,m)\}$ is the line through the origin with slope $m$.
+
+**Non-example.** The parabola $y = x^2 + 1$ is **not** an affine subspace — it is not a translate of any vector subspace (it is curved, not flat).
 
 ### Affine Subspaces in $\mathbb{R}^3$
 
-| Dimension | Geometric object | Parametric form |
-|---|---|---|
-| $0$ | Point | $L = \{v\}$ |
-| $1$ | Line | $L = v + \text{span}\{w_1\}$ |
-| $2$ | Plane (possibly not through origin) | $L = v + \text{span}\{w_1, w_2\}$ |
-| $3$ | The entire space $\mathbb{R}^3$ | $L = \mathbb{R}^3$ |
+[▶ W7_L2 @ 14:49](https://www.youtube.com/watch?v=RUJInY6skG0&t=889)
 
-**Example (plane in $\mathbb{R}^3$):** The plane $x + y + z = 1$ is an affine subspace. A particular point on it is $v = (1, 0, 0)$. The corresponding homogeneous equation $x + y + z = 0$ defines the direction space:
+| Type | Dimension | $U$ | $L = v + U$ |
+|---|---|---|---|
+| **Point** | 0 | $\{0\}$ | $\{v\}$ |
+| **Line** | 1 | $\text{span}\{v_1\}$ | $v + \{\lambda v_1 : \lambda \in \mathbb{R}\}$ |
+| **Plane** | 2 | $\text{span}\{v_1, v_2\}$ | $v + \{\lambda_1 v_1 + \lambda_2 v_2 : \lambda_1, \lambda_2 \in \mathbb{R}\}$ |
+| **Entire space** | 3 | $\mathbb{R}^3$ | $\mathbb{R}^3$ |
 
-$$U = \{(x,y,z) : x + y + z = 0\} = \text{span}\{(-1,1,0),\; (-1,0,1)\}.$$
+**Parametric description of a 2-dimensional affine subspace (plane) in $\mathbb{R}^3$:**
 
-So $L = (1,0,0) + U$.
+$$L = \{v + \lambda_1 v_1 + \lambda_2 v_2 : \lambda_1, \lambda_2 \in \mathbb{R}\}$$
+
+where $v \in \mathbb{R}^3$ is a point on the plane and $v_1, v_2$ are linearly independent direction vectors.
+
+### General Parametric Form
+
+In $\mathbb{R}^n$, a $k$-dimensional affine subspace can be written as:
+
+$$L = \{v + \lambda_1 v_1 + \lambda_2 v_2 + \cdots + \lambda_k v_k : \lambda_1, \ldots, \lambda_k \in \mathbb{R}\}$$
+
+where $\{v_1, \ldots, v_k\}$ is a basis for the direction subspace $U$.
 
 ---
 
 ## 5. Solution Sets as Affine Subspaces
 
-This is the most important application of affine subspaces in this course.
+This is the most important application of affine subspaces in the course.
 
-### Setup
-
-Consider the linear system $Ax = b$ where $A \in \mathbb{R}^{m \times n}$, $x \in \mathbb{R}^n$, $b \in \mathbb{R}^m$.
-
-There are three cases:
-
-| Case | Condition | Solution set |
-|---|---|---|
-| **Homogeneous** ($b = 0$) | Always consistent | $\text{null}(A) = \{x : Ax = 0\}$, a subspace of $\mathbb{R}^n$ |
-| **Inconsistent** | $b \notin \text{col}(A)$ | $\emptyset$ (empty set) |
-| **Consistent, $b \neq 0$** | $b \in \text{col}(A)$, $b \neq 0$ | An affine subspace of $\mathbb{R}^n$ |
-
-### The Structure Theorem
-
-**Theorem.** If the system $Ax = b$ is consistent and $x_p$ is any **particular solution** (i.e., $Ax_p = b$), then the complete solution set is
-
-$$L = x_p + \text{null}(A) = \{x_p + h : h \in \mathbb{R}^n,\; Ah = 0\}.$$
-
-*Proof.* ($\supseteq$) If $h \in \text{null}(A)$, then $A(x_p + h) = Ax_p + Ah = b + 0 = b$, so $x_p + h$ is a solution.
-
-($\subseteq$) If $x$ is any solution, then $A(x - x_p) = Ax - Ax_p = b - b = 0$, so $h = x - x_p \in \text{null}(A)$, hence $x = x_p + h \in x_p + \text{null}(A)$. $\blacksquare$
-
-> **Clarification:** The "general solution = particular solution + homogeneous solution" principle is one of the most widely used ideas in all of applied mathematics. It appears again in differential equations, signal processing, optimisation, and elsewhere.
-
-### Recipe for Finding the Complete Solution Set
-
-1. **Find a particular solution $x_p$** by any method (e.g., row reduction of $[A \mid b]$, then read off a solution by setting free variables to zero).
-2. **Find $\text{null}(A)$** by solving $Ax = 0$ (row reduce $[A \mid 0]$, express solution in terms of free variables).
-3. **Write the general solution** as $x = x_p + h$, where $h$ ranges over $\text{null}(A)$.
-
-### Worked Example
-
-**Example:** Solve the system $Ax = b$ where
-
-$$A = \begin{bmatrix} 1 & 2 & 1 \\ 2 & 4 & 3 \end{bmatrix}, \qquad b = \begin{bmatrix} 1 \\ 3 \end{bmatrix}.$$
-
-**Solution.**
-
-**Step 1: Find a particular solution.** Row reduce the augmented matrix:
-
-$$
+[▶ W7_L2 @ 17:16](https://www.

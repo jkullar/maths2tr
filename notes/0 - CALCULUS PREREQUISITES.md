@@ -1,240 +1,244 @@
 # SINGLE-VARIABLE CALCULUS PREREQUISITES
 
-This file reviews the essential single-variable calculus concepts required before beginning the study of linear algebra and multivariable calculus. The focus is on **limits** (left-hand, right-hand, and two-sided), **limit laws**, **continuity at a point**, **types of discontinuity**, and important function classes including the **floor function** and **piecewise functions**. Mastery of these ideas is critical: limits underpin the definitions of derivatives and integrals, while continuity is the foundation upon which multivariable generalisations (partial derivatives, continuity in $\mathbb{R}^n$) are built.
+This file reviews the essential single-variable calculus concepts needed before beginning a university course in linear algebra and multivariable calculus. We cover **limits** (left-hand, right-hand, and two-sided), the **laws governing limits**, **continuity** at a point, the various **types of discontinuity**, and important function classes including the **floor function** and **piecewise functions**. Mastery of these ideas is assumed throughout the course; the material here ensures a solid, precise foundation.
 
 ---
 
 ## 1. Intuitive Idea of a Limit
 
-Suppose $f$ is a function defined on some open interval containing $a$, except possibly at $a$ itself. We ask: as $x$ gets closer and closer to $a$, does $f(x)$ approach a single definite value?
+Suppose $f$ is a function defined on some open interval containing the point $a$, except possibly at $a$ itself. The **limit of $f(x)$ as $x$ approaches $a$** describes the value that $f(x)$ gets closer and closer to as $x$ gets closer and closer to $a$ — regardless of whether $f$ is actually defined at $a$ or what value $f(a)$ might take. [▶ Refresher_T1 @ 00:44](https://www.youtube.com/watch?v=x9Dv61Ml910&t=44)
 
-### Informal Description
-
-The statement
+We write:
 
 $$\lim_{x \to a} f(x) = L$$
 
-means that the values $f(x)$ can be made **arbitrarily close** to $L$ by taking $x$ **sufficiently close** to $a$ (but $x \neq a$). Crucially, we never require the function to be defined at $a$, nor do we care what $f(a)$ equals — the limit describes the **behaviour near** $a$, not **at** $a$.
+and read this as "the limit of $f(x)$ as $x$ tends to $a$ equals $L$."
 
-### Formal ($\varepsilon$–$\delta$) Definition
-
-> For every $\varepsilon > 0$ there exists $\delta > 0$ such that
-> $$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon.$$
-
-This precision will become indispensable when we later handle limits in $\mathbb{R}^n$.
+The key conceptual point: a limit is about the **behaviour near** $a$, not **at** $a$.
 
 ---
 
 ## 2. One-Sided Limits
 
-When studying limits, we must consider from **which direction** $x$ approaches $a$.
-
 ### 2.1 Left-Hand Limit
 
-The **left-hand limit** (or **limit from the left**) of $f$ at $a$ is denoted
+The **left-hand limit** (or **limit from the left**) of $f$ at $a$ is the value that $f(x)$ approaches as $x$ approaches $a$ through values **less than** $a$ (i.e., from the left on the number line). [▶ Refresher_T1 @ 02:44](https://www.youtube.com/watch?v=x9Dv61Ml910&t=164)
 
-$$\lim_{x \to a^{-}} f(x) \quad \text{(equivalently written } \lim_{x \to a^{-}} f(x)\text{)}$$
+$$\lim_{x \to a^{-}} f(x) = L^{-}$$
 
-and equals $L^{-}$ if, for every $\varepsilon > 0$, there exists $\delta > 0$ such that
+Formally: for every $\varepsilon > 0$ there exists $\delta > 0$ such that
 
-$$a - \delta < x < a \implies |f(x) - L^{-}| < \varepsilon.$$
-
-Here $x$ approaches $a$ **only through values less than** $a$ (i.e., from the left on the number line).
+$$0 < a - x < \delta \implies |f(x) - L^{-}| < \varepsilon.$$
 
 ### 2.2 Right-Hand Limit
 
-The **right-hand limit** (or **limit from the right**) of $f$ at $a$ is denoted
+The **right-hand limit** (or **limit from the right**) of $f$ at $a$ is the value that $f(x)$ approaches as $x$ approaches $a$ through values **greater than** $a$. [▶ Refresher_T1 @ 02:59](https://www.youtube.com/watch?v=x9Dv61Ml910&t=179)
 
-$$\lim_{x \to a^{+}} f(x)$$
+$$\lim_{x \to a^{+}} f(x) = L^{+}$$
 
-and equals $L^{+}$ if, for every $\varepsilon > 0$, there exists $\delta > 0$ such that
+Formally: for every $\varepsilon > 0$ there exists $\delta > 0$ such that
 
-$$a < x < a + \delta \implies |f(x) - L^{+}| < \varepsilon.$$
-
-Here $x$ approaches $a$ **only through values greater than** $a$.
+$$0 < x - a < \delta \implies |f(x) - L^{+}| < \varepsilon.$$
 
 ### 2.3 Existence of the Two-Sided Limit
-
-The following theorem connects one-sided limits with the ordinary (two-sided) limit:
 
 > **Theorem (Existence of a Limit).** The two-sided limit $\displaystyle\lim_{x \to a} f(x)$ exists and equals $L$ **if and only if** both one-sided limits exist and are equal:
 >
 > $$\lim_{x \to a^{-}} f(x) = \lim_{x \to a^{+}} f(x) = L.$$
 
-If $\displaystyle\lim_{x \to a^{-}} f(x) \neq \lim_{x \to a^{+}} f(x)$, then $\displaystyle\lim_{x \to a} f(x)$ **does not exist** (DNE).
+[▶ Refresher_T1 @ 03:13](https://www.youtube.com/watch?v=x9Dv61Ml910&t=193)
 
-> **Clarification:** "The limit does not exist" is a precise mathematical conclusion, not an expression of ignorance. It means no single real number $L$ can serve as the common value approached from both sides.
+This theorem is the primary tool for checking limit existence in piecewise-defined functions: compute each one-sided limit separately, then compare.
+
+> **Clarification:** A limit can exist at $a$ even if $f(a)$ is undefined, or if $f(a)$ differs from the limit. The limit concerns only the *approach*, not the *arrival*.
 
 ---
 
-## 3. The Floor Function — A Key Example
+## 3. Limit Laws
 
-### 3.1 Definition
+The following laws allow us to compute limits of complicated expressions from simpler ones. Assume $\displaystyle\lim_{x \to a} f(x) = L$ and $\displaystyle\lim_{x \to a} g(x) = M$ both exist.
 
-The **floor function** (also called the **greatest integer function**) is defined by
+| Law | Statement |
+|-----|-----------|
+| **Sum Law** | $\displaystyle\lim_{x \to a} [f(x) + g(x)] = L + M$ |
+| **Difference Law** | $\displaystyle\lim_{x \to a} [f(x) - g(x)] = L - M$ |
+| **Constant Multiple Law** | $\displaystyle\lim_{x \to a} [c \cdot f(x)] = c \cdot L$ for any constant $c$ |
+| **Product Law** | $\displaystyle\lim_{x \to a} [f(x) \cdot g(x)] = L \cdot M$ |
+| **Quotient Law** | $\displaystyle\lim_{x \to a} \dfrac{f(x)}{g(x)} = \dfrac{L}{M}$, provided $M \neq 0$ |
+| **Power Law** | $\displaystyle\lim_{x \to a} [f(x)]^n = L^n$ for any positive integer $n$ |
+| **Root Law** | $\displaystyle\lim_{x \to a} \sqrt[n]{f(x)} = \sqrt[n]{L}$, provided $L > 0$ when $n$ is even |
 
-$$\lfloor x \rfloor = \max\{ n \in \mathbb{Z} : n \leq x \}.$$
+### Direct Substitution for Polynomials and Rational Functions
 
-In words, $\lfloor x \rfloor$ is the **largest integer less than or equal to** $x$.
+An immediate consequence of the limit laws:
+
+- If $p(x)$ is a **polynomial**, then $\displaystyle\lim_{x \to a} p(x) = p(a)$.
+- If $r(x) = \dfrac{p(x)}{q(x)}$ is a **rational function** and $q(a) \neq 0$, then $\displaystyle\lim_{x \to a} r(x) = r(a)$.
+
+### A Key Standard Limit
+
+$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
+
+This result is used repeatedly; it was invoked in the piecewise function example below.
+
+> **Clarification:** The limit laws apply only when the individual limits exist (are finite). If a component limit does not exist or is infinite, the laws cannot be applied directly; other techniques (e.g., the Squeeze Theorem, L'Hôpital's rule) may be needed.
+
+---
+
+## 4. The Floor Function
+
+### 4.1 Definition
+
+The **floor function** (also called the **greatest integer function**) is denoted $\lfloor x \rfloor$ and defined by: [▶ Refresher_T1 @ 04:01](https://www.youtube.com/watch?v=x9Dv61Ml910&t=241)
+
+$$\lfloor x \rfloor = \text{the largest integer } n \text{ such that } n \leq x.$$
+
+Equivalently, $\lfloor x \rfloor = n$ where $n \in \mathbb{Z}$ and $n \leq x < n+1$.
+
+### 4.2 Examples of Floor Function Values
 
 | $x$ | $\lfloor x \rfloor$ |
-|---|---|
+|-----|---------------------|
 | $0.5$ | $0$ |
 | $0.75$ | $0$ |
-| $1.0$ | $1$ |
 | $1.25$ | $1$ |
+| $2.0$ | $2$ |
 | $-0.3$ | $-1$ |
-| $-1.0$ | $-1$ |
-| $2.99$ | $2$ |
+| $-1.7$ | $-2$ |
 
-The graph of $\lfloor x \rfloor$ is a **step function**: on each interval $[n, n+1)$ for $n \in \mathbb{Z}$, the function takes the constant value $n$, then **jumps** up by $1$ at each integer.
+### 4.3 Graph and Step-Function Behaviour
 
-### 3.2 Limits of the Floor Function at an Integer
+The floor function is a **step function**: it is constant on each interval $[n, n+1)$ for $n \in \mathbb{Z}$, taking the value $n$. At each integer, the function "jumps up" by $1$.
 
-Let us examine $\displaystyle\lim_{x \to 0} \lfloor x \rfloor$.
+Key properties:
+- On the interval $[n, n+1)$, we have $\lfloor x \rfloor = n$ (constant).
+- At each integer $n$, $\lfloor n \rfloor = n$ (the function takes the *upper* value at the left endpoint of each step).
+- There is a **jump discontinuity** at every integer.
 
-**Right-hand limit.** For $x \in [0, 1)$, we have $\lfloor x \rfloor = 0$. As $x \to 0^{+}$, the function value is constantly $0$, so
+### 4.4 Limits of the Floor Function at Integer Points
+
+**Example:** Determine whether $\displaystyle\lim_{x \to 0} \lfloor x \rfloor$ exists. [▶ Refresher_T1 @ 04:54](https://www.youtube.com/watch?v=x9Dv61Ml910&t=294)
+
+**Solution:**
+
+**Right-hand limit.** For $x \in [0, 1)$, we have $\lfloor x \rfloor = 0$. As $x \to 0^+$, the function is constantly $0$, so:
 
 $$\lim_{x \to 0^{+}} \lfloor x \rfloor = 0.$$
 
-**Left-hand limit.** For $x \in [-1, 0)$, we have $\lfloor x \rfloor = -1$. As $x \to 0^{-}$, the function value is constantly $-1$, so
+**Left-hand limit.** For $x \in [-1, 0)$, we have $\lfloor x \rfloor = -1$. As $x \to 0^-$, the function is constantly $-1$, so:
 
 $$\lim_{x \to 0^{-}} \lfloor x \rfloor = -1.$$
 
-**Conclusion.** Since $\lim_{x \to 0^{+}} \lfloor x \rfloor = 0 \neq -1 = \lim_{x \to 0^{-}} \lfloor x \rfloor$, the two-sided limit
+**Conclusion.** Since $\displaystyle\lim_{x \to 0^{+}} \lfloor x \rfloor = 0 \neq -1 = \lim_{x \to 0^{-}} \lfloor x \rfloor$, the two-sided limit **does not exist**. [▶ Refresher_T1 @ 06:07](https://www.youtube.com/watch?v=x9Dv61Ml910&t=367)
 
-$$\lim_{x \to 0} \lfloor x \rfloor \quad \text{does not exist.}$$
-
-> **Clarification:** The same argument applies at **every** integer $n$: the left-hand limit is $n - 1$ while the right-hand limit is $n$, so $\displaystyle\lim_{x \to n}\lfloor x \rfloor$ does not exist for any $n \in \mathbb{Z}$. At non-integer points, however, the floor function is constant in a neighbourhood, so the limit exists and equals the function value — the floor function is continuous at every non-integer.
+> **Clarification:** The same argument generalises. At any integer $n$, the left-hand limit is $n - 1$ and the right-hand limit is $n$. These are never equal, so $\displaystyle\lim_{x \to n} \lfloor x \rfloor$ does not exist for any $n \in \mathbb{Z}$. However, at any non-integer point $a$, the floor function is locally constant, so the limit exists and equals $\lfloor a \rfloor$.
 
 ---
 
-## 4. Limit Laws
-
-When individual limits exist, they can be combined using the following standard rules. Suppose
-
-$$\lim_{x \to a} f(x) = L \quad \text{and} \quad \lim_{x \to a} g(x) = M$$
-
-both exist and are finite. Then:
-
-| Law | Statement |
-|---|---|
-| **Sum / Difference** | $\displaystyle\lim_{x \to a}[f(x) \pm g(x)] = L \pm M$ |
-| **Constant Multiple** | $\displaystyle\lim_{x \to a}[c \cdot f(x)] = c \cdot L$ for any constant $c$ |
-| **Product** | $\displaystyle\lim_{x \to a}[f(x) \cdot g(x)] = L \cdot M$ |
-| **Quotient** | $\displaystyle\lim_{x \to a}\frac{f(x)}{g(x)} = \frac{L}{M}$, provided $M \neq 0$ |
-| **Power** | $\displaystyle\lim_{x \to a}[f(x)]^n = L^n$ for any positive integer $n$ |
-| **Root** | $\displaystyle\lim_{x \to a}\sqrt[n]{f(x)} = \sqrt[n]{L}$, provided $L > 0$ when $n$ is even |
-| **Composition** | If $g$ is continuous at $L$, then $\displaystyle\lim_{x \to a} g(f(x)) = g(L)$ |
-
-### Important Consequences
-
-1. **Polynomial functions** $p(x) = a_n x^n + \cdots + a_1 x + a_0$ are continuous everywhere, so $\displaystyle\lim_{x \to a} p(x) = p(a)$.
-
-2. **Rational functions** $\dfrac{p(x)}{q(x)}$ are continuous wherever $q(a) \neq 0$, so $\displaystyle\lim_{x \to a} \frac{p(x)}{q(x)} = \frac{p(a)}{q(a)}$ when $q(a) \neq 0$.
-
-3. All limit laws apply equally to **one-sided limits** — simply restrict attention to $x > a$ or $x < a$.
-
-### A Classical Limit
-
-One limit that cannot be computed by direct substitution is
-
-$$\lim_{x \to 0} \frac{\sin x}{x} = 1.$$
-
-This is typically proved via the **Squeeze (Sandwich) Theorem** and is used frequently. Note that the limit exists as a two-sided limit, which means both one-sided limits equal $1$:
-
-$$\lim_{x \to 0^{+}} \frac{\sin x}{x} = 1 \quad \text{and} \quad \lim_{x \to 0^{-}} \frac{\sin x}{x} = 1.$$
-
----
-
-## 5. Continuity at a Point
+## 5. Piecewise Functions
 
 ### 5.1 Definition
 
-A function $f$ is **continuous at** $x = a$ if the following **three conditions** all hold:
+A **piecewise function** is a function defined by different formulas on different parts (pieces) of its domain. The general form is:
 
-1. $f(a)$ **is defined** (i.e., $a$ is in the domain of $f$).
-2. $\displaystyle\lim_{x \to a} f(x)$ **exists** (i.e., left-hand and right-hand limits are equal).
-3. $\displaystyle\lim_{x \to a} f(x) = f(a)$ (the limit equals the function value).
+$$f(x) = \begin{cases} f_1(x), & \text{if } x \in I_1 \\ f_2(x), & \text{if } x \in I_2 \\ \vdots \\ f_k(x), & \text{if } x \in I_k \end{cases}$$
 
-If any one of these conditions fails, $f$ is **discontinuous at** $x = a$.
+where $I_1, I_2, \ldots, I_k$ partition the domain (or at least cover the domain of interest).
 
-### 5.2 Two-Step Procedure for Checking Continuity
+### 5.2 Strategy for Evaluating Limits of Piecewise Functions
 
-In practice (especially for piecewise functions), use the following systematic approach:
+At a **boundary point** $a$ (where the defining rule changes):
 
-**Step 1 — Check existence of the limit.**
+1. **Identify which formula** applies for $x < a$ and which for $x > a$.
+2. **Compute the left-hand limit** $\displaystyle\lim_{x \to a^-} f(x)$ using the formula valid for $x < a$.
+3. **Compute the right-hand limit** $\displaystyle\lim_{x \to a^+} f(x)$ using the formula valid for $x > a$.
+4. **Compare.** If both are equal (say to $L$), then $\displaystyle\lim_{x \to a} f(x) = L$. Otherwise the limit does not exist.
 
-Compute $\displaystyle\lim_{x \to a^{-}} f(x)$ and $\displaystyle\lim_{x \to a^{+}} f(x)$.
-- **Case 1 (limit DNE):** If the one-sided limits are not equal, then $\displaystyle\lim_{x \to a} f(x)$ does not exist, and $f$ is **not continuous** at $a$. Stop here.
-- **Case 2 (limit exists):** If both one-sided limits equal $L$, proceed to Step 2.
-
-**Step 2 — Compare limit with function value.**
-
-Check whether $f(a) = L$.
-- If $f(a) = L$, then $f$ is **continuous** at $x = a$.
-- If $f(a) \neq L$ (or $f(a)$ is undefined), then $f$ is **not continuous** at $x = a$.
-
-> **Clarification:** Step 1 failing and Step 2 failing represent **different types** of discontinuity (see Section 6 below). Always perform the steps in order.
+At **non-boundary points**, the function is given by a single formula locally, and standard limit laws apply directly.
 
 ---
 
-## 6. Types of Discontinuity
+## 6. Continuity at a Point
 
-When a function fails to be continuous at a point $a$, the nature of the failure falls into one of three categories.
+### 6.1 Definition
 
-### 6.1 Jump Discontinuity
+A function $f$ is **continuous at $x = a$** if all three of the following conditions hold: [▶ Refresher_T1 @ 08:10](https://www.youtube.com/watch?v=x9Dv61Ml910&t=490)
 
-A **jump discontinuity** occurs at $x = a$ when both one-sided limits exist but are **not equal**:
+1. $f(a)$ is defined (i.e., $a$ is in the domain of $f$).
+2. $\displaystyle\lim_{x \to a} f(x)$ exists (i.e., both one-sided limits exist and are equal).
+3. $\displaystyle\lim_{x \to a} f(x) = f(a)$ (the limiting value equals the function value).
 
-$$\lim_{x \to a^{-}} f(x) = L^{-}, \quad \lim_{x \to a^{+}} f(x) = L^{+}, \quad L^{-} \neq L^{+}.$$
+If any one of these conditions fails, $f$ is **discontinuous at $x = a$**.
 
-The "jump" has size $|L^{+} - L^{-}|$.
+### 6.2 Two-Step Continuity Test (Practical Procedure)
 
-**Example:** The floor function $\lfloor x \rfloor$ at every integer $n$. As shown in Section 3.2, the left-hand limit is $n-1$ and the right-hand limit is $n$, giving a jump of size $1$.
+In practice, we often combine the conditions into two checkable steps: [▶ Refresher_T1 @ 08:24](https://www.youtube.com/watch?v=x9Dv61Ml910&t=504)
 
-### 6.2 Removable Discontinuity
+| Step | Action | If it fails |
+|------|--------|-------------|
+| **Step 1** | Compute $\displaystyle\lim_{x \to a^-} f(x)$ and $\displaystyle\lim_{x \to a^+} f(x)$. Check if they are equal. | If they differ, the limit does not exist $\Rightarrow$ $f$ is **not continuous** at $a$. |
+| **Step 2** | (Only if Step 1 passes.) Check whether $\displaystyle\lim_{x \to a} f(x) = f(a)$. | If they differ (or $f(a)$ is undefined), $f$ is **not continuous** at $a$. |
 
-A **removable discontinuity** occurs at $x = a$ when the two-sided limit exists but either $f(a)$ is not defined, or $f(a)$ does not equal the limit:
+If both steps pass, then $f$ **is continuous** at $x = a$.
 
-$$\lim_{x \to a} f(x) = L \quad \text{but} \quad f(a) \neq L \text{ (or } f(a) \text{ undefined)}.$$
+> **Clarification:** The existence of the limit (Step 1) is a *necessary* condition for continuity, but it is *not sufficient*. Even when the limit exists, the function can be discontinuous if $f(a)$ is undefined or disagrees with the limit. Conversely, a function can have $f(a)$ defined and yet be discontinuous because the limit fails to exist.
 
-The discontinuity is called "removable" because we can **redefine** $f(a) = L$ to make $f$ continuous at $a$.
+---
 
-**Example:** Consider $g(x) = \dfrac{x^2 - 1}{x - 1}$ for $x \neq 1$. We can simplify:
+## 7. Types of Discontinuity
 
-$$g(x) = \frac{(x-1)(x+1)}{x-1} = x + 1 \quad (x \neq 1).$$
+When $f$ is discontinuous at $x = a$, the discontinuity falls into one of the following categories.
 
-Then $\displaystyle\lim_{x \to 1} g(x) = 2$, but $g(1)$ is undefined. Defining $g(1) = 2$ removes the discontinuity.
+### 7.1 Jump Discontinuity
 
-### 6.3 Essential (Infinite or Oscillatory) Discontinuity
+A **jump discontinuity** occurs at $x = a$ when both one-sided limits exist but are not equal:
 
-An **essential discontinuity** occurs when one or both one-sided limits **fail to exist** (they may tend to $\pm\infty$ or oscillate without settling). These cannot be "fixed" by redefining the function at a single point.
+$$\lim_{x \to a^{-}} f(x) \neq \lim_{x \to a^{+}} f(x).$$
 
-**Examples:**
-- $f(x) = \dfrac{1}{x}$ at $x = 0$: $\displaystyle\lim_{x \to 0^{+}} f(x) = +\infty$ and $\displaystyle\lim_{x \to 0^{-}} f(x) = -\infty$ (infinite discontinuity).
-- $f(x) = \sin\!\left(\dfrac{1}{x}\right)$ at $x = 0$: the function oscillates between $-1$ and $1$ infinitely often as $x \to 0$; neither one-sided limit exists (oscillatory discontinuity).
+The "jump" is the difference $\displaystyle\lim_{x \to a^{+}} f(x) - \lim_{x \to a^{-}} f(x)$.
+
+*Typical example:* The floor function $\lfloor x \rfloor$ at every integer $n$ (jump of size $1$).
+
+### 7.2 Removable Discontinuity
+
+A **removable discontinuity** occurs at $x = a$ when the two-sided limit exists but either:
+- $f(a)$ is not defined, or
+- $f(a) \neq \displaystyle\lim_{x \to a} f(x)$.
+
+It is called "removable" because we can **redefine** $f(a)$ to equal the limit, making $f$ continuous at $a$.
+
+*Typical example:* $f(x) = \dfrac{x^2 - 1}{x - 1}$ at $x = 1$. Here $f(1)$ is undefined, but $\displaystyle\lim_{x \to 1} f(x) = \lim_{x \to 1}(x+1) = 2$. Defining $f(1) = 2$ removes the discontinuity.
+
+### 7.3 Infinite (Essential) Discontinuity
+
+An **infinite discontinuity** occurs at $x = a$ when at least one of the one-sided limits is $+\infty$ or $-\infty$.
+
+*Typical example:* $f(x) = \dfrac{1}{x}$ at $x = 0$. We have $\displaystyle\lim_{x \to 0^+} \frac{1}{x} = +\infty$ and $\displaystyle\lim_{x \to 0^-} \frac{1}{x} = -\infty$.
+
+### 7.4 Oscillating Discontinuity
+
+An **oscillating discontinuity** occurs at $x = a$ when $f(x)$ oscillates without settling to any value (finite or infinite) as $x \to a$.
+
+*Typical example:* $f(x) = \sin\!\left(\dfrac{1}{x}\right)$ at $x = 0$. The function oscillates between $-1$ and $1$ infinitely often as $x \to 0$, so neither one-sided limit exists.
 
 ### Summary Table: Types of Discontinuity
 
-| Type | One-sided limits | Two-sided limit | Relation to $f(a)$ |
-|---|---|---|---|
-| **Continuous** | Both exist and are equal to $L$ | Exists, equals $L$ | $f(a) = L$ |
-| **Removable** | Both exist and are equal to $L$ | Exists, equals $L$ | $f(a) \neq L$ or undefined |
-| **Jump** | Both exist, $L^{-} \neq L^{+}$ | Does not exist | — |
-| **Essential** | At least one DNE (infinite/oscillatory) | Does not exist | — |
+| Type | Left-hand limit | Right-hand limit | Two-sided limit | $f(a)$ vs limit |
+|------|:-:|:-:|:-:|:-:|
+| **Jump** | Exists (finite) | Exists (finite) | Does not exist ($L^- \neq L^+$) | N/A |
+| **Removable** | Exists | Exists | Exists ($= L$) | $f(a) \neq L$ or undefined |
+| **Infinite** | $\pm\infty$ or finite | $\pm\infty$ or finite | Does not exist | N/A |
+| **Oscillating** | Does not exist | Does not exist | Does not exist | N/A |
 
 ---
 
-## 7. Piecewise Functions — Worked Examples
+## 8. Worked Examples
 
-A **piecewise function** is defined by different formulas on different parts of its domain. Continuity questions arise precisely at the **boundary points** where the formula changes, since away from these points each piece is typically a standard continuous function (polynomial, trigonometric, etc.).
+### Example 1: Continuity of a Piecewise Function (sinc-type)
 
-### Example 1: Continuous Piecewise Function
+**Example:** Let [▶ Refresher_T2 @ 00:17](https://www.youtube.com/watch?v=S6hzxX1AIBU&t=17)
 
-**Example:** Let
-
-$$f(x) = \begin{cases} \dfrac{\sin x}{x}, & x > 0, \\[6pt] 1, & x = 0, \\[4pt] x + 1, & x < 0. \end{cases}$$
+$$f(x) = \begin{cases} \dfrac{\sin x}{x}, & \text{if } x > 0, \\[6pt] 1, & \text{if } x = 0, \\[4pt] x + 1, & \text{if } x < 0. \end{cases}$$
 
 Is $f$ continuous at $x = 0$?
 
@@ -242,252 +246,199 @@ Is $f$ continuous at $x = 0$?
 
 **Step 1 — Compute one-sided limits.**
 
-*Right-hand limit ($x \to 0^{+}$):* For $x > 0$, the function is $\dfrac{\sin x}{x}$. Using the classical limit:
+*Right-hand limit:* For $x > 0$, the relevant formula is $\dfrac{\sin x}{x}$. Using the standard limit:
 
 $$\lim_{x \to 0^{+}} \frac{\sin x}{x} = 1.$$
 
-*Left-hand limit ($x \to 0^{-}$):* For $x < 0$, the function is $x + 1$. This is a polynomial, so:
+[▶ Refresher_T2 @ 01:22](https://www.youtube.com/watch?v=S6hzxX1AIBU&t=82)
+
+*Left-hand limit:* For $x < 0$, the relevant formula is $x + 1$. By direct substitution (polynomial):
 
 $$\lim_{x \to 0^{-}} (x + 1) = 0 + 1 = 1.$$
 
-Since both one-sided limits equal $1$, the two-sided limit exists:
+We can verify numerically: $f(-0.5) = 0.5$, $f(-1/3) = 2/3$, $f(-1/5) = 4/5$ — the values approach $1$. [▶ Refresher_T2 @ 02:28](https://www.youtube.com/watch?v=S6hzxX1AIBU&t=148)
+
+Since $\displaystyle\lim_{x \to 0^{+}} f(x) = 1 = \lim_{x \to 0^{-}} f(x)$, the two-sided limit exists:
 
 $$\lim_{x \to 0} f(x) = 1.$$
 
-**Step 2 — Compare with $f(0)$.**
+**Step 2 — Compare limit with function value.**
 
-By definition, $f(0) = 1$. Since
+The function is explicitly defined as $f(0) = 1$. Therefore:
 
-$$\lim_{x \to 0} f(x) = 1 = f(0),$$
+$$\lim_{x \to 0} f(x) = 1 = f(0).$$
 
-we conclude that $f$ **is continuous at** $x = 0$. $\square$
-
-> **Clarification:** The key insight is that $\sin x / x$ is not defined at $x = 0$, but the piecewise definition fills in the value $f(0) = 1$, which matches the limit. This is precisely how one "removes" what would otherwise be a removable discontinuity.
+**Conclusion:** $f$ is **continuous at $x = 0$**. ✓
 
 ---
 
-### Example 2: Another Continuous Piecewise Function
+### Example 2: Continuity of a Polynomial-Piecewise Function
 
-**Example:** Let
+**Example:** Let [▶ Refresher_T3 @ 00:15](https://www.youtube.com/watch?v=US18ZBaHO1Q&t=15)
 
-$$f(x) = \begin{cases} x^2, & x \geq 1, \\ x^3, & x < 1. \end{cases}$$
+$$f(x) = \begin{cases} x^2, & \text{if } x \geq 1, \\ x^3, & \text{if } x < 1. \end{cases}$$
 
 Is $f$ continuous at $x = 1$?
 
 **Solution:**
 
-For $x > 1$ and $x < 1$ separately, $f$ is a polynomial and hence continuous. The only point requiring investigation is $x = 1$.
+First, note that for $x > 1$ (strictly), $f(x) = x^2$ is a polynomial, hence continuous. For $x < 1$ (strictly), $f(x) = x^3$ is a polynomial, hence continuous. The only point where discontinuity *could* occur is at the boundary $x = 1$. [▶ Refresher_T3 @ 00:33](https://www.youtube.com/watch?v=US18ZBaHO1Q&t=33)
 
-**Step 1 — Compute one-sided limits.**
+**Step 1 — One-sided limits.**
 
-*Right-hand limit ($x \to 1^{+}$):* For $x \geq 1$, the function is $x^2$:
+*Right-hand limit:* For $x > 1$ (and also at $x = 1$ in the definition), $f(x) = x^2$:
 
 $$\lim_{x \to 1^{+}} x^2 = 1^2 = 1.$$
 
-*Left-hand limit ($x \to 1^{-}$):* For $x < 1$, the function is $x^3$:
+*Left-hand limit:* For $x < 1$, $f(x) = x^3$:
 
 $$\lim_{x \to 1^{-}} x^3 = 1^3 = 1.$$
 
-Since both one-sided limits equal $1$:
+Both one-sided limits equal $1$, so the two-sided limit exists:
 
 $$\lim_{x \to 1} f(x) = 1.$$
 
-**Step 2 — Compare with $f(1)$.**
+**Step 2 — Compare with function value.**
 
-By the first piece of the definition (since $x = 1$ satisfies $x \geq 1$):
+At $x = 1$, the first piece applies ($x \geq 1$), giving $f(1) = 1^2 = 1$.
 
-$$f(1) = 1^2 = 1.$$
+$$\lim_{x \to 1} f(x) = 1 = f(1).$$
 
-Therefore $\displaystyle\lim_{x \to 1} f(x) = 1 = f(1)$, and $f$ **is continuous at** $x = 1$. $\square$
-
-> **Clarification:** This example illustrates that a piecewise function **can** be continuous at its breakpoint. The fact that $x^2$ and $x^3$ happen to agree at $x = 1$ (both equal $1$) is what makes this work. If, for instance, the second piece were $2x^3$, the left-hand limit would be $2$, producing a jump discontinuity.
+**Conclusion:** $f$ is **continuous at $x = 1$**. ✓ [▶ Refresher_T3 @ 02:48](https://www.youtube.com/watch?v=US18ZBaHO1Q&t=168)
 
 ---
 
-### Example 3: A Piecewise Function with a Jump
+### Example 3: Floor Function — Discontinuity at Every Integer
 
-**Example:** Let
-
-$$g(x) = \begin{cases} x^2, & x \geq 1, \\ 3 - x, & x < 1. \end{cases}$$
-
-Is $g$ continuous at $x = 1$?
+**Example:** Show that $f(x) = \lfloor x \rfloor$ is not continuous at $x = 0$.
 
 **Solution:**
 
-**Step 1 — Compute one-sided limits.**
+From Section 4.4, we already found:
 
-*Right-hand limit:*
+$$\lim_{x \to 0^{+}} \lfloor x \rfloor = 0, \qquad \lim_{x \to 0^{-}} \lfloor x \rfloor = -1.$$
 
-$$\lim_{x \to 1^{+}} x^2 = 1.$$
+Since $0 \neq -1$, the two-sided limit does not exist. By the two-step continuity test, **Step 1 fails**, so $f$ is **not continuous at $x = 0$**. [▶ Refresher_T1 @ 10:28](https://www.youtube.com/watch?v=x9Dv61Ml910&t=628)
 
-*Left-hand limit:*
+Moreover, $f(0) = \lfloor 0 \rfloor = 0$, which equals the right-hand limit but not the left-hand limit. This is a **jump discontinuity** of size $1$.
 
-$$\lim_{x \to 1^{-}} (3 - x) = 3 - 1 = 2.$$
-
-Since $1 \neq 2$, the two-sided limit **does not exist**.
-
-**Conclusion:** By Step 1 (Case 1), $g$ is **not continuous at** $x = 1$. This is a **jump discontinuity** with jump size $|2 - 1| = 1$. $\square$
+The same argument shows that $\lfloor x \rfloor$ has a jump discontinuity at every integer $n \in \mathbb{Z}$.
 
 ---
 
-### Example 4: Removable Discontinuity in a Piecewise Function
+### Example 4: Identifying a Removable Discontinuity
 
 **Example:** Let
 
-$$h(x) = \begin{cases} x + 2, & x \neq 3, \\ 10, & x = 3. \end{cases}$$
+$$g(x) = \begin{cases} \dfrac{x^2 - 4}{x - 2}, & \text{if } x \neq 2, \\[6pt] 5, & \text{if } x = 2. \end{cases}$$
 
-Is $h$ continuous at $x = 3$?
+Determine the type of discontinuity at $x = 2$.
 
 **Solution:**
 
-**Step 1 — Compute the limit.**
+For $x \neq 2$:
 
-For $x \neq 3$, $h(x) = x + 2$. Therefore:
+$$g(x) = \frac{x^2 - 4}{x - 2} = \frac{(x-2)(x+2)}{x-2} = x + 2.$$
 
-$$\lim_{x \to 3} h(x) = \lim_{x \to 3}(x+2) = 5.$$
+Therefore:
 
-The limit exists (both one-sided limits equal $5$).
+$$\lim_{x \to 2} g(x) = \lim_{x \to 2}(x + 2) = 4.$$
 
-**Step 2 — Compare with $h(3)$.**
+The two-sided limit exists and equals $4$. However, $g(2) = 5 \neq 4$.
 
-$$h(3) = 10 \neq 5 = \lim_{x \to 3} h(x).$$
+**Step 1** passes (the limit exists), but **Step 2** fails (the limit does not equal the function value).
 
-Therefore $h$ is **not continuous at** $x = 3$. This is a **removable discontinuity**: redefining $h(3) = 5$ would restore continuity. $\square$
-
----
-
-## 8. Continuity on an Interval and Standard Continuous Functions
-
-### 8.1 Continuity on an Interval
-
-A function $f$ is **continuous on an open interval** $(a, b)$ if it is continuous at every point in $(a, b)$.
-
-For a **closed interval** $[a, b]$, we additionally require:
-- **Right-continuity** at $a$: $\displaystyle\lim_{x \to a^{+}} f(x) = f(a)$.
-- **Left-continuity** at $b$: $\displaystyle\lim_{x \to b^{-}} f(x) = f(b)$.
-
-### 8.2 Functions Known to Be Continuous
-
-The following families of functions are continuous on their natural domains. This fact, combined with limit laws, allows rapid computation of many limits.
-
-| Function type | Domain of continuity |
-|---|---|
-| Polynomial $p(x)$ | All of $\mathbb{R}$ |
-| Rational $p(x)/q(x)$ | $\{x \in \mathbb{R} : q(x) \neq 0\}$ |
-| $\sin x$, $\cos x$ | All of $\mathbb{R}$ |
-| $e^x$ | All of $\mathbb{R}$ |
-| $\ln x$ | $(0, \infty)$ |
-| $\sqrt[n]{x}$ ($n$ odd) | All of $\mathbb{R}$ |
-| $\sqrt[n]{x}$ ($n$ even) | $[0, \infty)$ |
-| $\lfloor x \rfloor$ | $\mathbb{R} \setminus \mathbb{Z}$ |
-
-The continuity of these standard functions, together with the **sum**, **product**, **quotient**, and **composition** rules from Section 4, means that any algebraic or transcendental expression built from them is continuous wherever it is defined.
+**Conclusion:** $g$ has a **removable discontinuity** at $x = 2$. Redefining $g(2) = 4$ would make $g$ continuous there.
 
 ---
 
-## 9. Strategy for Limit and Continuity Problems
-
-When faced with a limit or continuity problem, follow this systematic approach:
-
-### For computing $\displaystyle\lim_{x \to a} f(x)$:
-
-1. **Direct substitution:** If $f$ is continuous at $a$ (polynomial, rational with non-zero denominator, etc.), then $\displaystyle\lim_{x \to a} f(x) = f(a)$. Done.
-
-2. **Algebraic simplification:** If direct substitution gives an indeterminate form $\frac{0}{0}$, try factoring, rationalising, or simplifying before substituting again.
-
-3. **Known limits:** Use classical results like $\displaystyle\lim_{x \to 0} \frac{\sin x}{x} = 1$.
-
-4. **Squeeze Theorem:** If $g(x) \leq f(x) \leq h(x)$ near $a$ and $\displaystyle\lim_{x \to a} g(x) = \lim_{x \to a} h(x) = L$, then $\displaystyle\lim_{x \to a} f(x) = L$.
-
-5. **One-sided limits:** For piecewise functions or functions with different behaviour on each side, compute left-hand and right-hand limits **separately**.
-
-### For checking continuity at $x = a$:
-
-1. Identify the relevant **pieces** of the function definition on each side of $a$.
-2. Compute $\displaystyle\lim_{x \to a^{-}} f(x)$ and $\displaystyle\lim_{x \to a^{+}} f(x)$.
-3. If they differ → **not continuous** (jump discontinuity). Stop.
-4. If they agree → the limit $L$ exists. Check whether $f(a) = L$.
-5. If $f(a) = L$ → **continuous**. If not → **not continuous** (removable discontinuity).
-
----
-
-## 10. Extended Example: Combining Multiple Concepts
+### Example 5: A Function Continuous Despite Complicated Pieces
 
 **Example:** Let
 
-$$f(x) = \begin{cases} \dfrac{x^2 - 4}{x - 2}, & x > 2, \\[6pt] \lfloor x \rfloor + 2, & 0 \leq x \leq 2, \\[4pt] \sin(\pi x) + 1, & x < 0. \end{cases}$$
+$$h(x) = \begin{cases} x \sin\!\left(\dfrac{1}{x}\right), & \text{if } x \neq 0, \\[4pt] 0, & \text{if } x = 0. \end{cases}$$
 
-Determine the continuity of $f$ at $x = 0$ and $x = 2$.
+Is $h$ continuous at $x = 0$?
 
 **Solution:**
 
-**At $x = 0$:**
+We use the **Squeeze Theorem**. For $x \neq 0$:
 
-*Right-hand limit ($x \to 0^{+}$):* For $x \in (0, 2]$, $f(x) = \lfloor x \rfloor + 2$. For $x \in (0, 1)$, $\lfloor x \rfloor = 0$, so $f(x) = 2$. Thus:
+$$-|x| \leq x \sin\!\left(\frac{1}{x}\right) \leq |x|$$
 
-$$\lim_{x \to 0^{+}} f(x) = 2.$$
+since $|\sin(\cdot)| \leq 1$. As $x \to 0$, both $-|x| \to 0$ and $|x| \to 0$. By the Squeeze Theorem:
 
-*Left-hand limit ($x \to 0^{-}$):* For $x < 0$, $f(x) = \sin(\pi x) + 1$:
+$$\lim_{x \to 0} x \sin\!\left(\frac{1}{x}\right) = 0.$$
 
-$$\lim_{x \to 0^{-}} [\sin(\pi x) + 1] = \sin(0) + 1 = 1.$$
-
-Since $2 \neq 1$, the two-sided limit does not exist. Therefore $f$ has a **jump discontinuity** at $x = 0$.
-
-**At $x = 2$:**
-
-*Right-hand limit ($x \to 2^{+}$):* For $x > 2$, $f(x) = \dfrac{x^2 - 4}{x - 2} = \dfrac{(x-2)(x+2)}{x-2} = x + 2$ (valid since $x \neq 2$):
-
-$$\lim_{x \to 2^{+}} (x + 2) = 4.$$
-
-*Left-hand limit ($x \to 2^{-}$):* For $x \in [0, 2]$, $f(x) = \lfloor x \rfloor + 2$. For $x \in [1, 2)$, $\lfloor x \rfloor = 1$, so $f(x) = 3$. Thus:
-
-$$\lim_{x \to 2^{-}} f(x) = 3.$$
-
-Since $4 \neq 3$, the limit does not exist at $x = 2$. Therefore $f$ has a **jump discontinuity** at $x = 2$. $\square$
-
-> **Clarification:** Notice that even though $\dfrac{x^2 - 4}{x-2}$ has a removable discontinuity at $x = 2$ when considered alone, the overall piecewise function has a **jump** discontinuity there because the left piece approaches a different value.
+Since $h(0) = 0 = \displaystyle\lim_{x \to 0} h(x)$, the function $h$ is **continuous at $x = 0$**. ✓
 
 ---
 
-## 11. The Squeeze Theorem
+## 9. Important Continuous Function Families
 
-For completeness, we state one of the most powerful tools for evaluating limits:
+The following families of functions are continuous on their natural domains. This is frequently used without proof in limit computations.
 
-> **Theorem (Squeeze / Sandwich Theorem).** Suppose that in some open interval containing $a$ (except possibly at $a$ itself):
->
-> $$g(x) \leq f(x) \leq h(x),$$
->
-> and
->
-> $$\lim_{x \to a} g(x) = \lim_{x \to a} h(x) = L.$$
->
-> Then $\displaystyle\lim_{x \to a} f(x) = L$.
+| Function family | Continuous on |
+|----------------|---------------|
+| Polynomials $p(x) = a_n x^n + \cdots + a_0$ | All of $\mathbb{R}$ |
+| Rational functions $\dfrac{p(x)}{q(x)}$ | $\{x \in \mathbb{R} : q(x) \neq 0\}$ |
+| Trigonometric: $\sin x$, $\cos x$ | All of $\mathbb{R}$ |
+| Trigonometric: $\tan x$, $\sec x$ | $\mathbb{R} \setminus \{(2k+1)\pi/2 : k \in \mathbb{Z}\}$ |
+| Exponential $e^x$, $a^x$ ($a > 0$) | All of $\mathbb{R}$ |
+| Logarithmic $\ln x$, $\log_a x$ | $(0, \infty)$ |
+| Root functions $\sqrt[n]{x}$ | $[0,\infty)$ if $n$ even; $\mathbb{R}$ if $n$ odd |
 
-**Example:** Show that $\displaystyle\lim_{x \to 0} x^2 \sin\!\left(\frac{1}{x}\right) = 0$.
-
-**Solution:** For all $x \neq 0$:
-
-$$-1 \leq \sin\!\left(\frac{1}{x}\right) \leq 1 \implies -x^2 \leq x^2 \sin\!\left(\frac{1}{x}\right) \leq x^2.$$
-
-Since $\displaystyle\lim_{x \to 0}(-x^2) = 0$ and $\displaystyle\lim_{x \to 0} x^2 = 0$, the Squeeze Theorem gives
-
-$$\lim_{x \to 0} x^2 \sin\!\left(\frac{1}{x}\right) = 0. \quad \square$$
+**Compositions of continuous functions are continuous.** If $f$ is continuous at $a$ and $g$ is continuous at $f(a)$, then $g \circ f$ is continuous at $a$.
 
 ---
 
-## 12. Comprehensive Summary
+## 10. The Relationship Between Limits and Continuity
+
+It is worth stating the logical relationship explicitly:
+
+$$f \text{ continuous at } a \implies \lim_{x \to a} f(x) \text{ exists}$$
+
+but the converse is **false**: the limit may exist without the function being continuous (removable discontinuity).
+
+In other words:
+
+- **Continuity requires the limit**, plus agreement with the function value.
+- **Limit existence requires only** the two one-sided limits to agree; it says nothing about $f(a)$.
+
+| Scenario | Limit exists? | $f(a)$ defined? | Limit $= f(a)$? | Continuous? |
+|----------|:-:|:-:|:-:|:-:|
+| Smooth passage | Yes | Yes | Yes | **Yes** |
+| Removable discontinuity (hole) | Yes | No | N/A | **No** |
+| Removable discontinuity (wrong value) | Yes | Yes | No | **No** |
+| Jump discontinuity | No | Yes or No | N/A | **No** |
+| Infinite discontinuity | No | Possibly | N/A | **No** |
+
+---
+
+## 11. Full Summary Table
 
 | Concept | Key Idea |
-|---|---|
-| **Left-hand limit** $\displaystyle\lim_{x \to a^{-}} f(x)$ | Value $f(x)$ approaches as $x$ increases toward $a$ from below |
-| **Right-hand limit** $\displaystyle\lim_{x \to a^{+}} f(x)$ | Value $f(x)$ approaches as $x$ decreases toward $a$ from above |
+|---------|----------|
+| **Left-hand limit** $\displaystyle\lim_{x \to a^-} f(x)$ | Value $f(x)$ approaches as $x \to a$ from below |
+| **Right-hand limit** $\displaystyle\lim_{x \to a^+} f(x)$ | Value $f(x)$ approaches as $x \to a$ from above |
 | **Two-sided limit exists** | $\iff$ both one-sided limits exist and are equal |
-| **Limit laws** | Sum, product, quotient, power, composition rules for combining known limits |
-| **Continuity at $a$** | (1) $f(a)$ defined; (2) limit exists; (3) limit $= f(a)$ |
-| **Jump discontinuity** | One-sided limits exist but differ |
+| **Limit laws** | Sum, difference, product, quotient, power, root — apply when individual limits exist |
+| **Direct substitution** | Valid for polynomials and rational functions (where denominator $\neq 0$) |
+| **Floor function** $\lfloor x \rfloor$ | Largest integer $\leq x$; step function; jump discontinuity at every integer |
+| **Piecewise function** | Different formulas on different intervals; check boundary points for limit existence |
+| **Continuity at $a$** | (1) $f(a)$ defined, (2) limit exists, (3) limit $= f(a)$ |
+| **Jump discontinuity** | Both one-sided limits exist but differ |
 | **Removable discontinuity** | Limit exists but $\neq f(a)$ (or $f(a)$ undefined) |
-| **Essential discontinuity** | At least one one-sided limit DNE (infinite or oscillatory) |
-| **Floor function** $\lfloor x \rfloor$ | Continuous on $\mathbb{R} \setminus \mathbb{Z}$; jump discontinuity at every integer |
-| **Piecewise functions** | Check continuity only at breakpoints; use one-sided limits |
-| **Squeeze Theorem** | Bounding $f$ between two functions with the same limit forces $f$ to share that limit |
-| **$\displaystyle\lim_{x \to 0} \frac{\sin x}{x} = 1$** | Classical limit; essential for trigonometric limit problems |
+| **Infinite discontinuity** | At least one one-sided limit is $\pm\infty$ |
+| **Oscillating discontinuity** | Function oscillates; one-sided limit(s) do not exist |
+
+---
+
+## Sources
+
+- [Refresher_T1](https://www.youtube.com/watch?v=x9Dv61Ml910)
+- [Refresher_T2](https://www.youtube.com/watch?v=S6hzxX1AIBU)
+- [Refresher_T3](https://www.youtube.com/watch?v=US18ZBaHO1Q)
+- [Refresher_T4](https://www.youtube.com/watch?v=lBqVQxUYTIs)
+- [Refresher_T5](https://www.youtube.com/watch?v=Z9jpB1gK-PQ)
+- [Refresher_T6](https://www.youtube.com/watch?v=nNWcu09Qo04)

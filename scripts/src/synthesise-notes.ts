@@ -49,6 +49,85 @@ const PLAN: SynthesisTarget[] = [
     focusHint: 'Left-hand and right-hand limits, existence of limits, limit laws, continuity at a point, types of discontinuity, floor function, piecewise functions. These are single-variable calculus prerequisites needed before the course begins.',
   },
 
+  // ── W1-W4: Core Linear Algebra ────────────────────────────────────────────
+  {
+    output: '1 - MATRICES.md',
+    title: 'MATRICES',
+    sources: [
+      'week1/W1_L2_Matrices.md',
+      'week1/W1_L3_Systems_of_linear_equations.md',
+    ],
+    crossRefs: ['2 - SOLVING SYSTEMS', '5 - VECTORS AND SPACES'],
+    focusHint: 'Matrix definitions and notation, entry notation, special matrix types (square, diagonal, scalar, identity, zero, upper/lower triangular, symmetric), matrix addition, scalar multiplication, matrix multiplication and its properties, transpose, invertibility overview.',
+  },
+  {
+    output: '2 - SOLVING SYSTEMS.md',
+    title: 'SOLVING SYSTEMS OF LINEAR EQUATIONS',
+    sources: [
+      'week1/W1_L3_Systems_of_linear_equations.md',
+      'week2/W2_L4_The_echelon_form.md',
+      'week2/W2_L5_Row_reduction.md',
+      'week2/W2_L6_The_gaussian_elimination_method.md',
+    ],
+    crossRefs: ['1 - MATRICES'],
+    focusHint: 'Systems of linear equations, augmented matrices, row operations, echelon form (REF) and reduced row echelon form (RREF), Gaussian elimination, back substitution, number of solutions (unique, none, infinitely many), free variables and parametric form.',
+  },
+  {
+    output: '3 - DETERMINANTS.md',
+    title: 'DETERMINANTS',
+    sources: [
+      'week1/W1_L4_Determinants_-_part_1.md',
+      'week1/W1_L5_Determinants_-_part_2.md',
+      'week2/W2_L1_Determinants_-_part_3.md',
+    ],
+    crossRefs: ['1 - MATRICES'],
+    focusHint: '2×2 and 3×3 determinants, cofactor expansion along any row or column, minors and cofactors, properties of determinants (row operations effect, triangular matrices, multiplicativity), Sarrus rule.',
+  },
+  {
+    output: '4 - APPLYING DETERMINANTS.md',
+    title: 'APPLYING DETERMINANTS',
+    sources: [
+      'week2/W2_L2_Cramer-s_rule.md',
+      'week2/W2_L3_Solutions_to_a_system_of_linear_equations_with_an_invertible_coefficient_matrix.md',
+    ],
+    crossRefs: ['1 - MATRICES', '2 - SOLVING SYSTEMS', '3 - DETERMINANTS'],
+    focusHint: 'Matrix inverse via cofactor/adjugate method, Cramer\'s rule, relationship between determinant and invertibility, solving systems using the inverse, conditions for unique solutions.',
+  },
+  {
+    output: '5 - VECTORS AND SPACES.md',
+    title: 'VECTORS AND SPACES',
+    sources: [
+      'week1/W1_L1_Vectors.md',
+      'week3/W3_L1_Introduction_to_vector_spaces.md',
+      'week3/W3_L2_Some_properties_of_vector_spaces.md',
+    ],
+    crossRefs: ['1 - MATRICES'],
+    focusHint: 'Vectors as lists of numbers, geometric interpretation, vector addition and scalar multiplication, vector space axioms, subspaces and subspace test, span and spanning sets, ℝⁿ as vector space, zero vector, column space.',
+  },
+  {
+    output: '6 - INDEPENDENCE.md',
+    title: 'LINEAR INDEPENDENCE',
+    sources: [
+      'week3/W3_L3_Linear_dependence.md',
+      'week3/W3_L4_Linear_independence_-_part_1.md',
+      'week3/W3_L5_Linear_independence_-_part_2.md',
+    ],
+    crossRefs: ['5 - VECTORS AND SPACES', '1 - MATRICES'],
+    focusHint: 'Linear combinations, linear dependence and independence definitions, testing independence via row reduction, geometric meaning, relationship to determinant for square sets, maximal independent sets.',
+  },
+  {
+    output: '7 - BASIS AND RANK.md',
+    title: 'BASIS AND RANK',
+    sources: [
+      'week4/W4_L1_What_is_a_basis_for_a_vector_space.md',
+      'week4/W4_L2_Finding_bases_for_vector_spaces.md',
+      'week4/W4_L3_What_is_the_rank-dimension_for_a_vector_space.md',
+      'week4/W4_L4_Rank_and_dimension_using_gaussian_elimination.md',
+    ],
+    crossRefs: ['5 - VECTORS AND SPACES', '6 - INDEPENDENCE', '2 - SOLVING SYSTEMS'],
+    focusHint: 'Basis definition (spanning + independent), standard basis, finding a basis from a spanning set via row reduction, dimension of a vector space, rank of a matrix (row rank = column rank), rank-nullity theorem preview.',
+  },
+
   // ── Special Week: Multivariable Limits and Paths ──────────────────────────
   {
     output: '17 - MULTIVARIABLE LIMITS AND PATHS.md',

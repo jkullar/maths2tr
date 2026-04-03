@@ -1,237 +1,221 @@
 # THE HESSIAN MATRIX AND DIFFERENTIABILITY
 
-This file develops the theory of higher-order partial derivatives, culminating in the **Hessian matrix** — the multivariable analogue of the second derivative. The Hessian matrix is the central tool for classifying critical points of multivariable functions as local minima, local maxima, or saddle points. We also formalise what it means for a multivariable function to be **differentiable**, connecting this notion to the existence of tangent hyperplanes and best linear approximations developed in [[15 - TANGENTS AND CRITICAL POINTS]].
-
-Prerequisites: partial derivatives and the gradient vector ([[14 - PARTIAL AND DIRECTIONAL DERIVATIVES]]), critical points ([[15 - TANGENTS AND CRITICAL POINTS]]), determinants and matrix theory ([[1 - MATRICES]]).
+This file develops the theory of **higher-order partial derivatives** for multivariable functions, culminating in the **Hessian matrix** and its use as a classification tool for critical points. We begin by defining second-order and higher-order partial derivatives, establish the important symmetry result known as **Clairaut's theorem**, construct the Hessian matrix, and then present the **Hessian test** — the multivariable analogue of the second derivative test from one-variable calculus. We treat the test separately for functions of two and three variables, and conclude with a precise definition of **differentiability** for multivariable functions. Throughout, we connect back to foundational material on partial derivatives and gradients (see [[14 - PARTIAL AND DIRECTIONAL DERIVATIVES]]) and critical points (see [[15 - TANGENTS AND CRITICAL POINTS]]).
 
 ---
 
 ## 1. Higher-Order Partial Derivatives
 
-### 1.1 Motivation
+### Recall: First-Order Partial Derivatives
 
-For a single-variable function $f$, the first derivative $f'$ measures the rate of change, and the second derivative $f''$ measures how that rate of change itself varies — it captures **concavity**. In one-variable calculus, the second derivative test uses $f''(a)$ to classify critical points: $f''(a) > 0$ implies a local minimum, $f''(a) < 0$ implies a local maximum.
+Let $f(x_1, x_2, \ldots, x_n)$ be a scalar-valued function defined on a domain $D \subseteq \mathbb{R}^n$. The **partial derivative** of $f$ with respect to the variable $x_i$ is the function defined by [▶ W11_L1 @ 02:09](https://www.youtube.com/watch?v=SNAyzb35MAc&t=129)
 
-We seek an analogous test for functions of several variables. To build it, we must first understand what "second derivatives" mean when there are multiple variables.
+$$\frac{\partial f}{\partial x_i}(\tilde{x}) = \lim_{h \to 0} \frac{f(\tilde{x} + h\mathbf{e}_i) - f(\tilde{x})}{h}$$
 
-### 1.2 Recall: Partial Derivatives
+where $\mathbf{e}_i$ is the $i$-th standard basis vector in $\mathbb{R}^n$. The domain of $\frac{\partial f}{\partial x_i}$ consists of all points in $D$ where this limit exists. The partial derivative measures the **rate of change** of $f$ in the direction of $\mathbf{e}_i$ — equivalently, it treats $f$ as a function of $x_i$ alone while holding all other variables constant.
 
-Let $f(x_1, x_2, \ldots, x_n)$ be a scalar-valued function defined on a domain $D \subseteq \mathbb{R}^n$. The **partial derivative** of $f$ with respect to $x_i$ is
+A full treatment of partial derivatives appears in [[14 - PARTIAL AND DIRECTIONAL DERIVATIVES]].
 
-$$\frac{\partial f}{\partial x_i}(\tilde{a}) = \lim_{h \to 0} \frac{f(\tilde{a} + h\mathbf{e}_i) - f(\tilde{a})}{h},$$
+### Second-Order Partial Derivatives for $f(x,y)$
 
-where $\mathbf{e}_i$ is the $i$-th standard basis vector in $\mathbb{R}^n$. This measures the rate of change of $f$ in the direction of the $x_i$-axis at $\tilde{a}$. See [[14 - PARTIAL AND DIRECTIONAL DERIVATIVES]] for a full treatment.
+Since the partial derivative $\frac{\partial f}{\partial x}$ is itself a scalar-valued multivariable function, we may take its partial derivatives in turn. The resulting functions are called **second-order partial derivatives**. [▶ W11_L1 @ 03:52](https://www.youtube.com/watch?v=SNAyzb35MAc&t=232)
 
-### 1.3 Second-Order Partial Derivatives for $f(x, y)$
-
-Since each partial derivative $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$ is itself a scalar-valued function of $(x, y)$, we can differentiate it again. This produces four **second-order partial derivatives**:
+For a function $f(x,y)$ defined on a domain $D \subseteq \mathbb{R}^2$, there are four second-order partial derivatives:
 
 | Notation (subscript) | Notation (Leibniz) | Meaning |
 |---|---|---|
-| $f_{xx}$ | $\dfrac{\partial^2 f}{\partial x^2}$ | Differentiate w.r.t. $x$, then again w.r.t. $x$ |
-| $f_{yy}$ | $\dfrac{\partial^2 f}{\partial y^2}$ | Differentiate w.r.t. $y$, then again w.r.t. $y$ |
-| $f_{xy}$ | $\dfrac{\partial^2 f}{\partial y \, \partial x}$ | Differentiate w.r.t. $x$ first, then w.r.t. $y$ |
-| $f_{yx}$ | $\dfrac{\partial^2 f}{\partial x \, \partial y}$ | Differentiate w.r.t. $y$ first, then w.r.t. $x$ |
+| $f_{xx}$ | $\dfrac{\partial^2 f}{\partial x^2}$ | Differentiate $f$ w.r.t. $x$, then again w.r.t. $x$ |
+| $f_{yy}$ | $\dfrac{\partial^2 f}{\partial y^2}$ | Differentiate $f$ w.r.t. $y$, then again w.r.t. $y$ |
+| $f_{xy}$ | $\dfrac{\partial^2 f}{\partial y \, \partial x}$ | Differentiate $f$ w.r.t. $x$ first, then w.r.t. $y$ |
+| $f_{yx}$ | $\dfrac{\partial^2 f}{\partial x \, \partial y}$ | Differentiate $f$ w.r.t. $y$ first, then w.r.t. $x$ |
 
-The last two are called the **mixed partial derivatives**.
+The derivatives $f_{xy}$ and $f_{yx}$ are called the **mixed partial derivatives**.
 
-> **Clarification:** There is an important notational subtlety between the subscript and Leibniz forms. In the **subscript notation** $f_{xy}$, the order of differentiation reads **left to right**: first differentiate with respect to $x$, then with respect to $y$. In the **Leibniz notation** $\frac{\partial^2 f}{\partial y \, \partial x}$, the order reads **right to left** (innermost first): first $\frac{\partial}{\partial x}$, then $\frac{\partial}{\partial y}$. Thus:
-> $$f_{xy} = \frac{\partial}{\partial y}\!\left(\frac{\partial f}{\partial x}\right) = \frac{\partial^2 f}{\partial y \, \partial x}.$$
-> This reversal is a common source of errors. Remember: the subscript notation and the Leibniz denominator list variables in **opposite order**.
+> **Clarification:** There is an important notational subtlety regarding the order of differentiation. In the **subscript notation** $f_{xy}$, the order reads **left to right**: differentiate first with respect to $x$, then with respect to $y$. In the **Leibniz notation** $\frac{\partial^2 f}{\partial y \, \partial x}$, the order reads **right to left**: the variable closest to $f$ is applied first. That is:
+> $$f_{xy} = \frac{\partial}{\partial y}\!\left(\frac{\partial f}{\partial x}\right) = \frac{\partial^2 f}{\partial y \, \partial x}$$
+> This reversal is a common source of errors. Remember: subscript notation goes left-to-right; Leibniz notation goes right-to-left.
 
-### 1.4 Worked Examples (Second-Order Partials)
+### Worked Examples
 
-**Example 1:** Let $f(x, y) = x + y$.
+**Example 1:** Compute all second-order partial derivatives of $f(x,y) = x + y$.
 
-**Solution:** The first-order partials are $f_x = 1$ and $f_y = 1$. Since these are constants:
+**Solution:** The first-order partial derivatives are $f_x = 1$ and $f_y = 1$. Since these are constants:
 
-$$f_{xx} = 0, \quad f_{yy} = 0, \quad f_{xy} = 0, \quad f_{yx} = 0.$$
+$$f_{xx} = 0, \quad f_{yy} = 0, \quad f_{xy} = 0, \quad f_{yx} = 0$$
 
-Note that $f_{xy} = f_{yx}$.
+Observe that $f_{xy} = f_{yx} = 0$.
 
 ---
 
-**Example 2:** Let $f(x, y) = \sin(xy)$.
+**Example 2:** Compute all second-order partial derivatives of $f(x,y) = \sin(xy)$.
 
-**Solution:** The first-order partials are:
+**Solution:** First-order partial derivatives:
 
-$$f_x = y\cos(xy), \qquad f_y = x\cos(xy).$$
+$$f_x = y\cos(xy), \qquad f_y = x\cos(xy)$$
 
-Now compute each second-order partial:
+Second-order partial derivatives:
 
-$$f_{xx} = \frac{\partial}{\partial x}\bigl[y\cos(xy)\bigr] = y \cdot (-\sin(xy)) \cdot y = -y^2 \sin(xy).$$
+$$f_{xx} = \frac{\partial}{\partial x}\bigl[y\cos(xy)\bigr] = y \cdot (-y\sin(xy)) = -y^2\sin(xy)$$
 
-$$f_{yy} = \frac{\partial}{\partial y}\bigl[x\cos(xy)\bigr] = x \cdot (-\sin(xy)) \cdot x = -x^2 \sin(xy).$$
+$$f_{yy} = \frac{\partial}{\partial y}\bigl[x\cos(xy)\bigr] = x \cdot (-x\sin(xy)) = -x^2\sin(xy)$$
 
-For the mixed partials, compute $f_{xy}$: differentiate $f_x = y\cos(xy)$ with respect to $y$:
+For the mixed partials, we compute $f_{xy}$:
 
-$$f_{xy} = \frac{\partial}{\partial y}\bigl[y\cos(xy)\bigr] = 1 \cdot \cos(xy) + y \cdot (-\sin(xy)) \cdot x = \cos(xy) - xy\sin(xy).$$
+$$f_{xy} = \frac{\partial}{\partial y}\bigl[y\cos(xy)\bigr] = 1 \cdot \cos(xy) + y \cdot (-x\sin(xy)) = \cos(xy) - xy\sin(xy)$$
 
-Similarly, $f_{yx}$: differentiate $f_y = x\cos(xy)$ with respect to $x$:
+And $f_{yx}$:
 
-$$f_{yx} = \frac{\partial}{\partial x}\bigl[x\cos(xy)\bigr] = 1 \cdot \cos(xy) + x \cdot (-\sin(xy)) \cdot y = \cos(xy) - xy\sin(xy).$$
+$$f_{yx} = \frac{\partial}{\partial x}\bigl[x\cos(xy)\bigr] = 1 \cdot \cos(xy) + x \cdot (-y\sin(xy)) = \cos(xy) - xy\sin(xy)$$
 
-Again, $f_{xy} = f_{yx}$. This equality is not a coincidence — it is guaranteed by Clairaut's theorem whenever the mixed partials are continuous.
+Again, $f_{xy} = f_{yx}$. This equality is not a coincidence — it is guaranteed by Clairaut's theorem (Section 2) whenever the mixed partials are continuous.
 
-### 1.5 Second-Order Partial Derivatives for $f(x_1, x_2, \ldots, x_n)$
+### Second-Order Partial Derivatives for $f(x_1, x_2, \ldots, x_n)$
 
-For a function of $n$ variables, the second-order partial derivatives are defined analogously. There are $n^2$ of them:
+For a function of $n$ variables, there are $n^2$ second-order partial derivatives. [▶ W11_L1 @ 20:22](https://www.youtube.com/watch?v=SNAyzb35MAc&t=1222) The general second-order partial derivative is:
 
-$$f_{x_i x_j} = \frac{\partial^2 f}{\partial x_j \, \partial x_i} = \frac{\partial}{\partial x_j}\!\left(\frac{\partial f}{\partial x_i}\right), \qquad 1 \leq i, j \leq n.$$
+$$f_{x_i x_j} = \frac{\partial^2 f}{\partial x_j \, \partial x_i} = \frac{\partial}{\partial x_j}\!\left(\frac{\partial f}{\partial x_i}\right)$$
 
-When $i = j$, we write $f_{x_i x_i} = \frac{\partial^2 f}{\partial x_i^2}$. When $i \neq j$, these are the mixed partial derivatives.
+When $i = j$, this simplifies to $f_{x_i x_i} = \frac{\partial^2 f}{\partial x_i^2}$.
 
-**Example 3:** Let $f(x, y, z) = xy + yz + zx$.
+**Example 3:** Let $f(x,y,z) = xy + yz + zx$. Compute all second-order partial derivatives.
 
-**Solution:** First-order partials:
+**Solution:** First-order partial derivatives:
 
-$$f_x = y + z, \quad f_y = x + z, \quad f_z = x + y.$$
+$$f_x = y + z, \qquad f_y = x + z, \qquad f_z = x + y$$
 
-Second-order partials: all the "pure" second partials vanish:
+The nine second-order partial derivatives are:
 
-$$f_{xx} = 0, \quad f_{yy} = 0, \quad f_{zz} = 0.$$
+$$f_{xx} = 0, \quad f_{yy} = 0, \quad f_{zz} = 0$$
 
-All six mixed partials equal $1$:
+$$f_{xy} = 1, \quad f_{xz} = 1, \quad f_{yz} = 1$$
 
-$$f_{xy} = \frac{\partial}{\partial y}(y + z) = 1, \quad f_{xz} = \frac{\partial}{\partial z}(y + z) = 1, \quad f_{yz} = \frac{\partial}{\partial z}(x + z) = 1.$$
+$$f_{yx} = 1, \quad f_{zx} = 1, \quad f_{zy} = 1$$
 
-By Clairaut's theorem, $f_{yx} = f_{xy} = 1$, $f_{zx} = f_{xz} = 1$, and $f_{zy} = f_{yz} = 1$.
+All mixed partials agree: $f_{xy} = f_{yx} = 1$, $f_{xz} = f_{zx} = 1$, $f_{yz} = f_{zy} = 1$.
 
-### 1.6 Higher-Order Partial Derivatives
+### Higher-Order Partial Derivatives
 
-One can iterate the process indefinitely. The **$k$-th order partial derivative** is defined by taking $k$ successive partial derivatives:
+One can iterate this process indefinitely. The **$k$-th order partial derivative** is defined by taking $k$ successive partial differentiations: [▶ W11_L1 @ 24:49](https://www.youtube.com/watch?v=SNAyzb35MAc&t=1489)
 
-$$f_{x_{i_1} x_{i_2} \cdots x_{i_k}} = \frac{\partial}{\partial x_{i_k}} \cdots \frac{\partial}{\partial x_{i_2}} \frac{\partial f}{\partial x_{i_1}}.$$
+$$f_{x_{i_1} x_{i_2} \cdots x_{i_k}} = \frac{\partial}{\partial x_{i_k}} \!\left( \frac{\partial}{\partial x_{i_{k-1}}} \!\left( \cdots \frac{\partial}{\partial x_{i_2}}\!\left(\frac{\partial f}{\partial x_{i_1}}\right) \cdots \right)\right)$$
 
-The subscript notation reads left-to-right; the Leibniz notation reads right-to-left (innermost operator acts first). As with first-order partials, there is no guarantee that higher-order partials exist — the domain of the $k$-th order partial consists of precisely those points where the requisite limit exists.
+In the subscript notation, differentiation proceeds left to right: first w.r.t. $x_{i_1}$, then w.r.t. $x_{i_2}$, and so on. In the Leibniz notation, differentiation proceeds right to left. As always, the existence of such derivatives is not guaranteed — the domain consists of those points where all required limits exist.
 
 ---
 
 ## 2. Symmetry of Mixed Partials: Clairaut's Theorem
 
-### 2.1 Statement of the Theorem
+### Statement of the Theorem
 
-The examples above exhibited the equality $f_{xy} = f_{yx}$. This is guaranteed under a mild continuity condition.
+A natural question arises: does the order of differentiation matter for mixed partials? The answer, under a mild continuity hypothesis, is **no**.
 
-**Theorem (Clairaut's Theorem).** Let $f(x, y)$ be defined on a domain $D \subseteq \mathbb{R}^2$ containing a point $(a, b)$ and an open ball around it. If the mixed partial derivatives $f_{xy}$ and $f_{yx}$ are both **continuous** in an open ball around $(a, b)$, then
+**Theorem (Clairaut's Theorem).** Let $f(x,y)$ be a function defined on a domain $D \subseteq \mathbb{R}^2$ containing a point $\mathbf{a}$ and an open ball around it. If the second-order mixed partial derivatives $f_{xy}$ and $f_{yx}$ are both **continuous** in an open ball around $\mathbf{a}$, then [▶ W11_L1 @ 12:27](https://www.youtube.com/watch?v=SNAyzb35MAc&t=747)
 
-$$f_{xy}(a, b) = f_{yx}(a, b).$$
+$$f_{xy}(\mathbf{a}) = f_{yx}(\mathbf{a})$$
 
-The theorem generalises to $n$ variables: if $f_{x_i x_j}$ and $f_{x_j x_i}$ are continuous in a neighbourhood of $\tilde{a}$, then $f_{x_i x_j}(\tilde{a}) = f_{x_j x_i}(\tilde{a})$.
+> **Clarification:** The hypothesis that the mixed partials are **continuous** is essential — it cannot be dropped. There exist functions for which the mixed partials exist at a point but are not equal there, precisely because the continuity condition fails (see Example 4 below).
 
-More generally, under suitable continuity hypotheses on all $k$-th order partials, the order of differentiation in a $k$-th order partial derivative can be **freely rearranged**:
+### Generalization to $n$ Variables and Higher Orders
 
-$$f_{x_{i_1} x_{i_2} \cdots x_{i_k}} = f_{x_{i_{\sigma(1)}} x_{i_{\sigma(2)}} \cdots x_{i_{\sigma(k)}}}$$
+An analogous statement holds for functions of $n$ variables: under suitable continuity hypotheses, any $k$-th order partial derivative is independent of the order in which the differentiations are performed. Formally, if all $k$-th order partial derivatives are continuous in a neighbourhood of a point, then
 
-for any permutation $\sigma$ of $\{1, 2, \ldots, k\}$.
+$$f_{x_{i_1} x_{i_2} \cdots x_{i_k}} = f_{x_{j_1} x_{j_2} \cdots x_{j_k}}$$
 
-### 2.2 Why the Hypothesis Matters
+whenever $(j_1, j_2, \ldots, j_k)$ is a rearrangement (permutation) of $(i_1, i_2, \ldots, i_k)$.
 
-The continuity hypothesis in Clairaut's theorem is **essential**. Without it, mixed partials can differ.
+In practice, for "nice" functions (polynomials, trigonometric functions, exponentials, and their compositions — wherever they are defined), all partial derivatives are continuous and Clairaut's theorem applies freely.
 
-**Example 4 (Mixed partials are not always equal):** Define
+### A Counterexample Where the Hypothesis Fails
 
-$$f(x, y) = \begin{cases} \dfrac{xy(x^2 - y^2)}{x^2 + y^2} & (x, y) \neq (0, 0), \\[6pt] 0 & (x, y) = (0, 0). \end{cases}$$
+**Example 4:** Consider the function
 
-**Solution:** We compute the partial derivatives at the origin from the definition.
+$$f(x,y) = \begin{cases} \dfrac{xy(x^2 - y^2)}{x^2 + y^2} & \text{if } (x,y) \neq (0,0) \\[6pt] 0 & \text{if } (x,y) = (0,0) \end{cases}$$
 
-**Step 1:** $f_x(0, 0)$ and $f_y(0, 0)$.
+**Step 1: Compute the first-order partial derivatives at $(0,0)$.**
 
-$$f_x(0, 0) = \lim_{h \to 0} \frac{f(h, 0) - f(0, 0)}{h} = \lim_{h \to 0} \frac{0 - 0}{h} = 0.$$
+$$f_x(0,0) = \lim_{h \to 0} \frac{f(h,0) - f(0,0)}{h} = \lim_{h \to 0} \frac{0 - 0}{h} = 0$$
 
-By symmetry, $f_y(0, 0) = 0$.
+Similarly, $f_y(0,0) = 0$.
 
-**Step 2:** Away from the origin, one computes (via the quotient rule) that:
+**Step 2: Compute the partial derivatives away from $(0,0)$.**
 
-$$f_x(x, y) = \frac{y(x^4 - y^4 + 4x^2 y^2)}{(x^2 + y^2)^2}, \qquad f_y(x, y) = \frac{x(x^4 - y^4 - 4x^2 y^2)}{(x^2 + y^2)^2}$$
+Using the quotient rule for $(x,y) \neq (0,0)$:
 
-for $(x, y) \neq (0, 0)$.
+$$f_x(x,y) = \frac{y(x^4 - y^4 + 4x^2y^2)}{(x^2+y^2)^2} \quad \text{(after simplification)}$$
 
-**Step 3:** Compute $f_{xy}(0, 0)$ from the definition:
+$$f_y(x,y) = \frac{x(x^4 - y^4 - 4x^2y^2)}{(x^2+y^2)^2} \quad \text{(after simplification)}$$
 
-$$f_{xy}(0, 0) = \lim_{h \to 0} \frac{f_x(0, h) - f_x(0, 0)}{h}.$$
+**Step 3: Compute the mixed partials at $(0,0)$ from the definition.**
 
-From the formula for $f_x$, setting $x = 0$: $f_x(0, h) = \frac{h \cdot(-h^4)}{h^4} = -h$. Thus:
+$$f_{xy}(0,0) = \frac{\partial}{\partial y}\!\left(\frac{\partial f}{\partial x}\right)\bigg|_{(0,0)} = \lim_{h \to 0} \frac{f_x(0,h) - f_x(0,0)}{h}$$
 
-$$f_{xy}(0, 0) = \lim_{h \to 0} \frac{-h - 0}{h} = -1.$$
+Substituting: $f_x(0,h) = \frac{h \cdot(-h^4)}{h^4} = -h$, so
 
-**Step 4:** Compute $f_{yx}(0, 0)$:
+$$f_{xy}(0,0) = \lim_{h \to 0} \frac{-h - 0}{h} = -1$$
 
-$$f_{yx}(0, 0) = \lim_{h \to 0} \frac{f_y(h, 0) - f_y(0, 0)}{h}.$$
+Now compute $f_{yx}(0,0)$:
 
-Setting $y = 0$: $f_y(h, 0) = \frac{h \cdot h^4}{h^4} = h$. Thus:
+$$f_{yx}(0,0) = \lim_{h \to 0} \frac{f_y(h,0) - f_y(0,0)}{h}$$
 
-$$f_{yx}(0, 0) = \lim_{h \to 0} \frac{h - 0}{h} = 1.$$
+Substituting: $f_y(h,0) = \frac{h \cdot h^4}{h^4} = h$, so
 
-**Conclusion:** $f_{xy}(0, 0) = -1 \neq 1 = f_{yx}(0, 0)$. The mixed partial derivatives are **not** continuous at the origin, so Clairaut's theorem does not apply, and indeed the mixed partials differ.
+$$f_{yx}(0,0) = \lim_{h \to 0} \frac{h - 0}{h} = 1$$
 
-### 2.3 Practical Consequence
-
-For all "standard" functions encountered in applications — polynomials, rational functions (away from zeros of the denominator), trigonometric, exponential, and logarithmic functions — the mixed partials are continuous wherever they exist. Thus **Clairaut's theorem applies in virtually every practical computation**, and you may freely interchange the order of mixed partial differentiation.
-
-For the remainder of these notes, we assume that all functions satisfy the hypotheses of Clairaut's theorem unless stated otherwise.
+**Conclusion:** $f_{xy}(0,0) = -1 \neq 1 = f_{yx}(0,0)$. The mixed partials are **not equal** at the origin. This occurs because the mixed partials, while they exist at $(0,0)$, are **not continuous** there, violating the hypothesis of Clairaut's theorem.
 
 ---
 
 ## 3. The Hessian Matrix
 
-### 3.1 Definition
+### Definition
 
-Let $f(x_1, x_2, \ldots, x_n)$ be a function defined on a domain $D \subseteq \mathbb{R}^n$ whose second-order partial derivatives all exist. The **Hessian matrix** of $f$ is the $n \times n$ matrix
+Let $f(x_1, x_2, \ldots, x_n)$ be a function defined on a domain $D \subseteq \mathbb{R}^n$ whose second-order partial derivatives all exist. The **Hessian matrix** of $f$ is the $n \times n$ matrix of second-order partial derivatives: [▶ W11_L1 @ 28:10](https://www.youtube.com/watch?v=SNAyzb35MAc&t=1690)
 
-$$H_f = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \, \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \, \partial x_n} \\[8pt] \dfrac{\partial^2 f}{\partial x_2 \, \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \, \partial x_n} \\[8pt] \vdots & \vdots & \ddots & \vdots \\[8pt] \dfrac{\partial^2 f}{\partial x_n \, \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \, \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}.$$
+$$H_f = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \, \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \, \partial x_n} \\[10pt] \dfrac{\partial^2 f}{\partial x_2 \, \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \, \partial x_n} \\[10pt] \vdots & \vdots & \ddots & \vdots \\[10pt] \dfrac{\partial^2 f}{\partial x_n \, \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \, \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}$$
 
-The $(i, j)$-entry is:
+The $(i,j)$-entry of the Hessian matrix is:
 
-$$(H_f)_{ij} = \frac{\partial^2 f}{\partial x_i \, \partial x_j} = f_{x_i x_j}.$$
+$$(H_f)_{ij} = \frac{\partial^2 f}{\partial x_j \, \partial x_i} = f_{x_i x_j}$$
 
-When evaluated at a specific point $\tilde{a}$, we write $H_f(\tilde{a})$; this is a matrix of **numbers**.
+When the hypotheses of Clairaut's theorem are satisfied, the Hessian matrix is **symmetric**: $(H_f)_{ij} = (H_f)_{ji}$.
 
-> **Clarification:** The Hessian matrix is constructed by taking the gradient vector $\nabla f = (f_{x_1}, f_{x_2}, \ldots, f_{x_n})$ and differentiating each component with respect to every variable. The $i$-th row of $H_f$ consists of all partial derivatives of $f_{x_i}$.
+> **Clarification:** The Hessian is a matrix-valued **function** — its entries may depend on the point $(x_1, \ldots, x_n)$. When we write $H_f(\mathbf{a})$, we mean the Hessian evaluated at the specific point $\mathbf{a}$, giving a matrix of numbers.
 
-### 3.2 Symmetry of the Hessian
+### Worked Examples
 
-By Clairaut's theorem, whenever the second-order partials are continuous:
+**Example 5:** The Hessian matrix of $f(x,y) = x + y$.
 
-$$(H_f)_{ij} = f_{x_i x_j} = f_{x_j x_i} = (H_f)_{ji}.$$
+Since all second-order partial derivatives are zero:
 
-Therefore, **the Hessian matrix is symmetric** under the standard hypotheses. This is an important structural property: the Hessian is always a real symmetric matrix.
-
-### 3.3 Worked Examples
-
-**Example 5:** $f(x, y) = x + y$.
-
-**Solution:** All second-order partials are zero, so:
-
-$$H_f = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}.$$
+$$H_f = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$
 
 ---
 
-**Example 6:** $f(x, y) = \sin(xy)$.
+**Example 6:** The Hessian matrix of $f(x,y) = \sin(xy)$.
 
-**Solution:** From Example 2:
+From Example 2:
 
-$$H_f = \begin{bmatrix} -y^2 \sin(xy) & \cos(xy) - xy\sin(xy) \\ \cos(xy) - xy\sin(xy) & -x^2 \sin(xy) \end{bmatrix}.$$
+$$H_f = \begin{bmatrix} -y^2\sin(xy) & \cos(xy) - xy\sin(xy) \\ \cos(xy) - xy\sin(xy) & -x^2\sin(xy) \end{bmatrix}$$
 
-Note the symmetry: the off-diagonal entries are equal, confirming Clairaut's theorem.
-
----
-
-**Example 7:** $f(x, y, z) = xy + yz + zx$.
-
-**Solution:** From Example 3, the Hessian is the $3 \times 3$ matrix:
-
-$$H_f = \begin{bmatrix} 0 & 1 & 1 \\ 1 & 0 & 1 \\ 1 & 1 & 0 \end{bmatrix}.$$
-
-This is a constant matrix (independent of the point), and is symmetric.
+Note the symmetry $H_f = H_f^T$, consistent with Clairaut's theorem.
 
 ---
 
-## 4. The Hessian Test for $f(x, y)$
+**Example 7:** The Hessian matrix of $f(x,y,z) = xy + yz + zx$.
 
-### 4.1 Review: The Second Derivative Test in One Variable
+From Example 3:
 
-For a function $f$ of one variable with a critical point at $x = a$ (so $f'(a) = 0$), the **second derivative test** states:
+$$H_f = \begin{bmatrix} 0 & 1 & 1 \\ 1 & 0 & 1 \\ 1 & 1 & 0 \end{bmatrix}$$
+
+This is a $3 \times 3$ symmetric matrix with a familiar structure from linear algebra (see [[1 - MATRICES]]).
+
+---
+
+## 4. The Hessian Test for $f(x,y)$
+
+### Recall: The Second Derivative Test for One Variable
+
+For a function $f$ of one variable, suppose $a$ is a critical point (i.e., $f'(a) = 0$) and $f$ is twice differentiable at $a$: [▶ W11_L2 @ 00:46](https://www.youtube.com/watch?v=XJH8RJ5m3OU&t=46)
 
 | Condition | Conclusion |
 |---|---|
@@ -239,175 +223,166 @@ For a function $f$ of one variable with a critical point at $x = a$ (so $f'(a) =
 | $f''(a) < 0$ | $a$ is a **local maximum** |
 | $f''(a) = 0$ | **Inconclusive** |
 
-We seek an analogous test using the Hessian matrix.
+The Hessian test generalises this to functions of two (and more) variables.
 
-### 4.2 Statement of the Hessian Test ($n = 2$)
+### Statement of the Hessian Test for Two Variables
 
-Let $f(x, y)$ be defined on a domain $D \subseteq \mathbb{R}^2$. Suppose $\tilde{a} = (a, b)$ is a **critical point** (i.e., $\nabla f(\tilde{a}) = \mathbf{0}$ or $\nabla f$ does not exist), and suppose the first and second-order partial derivatives of $f$ are **continuous** in an open ball around $\tilde{a}$.
+**Theorem (Hessian Test for $f(x,y)$).** Let $f(x,y)$ be defined on a domain $D \subseteq \mathbb{R}^2$, and let $\mathbf{a} = (a,b)$ be a critical point of $f$ (i.e., $\nabla f(\mathbf{a}) = \mathbf{0}$). Suppose the first- and second-order partial derivatives of $f$ are continuous in an open ball around $\mathbf{a}$. Define the **Hessian determinant**: [▶ W11_L2 @ 03:00](https://www.youtube.com/watch?v=XJH8RJ5m3OU&t=180)
 
-Compute the Hessian matrix at $\tilde{a}$:
+$$D = \det(H_f(\mathbf{a})) = f_{xx}(\mathbf{a}) \cdot f_{yy}(\mathbf{a}) - \bigl(f_{xy}(\mathbf{a})\bigr)^2$$
 
-$$H_f(\tilde{a}) = \begin{bmatrix} f_{xx}(\tilde{a}) & f_{xy}(\tilde{a}) \\ f_{xy}(\tilde{a}) & f_{yy}(\tilde{a}) \end{bmatrix}$$
-
-and its determinant (sometimes called the **Hessian determinant** or **discriminant**):
-
-$$D = \det\bigl(H_f(\tilde{a})\bigr) = f_{xx}(\tilde{a}) \cdot f_{yy}(\tilde{a}) - \bigl[f_{xy}(\tilde{a})\bigr]^2.$$
+(Note: by Clairaut's theorem, $f_{xy}(\mathbf{a}) = f_{yx}(\mathbf{a})$ under our hypotheses, so the cross-term is $f_{xy}^2$.)
 
 Then:
 
 | Condition | Conclusion |
 |---|---|
-| $D > 0$ and $f_{xx}(\tilde{a}) > 0$ | $\tilde{a}$ is a **local minimum** |
-| $D > 0$ and $f_{xx}(\tilde{a}) < 0$ | $\tilde{a}$ is a **local maximum** |
-| $D < 0$ | $\tilde{a}$ is a **saddle point** |
+| $D > 0$ and $f_{xx}(\mathbf{a}) > 0$ | $\mathbf{a}$ is a **local minimum** |
+| $D > 0$ and $f_{xx}(\mathbf{a}) < 0$ | $\mathbf{a}$ is a **local maximum** |
+| $D < 0$ | $\mathbf{a}$ is a **saddle point** |
 | $D = 0$ | **Inconclusive** (degenerate case) |
 
-> **Clarification:** When $D > 0$, the sign of $f_{xx}(\tilde{a})$ determines whether we have a minimum or maximum. One could equivalently check $f_{yy}(\tilde{a})$: since $D = f_{xx}f_{yy} - f_{xy}^2 > 0$, the signs of $f_{xx}$ and $f_{yy}$ must agree (they have the same sign). So the test is symmetric in $x$ and $y$.
+> **Clarification:** When $D > 0$, the sign of $f_{xx}$ alone determines the nature of the critical point. You do **not** need to check $f_{yy}$ separately, because $D > 0$ together with $f_{xx} > 0$ automatically implies $f_{yy} > 0$ (and similarly for the negative case). Indeed, $D > 0$ means $f_{xx} f_{yy} > f_{xy}^2 \geq 0$, so $f_{xx}$ and $f_{yy}$ must have the same sign.
 
-### 4.3 Prototype Examples
+### Prototype Examples to Remember the Test
 
-These four functions illustrate each case of the test and serve as mnemonics.
+The following four functions are the canonical examples for each case. Memorising them provides an easy way to reconstruct the test from scratch.
 
-**Prototype 1 — Local minimum:** $f(x, y) = x^2 + y^2$.
+**Prototype 1: Local minimum — $f(x,y) = x^2 + y^2$**
 
-$$\nabla f = (2x, 2y), \quad H_f = \begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix}.$$
+- $\nabla f = (2x, 2y)$; critical point: $(0,0)$.
+- $H_f = \begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix}$, so $D = 4 > 0$ and $f_{xx} = 2 > 0$.
+- **Conclusion:** $(0,0)$ is a local minimum. ✓ (This is obvious since $f \geq 0$ with equality only at the origin.)
 
-Critical point: $(0, 0)$. At $(0, 0)$: $D = 4 > 0$ and $f_{xx} = 2 > 0$. **Conclusion:** local minimum. ✓ (The function is a bowl opening upward.)
+**Prototype 2: Local maximum — $f(x,y) = -x^2 - y^2$**
 
----
+- $\nabla f = (-2x, -2y)$; critical point: $(0,0)$.
+- $H_f = \begin{bmatrix} -2 & 0 \\ 0 & -2 \end{bmatrix}$, so $D = 4 > 0$ and $f_{xx} = -2 < 0$.
+- **Conclusion:** $(0,0)$ is a local maximum. ✓
 
-**Prototype 2 — Local maximum:** $f(x, y) = -x^2 - y^2$.
+**Prototype 3: Saddle point — $f(x,y) = x^2 - y^2$**
 
-$$\nabla f = (-2x, -2y), \quad H_f = \begin{bmatrix} -2 & 0 \\ 0 & -2 \end{bmatrix}.$$
+- $\nabla f = (2x, -2y)$; critical point: $(0,0)$.
+- $H_f = \begin{bmatrix} 2 & 0 \\ 0 & -2 \end{bmatrix}$, so $D = -4 < 0$.
+- **Conclusion:** $(0,0)$ is a saddle point. ✓
 
-Critical point: $(0, 0)$. At $(0, 0)$: $D = 4 > 0$ and $f_{xx} = -2 < 0$. **Conclusion:** local maximum. ✓ (An inverted bowl.)
+**Prototype 4: Inconclusive — $f(x,y) = x^4 + y^4$**
 
----
+- $\nabla f = (4x^3, 4y^3)$; critical point: $(0,0)$.
+- $H_f(0,0) = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$, so $D = 0$.
+- **Conclusion:** Inconclusive. ✗ (In reality, $(0,0)$ is a global minimum — the test simply cannot detect it because the second-order information vanishes.)
 
-**Prototype 3 — Saddle point:** $f(x, y) = x^2 - y^2$.
+### Further Worked Examples
 
-$$\nabla f = (2x, -2y), \quad H_f = \begin{bmatrix} 2 & 0 \\ 0 & -2 \end{bmatrix}.$$
-
-Critical point: $(0, 0)$. At $(0, 0)$: $D = (2)(-2) - 0 = -4 < 0$. **Conclusion:** saddle point. ✓ (The classic saddle shape.)
-
----
-
-**Prototype 4 — Inconclusive:** $f(x, y) = x^4 + y^4$.
-
-$$\nabla f = (4x^3, 4y^3), \quad H_f = \begin{bmatrix} 12x^2 & 0 \\ 0 & 12y^2 \end{bmatrix}.$$
-
-Critical point: $(0, 0)$. At $(0, 0)$: $H_f(0,0) = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$, so $D = 0$. **Conclusion:** inconclusive. Yet $(0, 0)$ is clearly a global minimum (since $x^4 + y^4 \geq 0$ with equality only at the origin).
-
-> **Clarification:** The inconclusive case does **not** mean the point is not an extremum — it means the Hessian test cannot determine its nature. Other methods (direct analysis, higher-order tests) must be used.
-
-### 4.4 Further Worked Examples
-
-**Example 8:** $f(x, y) = x^2 + 6xy + 4y^2 + 2x - 4y$.
+**Example 8:** Classify the critical points of $f(x,y) = x^2 + 6xy + 4y^2 + 2x - 4y$.
 
 **Solution:**
 
-**Step 1 — Gradient:**
+*Step 1: Find the gradient.*
 
-$$\nabla f = (2x + 6y + 2, \; 6x + 8y - 4).$$
+$$\nabla f = (2x + 6y + 2, \; 6x + 8y - 4)$$
 
-**Step 2 — Critical points:** Set $\nabla f = \mathbf{0}$:
+*Step 2: Set the gradient to zero.*
 
 $$\begin{cases} 2x + 6y + 2 = 0 \\ 6x + 8y - 4 = 0 \end{cases}$$
 
-From the first equation: $x = -3y - 1$. Substituting into the second: $6(-3y - 1) + 8y - 4 = 0 \implies -18y - 6 + 8y - 4 = 0 \implies -10y = 10 \implies y = -1$. Then $x = -3(-1) - 1 = 2$.
+Solving (e.g., by Gaussian elimination): from the first equation, $x = -3y - 1$. Substituting into the second: $6(-3y-1) + 8y - 4 = 0 \implies -10y - 10 = 0 \implies y = -1$. Then $x = -3(-1) - 1 = 2$.
 
 Critical point: $(2, -1)$.
 
-**Step 3 — Hessian:**
+*Step 3: Compute the Hessian.*
 
-$$H_f = \begin{bmatrix} 2 & 6 \\ 6 & 8 \end{bmatrix}.$$
+$$H_f = \begin{bmatrix} 2 & 6 \\ 6 & 8 \end{bmatrix}$$
 
-(This is constant — independent of the point.)
+(This Hessian is constant — it does not depend on the point.)
 
-**Step 4 — Hessian test at $(2, -1)$:**
+*Step 4: Apply the test at $(2,-1)$.*
 
-$$D = \det\begin{bmatrix} 2 & 6 \\ 6 & 8 \end{bmatrix} = 16 - 36 = -20 < 0.$$
+$$D = \det(H_f) = (2)(8) - (6)^2 = 16 - 36 = -20 < 0$$
 
-**Conclusion:** $(2, -1)$ is a **saddle point**.
+Since $D < 0$, the point $(2,-1)$ is a **saddle point**.
 
 ---
 
-**Example 9:** $f(x, y) = xy - x^3 - y^2$.
+**Example 9:** Classify the critical points of $f(x,y) = xy - x^3 - y^2$.
 
 **Solution:**
 
-**Step 1 — Gradient:**
+*Step 1: Gradient.*
 
-$$\nabla f = (y - 3x^2, \; x - 2y).$$
+$$\nabla f = (y - 3x^2, \; x - 2y)$$
 
-**Step 2 — Critical points:** Set $\nabla f = \mathbf{0}$:
+*Step 2: Set to zero.*
 
-$$\begin{cases} y - 3x^2 = 0 \\ x - 2y = 0 \end{cases}$$
+From $x - 2y = 0$, we get $x = 2y$. Substituting into $y - 3x^2 = 0$:
 
-From the second equation: $x = 2y$. Substituting into the first: $y = 3(2y)^2 = 12y^2$, so $y(1 - 12y) = 0$.
+$$y - 3(2y)^2 = 0 \implies y - 12y^2 = 0 \implies y(1 - 12y) = 0$$
 
-- If $y = 0$: then $x = 0$. Critical point: $(0, 0)$.
+- If $y = 0$: then $x = 0$. Critical point: $(0,0)$.
 - If $y = \frac{1}{12}$: then $x = \frac{1}{6}$. Critical point: $\left(\frac{1}{6}, \frac{1}{12}\right)$.
 
-**Step 3 — Hessian:**
+*Step 3: Hessian.*
 
-$$H_f = \begin{bmatrix} -6x & 1 \\ 1 & -2 \end{bmatrix}.$$
+$$H_f = \begin{bmatrix} -6x & 1 \\ 1 & -2 \end{bmatrix}$$
 
-**Step 4 — Test at $(0, 0)$:**
+*Step 4: Test at $(0,0)$.*
 
-$$H_f(0, 0) = \begin{bmatrix} 0 & 1 \\ 1 & -2 \end{bmatrix}, \quad D = (0)(-2) - 1^2 = -1 < 0.$$
+$$H_f(0,0) = \begin{bmatrix} 0 & 1 \\ 1 & -2 \end{bmatrix}, \qquad D = (0)(-2) - (1)^2 = -1 < 0$$
 
-**Conclusion:** $(0, 0)$ is a **saddle point**.
+**Conclusion:** $(0,0)$ is a **saddle point**.
 
-**Step 5 — Test at $\left(\frac{1}{6}, \frac{1}{12}\right)$:**
+*Step 5: Test at $\left(\frac{1}{6}, \frac{1}{12}\right)$.*
 
-$$H_f\!\left(\tfrac{1}{6}, \tfrac{1}{12}\right) = \begin{bmatrix} -1 & 1 \\ 1 & -2 \end{bmatrix}, \quad D = (-1)(-2) - 1^2 = 2 - 1 = 1 > 0.$$
+$$H_f\!\left(\tfrac{1}{6}, \tfrac{1}{12}\right) = \begin{bmatrix} -1 & 1 \\ 1 & -2 \end{bmatrix}, \qquad D = (-1)(-2) - (1)^2 = 2 - 1 = 1 > 0$$
 
-Since $D > 0$ and $f_{xx} = -1 < 0$: **Conclusion:** $\left(\frac{1}{6}, \frac{1}{12}\right)$ is a **local maximum**.
+Since $D > 0$ and $f_{xx} = -1 < 0$:
 
----
-
-**Example 10:** $f(x, y) = \sin(xy)$.
-
-**Solution:** From earlier work, the critical points where $\nabla f = \mathbf{0}$ satisfy either:
-
-- $\cos(xy) = 0$ (which forces $\sin(xy) = \pm 1$), giving curves of global maxima and minima, or
-- $\cos(xy) \neq 0$, which requires both $x = 0$ and $y = 0$, giving the isolated critical point $(0, 0)$.
-
-**Test at $(0, 0)$:**
-
-$$H_f(0, 0) = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}, \quad D = 0 - 1 = -1 < 0.$$
-
-**Conclusion:** $(0, 0)$ is a **saddle point**.
-
-**Test at points where $\sin(xy) = \pm 1$:** In both cases, $\cos(xy) = 0$, and the Hessian becomes:
-
-$$H_f = \begin{bmatrix} \mp y^2 & -xy\sin(xy) \\ -xy\sin(xy) & \mp x^2 \end{bmatrix} = \begin{bmatrix} \mp y^2 & 0 \\ 0 & \mp x^2 \end{bmatrix}$$
-
-(since $\cos(xy) = 0$ kills the non-$\sin$ terms in the off-diagonal entries, leaving only $-xy\sin(xy)$ which, noting that $xy = \frac{\pi}{2} + k\pi$ and cancellations, actually gives): In fact, the off-diagonal is $\cos(xy) - xy\sin(xy) = 0 - xy(\pm 1)$. So the Hessian at such a point is:
-
-$$H_f = \begin{bmatrix} \mp y^2 & \mp xy \\ \mp xy & \mp x^2 \end{bmatrix}$$
-
-where the upper sign corresponds to $\sin(xy) = 1$ and the lower to $\sin(xy) = -1$.
-
-The determinant is $(\mp y^2)(\mp x^2) - (\mp xy)^2 = x^2 y^2 - x^2 y^2 = 0$.
-
-**Conclusion:** The Hessian test is **inconclusive** at all points where $\sin(xy) = \pm 1$, even though these are clearly global extrema. This demonstrates that the test can fail even at obvious extrema.
+**Conclusion:** $\left(\frac{1}{6}, \frac{1}{12}\right)$ is a **local maximum**.
 
 ---
 
-## 5. Leading Principal Minors and the Hessian Test for $f(x, y, z)$
+**Example 10:** Classify the critical point $(0,0)$ of $f(x,y) = \sin(xy)$.
 
-### 5.1 Leading Principal Minors
+**Solution:** We identified in [[15 - TANGENTS AND CRITICAL POINTS]] that the critical points of $\sin(xy)$ include $(0,0)$ (where $\cos(0) \neq 0$ forces $x = 0$ and $y = 0$) and curves where $\cos(xy) = 0$.
 
-To state the Hessian test for three or more variables, we need the concept of **leading principal minors**.
+At $(0,0)$:
 
-**Definition.** Let $A$ be an $n \times n$ matrix. The **$k$-th leading principal minor** of $A$, denoted $\Delta_k$, is the determinant of the $k \times k$ submatrix in the **top-left corner** of $A$:
+$$H_f(0,0) = \begin{bmatrix} 0 & \cos(0) - 0 \\ \cos(0) - 0 & 0 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}$$
 
-$$\Delta_k = \det\bigl(A_{[1..k, \, 1..k]}\bigr), \qquad k = 1, 2, \ldots, n.$$
+$$D = (0)(0) - (1)^2 = -1 < 0$$
 
-For the $3 \times 3$ Hessian matrix
+**Conclusion:** $(0,0)$ is a **saddle point**. [▶ W11_L2 @ 25:13](https://www.youtube.com/watch?v=XJH8RJ5m3OU&t=1513)
 
-$$H_f(\tilde{a}) = \begin{bmatrix} f_{xx} & f_{xy} & f_{xz} \\ f_{xy} & f_{yy} & f_{yz} \\ f_{xz} & f_{yz} & f_{zz} \end{bmatrix}$$
+For critical points where $\cos(xy) = 0$ (i.e., $\sin(xy) = \pm 1$), the Hessian has the form:
 
-(all evaluated at $\tilde{a}$), the
+$$H_f = \begin{bmatrix} -y^2 \sin(xy) & -xy\sin(xy) \\ -xy\sin(xy) & -x^2 \sin(xy) \end{bmatrix}$$
+
+with $\cos(xy) = 0$. The determinant is:
+
+$$D = (y^2 \sin(xy))(x^2 \sin(xy)) - (xy\sin(xy))^2 = x^2 y^2 \sin^2(xy) - x^2 y^2 \sin^2(xy) = 0$$
+
+The test is **inconclusive** at every point on these curves, even though we know they are global maxima ($\sin(xy) = 1$) or global minima ($\sin(xy) = -1$). This illustrates that the Hessian test can fail even at points whose nature is completely understood by other means.
+
+---
+
+## 5. Leading Principal Minors and the Hessian Test for $f(x,y,z)$
+
+### Leading Principal Minors
+
+To state the Hessian test for three (or more) variables, we need the concept of **leading principal minors** of a matrix. [▶ W11_L3 @ 07:02](https://www.youtube.com/watch?v=QOqj5I8q_eU&t=422)
+
+**Definition.** For an $n \times n$ matrix $A$, the **$k$-th leading principal minor** $\Delta_k$ is the determinant of the $k \times k$ submatrix in the **top-left corner** of $A$, for $k = 1, 2, \ldots, n$.
+
+For a $3 \times 3$ Hessian matrix:
+
+$$H_f(\mathbf{a}) = \begin{bmatrix} f_{xx} & f_{xy} & f_{xz} \\ f_{xy} & f_{yy} & f_{yz} \\ f_{xz} & f_{yz} & f_{zz} \end{bmatrix}$$
+
+(where all entries are evaluated at $\mathbf{a}$ and we use Clairaut's theorem for symmetry), the leading principal minors are:
+
+$$\Delta_1 = f_{xx}(\mathbf{a})$$
+
+$$\Delta_2 = \det\begin{bmatrix} f_{xx} & f_{xy} \\ f_{xy} & f_{yy} \end{bmatrix}\bigg|_{\mathbf{a}} = f_{xx}(\mathbf{a}) \cdot f_{yy}(\mathbf{a}) - \bigl(f_{xy}(\mathbf{a})\bigr)^2$$
+
+$$\Delta_3 = \det(H_f(\mathbf{a}))$$
+
+Note that $\Delta
