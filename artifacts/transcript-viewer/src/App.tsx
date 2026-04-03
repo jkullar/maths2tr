@@ -346,6 +346,7 @@ function App() {
                 <NotesView
                   sidebarOpen={sidebarOpen}
                   onSidebarClose={() => setSidebarOpen(false)}
+                  onNavigateToTranscript={handleNavigateToTranscript}
                 />
               )}
             </main>

@@ -4,7 +4,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Search, X, Play, Pause, Square, Volume2 } from "lucide-react";
+import { ChevronRight, Search, X, Play, Pause, Square, Volume2, PlayCircle } from "lucide-react";
 import notesRaw from "@/data/notes.json";
 
 interface Note {
@@ -34,6 +34,9 @@ function toNoteId(link: string): string | null {
   return found?.id ?? null;
 }
 
+// Regex that matches note timestamp links: [▶ W7_L1 @ 00:31](url)
+const TIMESTAMP_LINK_RE = /^▶\s+(\S+)\s+@\s+(\d{1,2}:\d{2})$/;
+
 function stripForSpeech(markdown: string): string {
   return markdown
     .replace(/\$\$[\s\S]*?\$\$/g, " math formula. ")
@@ -48,6 +51,8 @@ function stripForSpeech(markdown: string): string {
     .replace(/^>\s+/gm, "")
     .replace(/^[-*+]\s+/gm, "")
     .replace(/^\d+\.\s+/gm, "")
+    // Strip timestamp links entirely (they add no audio value)
+    .replace(/\[▶[^\]]+\]\([^)]+\)/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/^---+$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
@@ -57,6 +62,7 @@ function stripForSpeech(markdown: string): string {
 interface NotesViewProps {
   sidebarOpen: boolean;
   onSidebarClose: () => void;
+  onNavigateToTranscript: (code: string, timestamp: string) => void;
 }
 
 // Load voices, waiting for Chrome's async voiceschanged event if needed
@@ -70,7 +76,7 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
-export function NotesView({ sidebarOpen, onSidebarClose }: NotesViewProps) {
+export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript }: NotesViewProps) {
   const [selectedId, setSelectedId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
   const [ttsState, setTtsState] = useState<"idle" | "playing" | "paused">("idle");
@@ -335,6 +341,7 @@ export function NotesView({ sidebarOpen, onSidebarClose }: NotesViewProps) {
                 rehypePlugins={[rehypeKatex]}
                 components={{
                   a: ({ href, children }) => {
+                    // Wikilink → in-note navigation
                     if (href?.startsWith("#note-")) {
                       const noteId = href.replace("#note-", "");
                       return (
@@ -343,6 +350,26 @@ export function NotesView({ sidebarOpen, onSidebarClose }: NotesViewProps) {
                           className="text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary transition-colors font-medium cursor-pointer"
                         >
                           {children}
+                        </button>
+                      );
+                    }
+                    // Timestamp link → navigate to Transcripts tab at exact moment
+                    const linkText = typeof children === "string"
+                      ? children
+                      : Array.isArray(children)
+                        ? children.map((c) => (typeof c === "string" ? c : "")).join("")
+                        : "";
+                    const tsMatch = linkText.match(TIMESTAMP_LINK_RE);
+                    if (tsMatch) {
+                      const [, code, timestamp] = tsMatch;
+                      return (
+                        <button
+                          onClick={() => onNavigateToTranscript(code, timestamp)}
+                          title={`Open ${code} at ${timestamp} in Transcripts`}
+                          className="inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer not-prose"
+                        >
+                          <PlayCircle className="w-3 h-3 flex-shrink-0" />
+                          {code} @ {timestamp}
                         </button>
                       );
                     }
