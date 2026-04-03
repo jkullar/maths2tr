@@ -24,13 +24,16 @@ const data = transcriptsData as unknown as TranscriptsData;
 type CourseTab = "transcripts" | "curriculum" | "notes";
 type TranscriptsMode = "welcome" | "transcript" | "search";
 
-const COURSE_META: Record<string, { name: string; level: string; semester: string }> = {
+const COURSE_META: Record<string, { name: string; level: string; semester: string; degreeSlug: string }> = {
   maths2: {
     name: "Mathematics for Data Science II",
     level: "Foundation",
     semester: "Semester 2",
+    degreeSlug: "bs-data-science",
   },
 };
+
+const DEGREE_SLUGS = new Set(["bs-data-science"]);
 
 function App() {
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ function App() {
   const pathParts = location.pathname.split("/").filter(Boolean);
   const appPage: "home" | "course" | "aigroup" =
     pathParts[0] === "ai-group" ? "aigroup" :
-    pathParts[0] === "course" ? "course" : "home";
+    (DEGREE_SLUGS.has(pathParts[0]) && pathParts[1]) ? "course" : "home";
   const activeCourse: string | null = appPage === "course" ? (pathParts[1] ?? null) : null;
 
   const [darkMode, setDarkMode] = useState(false);
@@ -77,7 +80,8 @@ function App() {
   }, [debouncedQuery, selectedVideo]);
 
   const handleOpenCourse = useCallback((courseId: string, withQuery?: string) => {
-    navigate(`/course/${courseId}`);
+    const degreeSlug = COURSE_META[courseId]?.degreeSlug ?? "bs-data-science";
+    navigate(`/${degreeSlug}/${courseId}`);
     setCourseTab("transcripts");
     if (withQuery) {
       setSearchQuery(withQuery);

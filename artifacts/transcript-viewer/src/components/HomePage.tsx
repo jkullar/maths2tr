@@ -13,6 +13,7 @@ interface Course {
   code: string;
   name: string;
   available: boolean;
+  degreeSlug?: string;
   stats?: { videos: number; transcripts: number; concepts: number; notes?: number };
 }
 
@@ -57,6 +58,7 @@ const PROGRAMS: Program[] = [
             code: "BSCMA1002",
             name: "Mathematics for Data Science II",
             available: true,
+            degreeSlug: "bs-data-science",
             stats: { videos: 110, transcripts: 109, concepts: 270, notes: 18 },
           },
           { id: "", code: "BSCST1002", name: "Statistics for Data Science II", available: false },
@@ -179,7 +181,7 @@ function CourseCard({ course, onOpen }: { course: Course; onOpen: () => void }) 
 
   return (
     <Link
-      to={`/course/${course.id}`}
+      to={`/${course.degreeSlug ?? "bs-data-science"}/${course.id}`}
       onClick={onOpen}
       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all text-left group"
     >
