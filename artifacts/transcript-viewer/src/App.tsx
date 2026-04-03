@@ -14,6 +14,7 @@ import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { CurriculumView } from "@/components/CurriculumView";
 import { NotesView } from "@/components/NotesView";
 import { HomePage } from "@/components/HomePage";
+import { GlobalSearchResults } from "@/components/GlobalSearchResults";
 import { cn } from "@/lib/utils";
 
 const data = transcriptsData as unknown as TranscriptsData;
@@ -65,12 +66,17 @@ function App() {
     return "welcome";
   }, [debouncedQuery, selectedVideo]);
 
-  const handleOpenCourse = useCallback((courseId: string) => {
+  const handleOpenCourse = useCallback((courseId: string, withQuery?: string) => {
     setActiveCourse(courseId);
     setAppPage("course");
     setCourseTab("transcripts");
-    setSearchQuery("");
-    setDebouncedQuery("");
+    if (withQuery) {
+      setSearchQuery(withQuery);
+      setDebouncedQuery(withQuery);
+    } else {
+      setSearchQuery("");
+      setDebouncedQuery("");
+    }
   }, []);
 
   const handleGoHome = useCallback(() => {
@@ -124,8 +130,12 @@ function App() {
   };
 
   const courseMeta = activeCourse ? COURSE_META[activeCourse] : null;
-  const showSearch = appPage === "course" && courseTab === "transcripts";
   const showMobileMenuBtn = appPage === "course" && courseTab === "transcripts";
+  const isGlobalSearch = appPage === "home" && debouncedQuery.trim().length > 0;
+  const searchPlaceholder =
+    appPage === "home"
+      ? "Search across all courses... (e.g. vector, gradient)"
+      : "Search transcripts...";
 
   const COURSE_TABS: { id: CourseTab; label: string; icon: typeof BookOpen }[] = [
     { id: "transcripts", label: "Transcripts", icon: BookOpen },
@@ -188,27 +198,25 @@ function App() {
 
           <div className="flex-1" />
 
-          {showSearch && (
-            <div className="flex-1 max-w-md relative hidden sm:block">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="search"
-                placeholder="Search transcripts..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full h-8 pl-8 pr-8 rounded-md text-sm bg-muted/60 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          )}
+          <div className="flex-1 max-w-md relative hidden sm:block">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="search"
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full h-8 pl-8 pr-8 rounded-md text-sm bg-muted/60 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={clearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
 
           <button
             onClick={() => setDarkMode((v) => !v)}
@@ -236,7 +244,7 @@ function App() {
               </button>
             ))}
 
-            {showSearch && (
+            {courseTab === "transcripts" && (
               <div className="flex-1 flex items-center justify-end pb-1 sm:hidden">
                 <div className="relative w-40">
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
@@ -269,7 +277,14 @@ function App() {
 
         {appPage === "home" && (
           <main className="flex-1 overflow-hidden">
-            <HomePage onOpenCourse={handleOpenCourse} />
+            {isGlobalSearch ? (
+              <GlobalSearchResults
+                query={debouncedQuery}
+                onOpenCourse={handleOpenCourse}
+              />
+            ) : (
+              <HomePage onOpenCourse={handleOpenCourse} />
+            )}
           </main>
         )}
 
