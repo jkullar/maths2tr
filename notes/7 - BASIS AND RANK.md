@@ -1,424 +1,380 @@
+
+
 # BASIS AND RANK
 
-## 1. Span and Spanning Sets
+This file develops the central concept of a **basis** for a vector space — a set of vectors that is simultaneously linearly independent and spanning. A basis provides the most efficient way to represent every vector in a space, and its size gives us the **dimension** of that space. We then connect these ideas to matrices through the **rank**, establishing the fundamental equality of row rank and column rank. These concepts unify much of what we have studied so far: solving linear systems ([[2 - SOLVING SYSTEMS]]), understanding vector spaces ([[5 - VECTORS AND SPACES]]), and testing linear independence ([[6 - INDEPENDENCE]]).
 
-### Definition of Span
+---
 
-The **span** of a set of vectors $S = \{v_1, v_2, \ldots, v_k\}$ is the set of **all possible linear combinations** of vectors in $S$:
+## 1. Span of a Set of Vectors
 
-$$\text{span}(S) = \{a_1 v_1 + a_2 v_2 + \cdots + a_k v_k \mid a_1, a_2, \ldots, a_k \in \mathbb{R}\}$$
+Before defining a basis, we need the notion of **span** — the collection of all vectors reachable by forming linear combinations of a given set.
 
-**Convention:** $\text{span}(\emptyset) = \{0\}$ (the span of the empty set is just the zero vector).
+### Definition
 
-**Key property:** $\text{span}(S)$ is always a **subspace** of the vector space $V$. If you add two vectors in the span, the result is still in the span; if you scale a vector in the span, the result is still in the span.
+Let $S = \{v_1, v_2, \ldots, v_k\}$ be a subset of a vector space $V$. The **span** of $S$ is the set of all finite linear combinations of vectors in $S$: [▶ W4_L1 @ 02:52](https://www.youtube.com/watch?v=lhAQIaFOPxA&t=172)
 
-### Examples
+$$\text{span}(S) = \left\{ a_1 v_1 + a_2 v_2 + \cdots + a_k v_k \;\middle|\; a_1, a_2, \ldots, a_k \in \mathbb{R} \right\}$$
 
-**In $\mathbb{R}^2$:**
-- $\text{span}\{(1, 0)\} = \{(a, 0) \mid a \in \mathbb{R}\}$ = the x-axis (a line)
-- $\text{span}\{(1, 1)\} = \{(a, a) \mid a \in \mathbb{R}\}$ = the line $y = x$
-- $\text{span}\{(1, 0), (0, 1)\} = \mathbb{R}^2$ (the entire plane)
+By convention, the span of the empty set is the zero vector alone:
 
-**In $\mathbb{R}^3$:**
-- $\text{span}\{(1, 0, 0), (0, 1, 0)\} = \{(a, b, 0) \mid a, b \in \mathbb{R}\}$ = the xy-plane
-- $\text{span}\{(1, 0, 0), (0, 1, 0), (0, 0, 1)\} = \mathbb{R}^3$
+$$\text{span}(\varnothing) = \{\mathbf{0}\}$$
 
-### Spanning Sets
+### Key Property
 
-A set $S$ is a **spanning set** for a vector space $V$ if $\text{span}(S) = V$, meaning every vector in $V$ can be written as a linear combination of vectors from $S$.
+The span of any subset $S \subseteq V$ is itself a **subspace** of $V$ (see [[5 - VECTORS AND SPACES]] for the subspace definition). This follows because:
 
-**Key facts about spanning sets:**
-- If $S$ is a spanning set for $V$ and $S \subseteq T$, then $T$ is also a spanning set for $V$ (supersets of spanning sets are spanning)
-- If $T \subseteq \text{span}(S)$, then $\text{span}(T) \subseteq \text{span}(S)$
+1. $\mathbf{0} \in \text{span}(S)$ (take all coefficients equal to zero).
+2. Any linear combination of elements in $\text{span}(S)$ is again in $\text{span}(S)$.
+
+### Monotonicity of Span
+
+If $T \subseteq S$, then $\text{span}(T) \subseteq \text{span}(S)$. More generally:
+
+> If $T \subseteq \text{span}(S)$, then $\text{span}(T) \subseteq \text{span}(S)$.
+
+This means that adding vectors to a set can only enlarge (or maintain) the span, and removing vectors can only shrink (or maintain) it.
+
+### Worked Examples
+
+**Example 1:** Let $S = \{(1, 0)\} \subset \mathbb{R}^2$.
+
+$$\text{span}(S) = \{a(1,0) \mid a \in \mathbb{R}\} = \{(a, 0) \mid a \in \mathbb{R}\}$$
+
+This is the $x$-axis in $\mathbb{R}^2$.
+
+**Example 2:** Let $S = \{(1, 1)\} \subset \mathbb{R}^2$.
+
+$$\text{span}(S) = \{a(1,1) \mid a \in \mathbb{R}\} = \{(a, a) \mid a \in \mathbb{R}\}$$
+
+This is the line $y = x$ in $\mathbb{R}^2$.
+
+**Example 3:** Let $S = \{(1, 0, 0),\; (0, 1, 0)\} \subset \mathbb{R}^3$.
+
+$$\text{span}(S) = \{a(1,0,0) + b(0,1,0) \mid a, b \in \mathbb{R}\} = \{(a, b, 0) \mid a, b \in \mathbb{R}\}$$
+
+This is the $xy$-plane in $\mathbb{R}^3$.
+
+---
+
+## 2. Spanning Sets
+
+### Definition
+
+Let $V$ be a vector space. A subset $S \subseteq V$ is called a **spanning set** for $V$ if $\text{span}(S) = V$. [▶ W4_L1 @ 05:49](https://www.youtube.com/watch?v=lhAQIaFOPxA&t=349)
+
+Equivalently, $S$ is a spanning set for $V$ if every vector $v \in V$ can be written as a linear combination of vectors from $S$.
+
+### Examples in $\mathbb{R}^2$
+
+| Set $S$ | Spanning $\mathbb{R}^2$? | Reason |
+|---|---|---|
+| $\{(1,0),\;(0,1)\}$ | Yes | $(x,y) = x(1,0) + y(0,1)$ |
+| $\{(1,0),\;(0,1),\;(1,2)\}$ | Yes | Superset of a spanning set |
+| $\{(1,1),\;(0,1)\}$ | Yes | $(x,y) = x(1,1) + (y-x)(0,1)$ |
+| $\{(1,0)\}$ | No | Only reaches the $x$-axis |
+
+> **Clarification:** If $S$ is a spanning set for $V$, then any superset $S' \supseteq S$ is also a spanning set for $V$. This means spanning sets are not unique, and they can be much larger than necessary.
 
 ### Building a Spanning Set by Appending
 
-You can construct a spanning set for $\mathbb{R}^n$ by starting with the empty set and repeatedly **appending** vectors that lie **outside** the current span:
+A systematic way to construct a spanning set for a vector space (such as $\mathbb{R}^3$) is to start with the empty set and repeatedly **append** vectors that lie outside the current span: [▶ W4_L1 @ 11:52](https://www.youtube.com/watch?v=lhAQIaFOPxA&t=712)
 
-**Example for $\mathbb{R}^3$:**
+1. Start with $S_0 = \varnothing$. Then $\text{span}(S_0) = \{\mathbf{0}\}$.
+2. Choose $v_1 \notin \text{span}(S_0)$ and set $S_1 = \{v_1\}$. Now $\text{span}(S_1)$ is a line.
+3. Choose $v_2 \notin \text{span}(S_1)$ and set $S_2 = \{v_1, v_2\}$. Now $\text{span}(S_2)$ is a plane.
+4. Choose $v_3 \notin \text{span}(S_2)$ and set $S_3 = \{v_1, v_2, v_3\}$. Now $\text{span}(S_3) = \mathbb{R}^3$.
 
-1. $S_0 = \emptyset$, $\text{span}(S_0) = \{(0,0,0)\}$ — not all of $\mathbb{R}^3$
-2. Append $(0, 2, 1)$ (outside $\text{span}(S_0)$): $S_1 = \{(0,2,1)\}$, $\text{span}(S_1)$ = a line
-3. Append $(2, 2, 0)$ (outside $\text{span}(S_1)$): $S_2 = \{(0,2,1), (2,2,0)\}$, $\text{span}(S_2)$ = a plane
-4. Append $(0, 0, 5)$ (outside $\text{span}(S_2)$): $S_3 = \{(0,2,1), (2,2,0), (0,0,5)\}$, $\text{span}(S_3) = \mathbb{R}^3$ ✓
+**Example:** Starting in $\mathbb{R}^3$:
 
-Any vector $(x, y, z)$ can be written as a linear combination:
-$$(x,y,z) = \frac{y-x}{2}(0,2,1) + \frac{x}{2}(2,2,0) + \frac{x-y+2z}{10}(0,0,5)$$
+- $S_0 = \varnothing$, $\;\text{span}(S_0) = \{(0,0,0)\}$.
+- Append $(0, 2, 1)$: $\;S_1 = \{(0,2,1)\}$, $\;\text{span}(S_1)$ is a line through the origin.
+- Append $(2,2,0)$: $\;S_2 = \{(0,2,1),\;(2,2,0)\}$, $\;\text{span}(S_2)$ is a plane.
+- Append $(0,0,5)$: $\;S_3 = \{(0,2,1),\;(2,2,0),\;(0,0,5)\}$.
+
+Every $(x,y,z) \in \mathbb{R}^3$ can be written as:
+
+$$\left(\frac{y-x}{2}\right)(0,2,1) + \left(\frac{x}{2}\right)(2,2,0) + \left(\frac{x - y + 2z}{10}\right)(0,0,5) = (x,y,z)$$
+
+Hence $\text{span}(S_3) = \mathbb{R}^3$, and $S_3$ is a spanning set for $\mathbb{R}^3$. The coefficients above are found by solving the corresponding $3 \times 3$ linear system (see [[2 - SOLVING SYSTEMS]]).
 
 ---
 
-## 2. Basis
+## 3. Basis: Definition and Fundamental Properties
 
 ### Definition
 
-A **basis** $B$ of a vector space $V$ is a set of vectors that is:
-1. **Linearly independent** — the only combination giving zero is the trivial one
-2. **Spanning** — every vector in $V$ can be written as a linear combination of vectors in $B$
+A **basis** $B$ for a vector space $V$ is a subset of $V$ that satisfies two conditions simultaneously: [▶ W4_L1 @ 19:12](https://www.youtube.com/watch?v=lhAQIaFOPxA&t=1152)
 
-A basis achieves an **optimal balance**: large enough to span $V$, but small enough to remain linearly independent.
+1. **Spanning:** $\text{span}(B) = V$.
+2. **Linearly independent:** the only solution to $a_1 v_1 + a_2 v_2 + \cdots + a_k v_k = \mathbf{0}$ (where $v_i \in B$) is $a_1 = a_2 = \cdots = a_k = 0$.
 
-### Unique Representation
+A basis is, informally, a set that is "just the right size" — large enough to span $V$, but small enough to remain linearly independent.
 
-If $B = \{v_1, v_2, \ldots, v_n\}$ is a basis for $V$, then every vector $v \in V$ can be written **uniquely** as:
+### Unique Representation Property
+
+If $B = \{v_1, v_2, \ldots, v_n\}$ is a basis for $V$, then every vector $v \in V$ can be written **uniquely** as: [▶ W4_L3 @ 00:28](https://www.youtube.com/watch?v=oATXqim4F5Q&t=28)
 
 $$v = a_1 v_1 + a_2 v_2 + \cdots + a_n v_n$$
 
-- **Spanning** guarantees that such a representation **exists**
-- **Linear independence** guarantees that the coefficients $a_1, \ldots, a_n$ are **unique**
+for scalars $a_1, a_2, \ldots, a_n \in \mathbb{R}$.
 
-### Equivalent Characterizations
+*Why uniqueness?* Suppose there were two representations:
 
-The following conditions on a subset $B$ of $V$ are equivalent:
+$$v = a_1 v_1 + \cdots + a_n v_n = b_1 v_1 + \cdots + b_n v_n$$
 
-| Condition | Description |
-|-----------|-------------|
-| Basis | Linearly independent and spanning |
-| Maximal linearly independent set | Linearly independent, and appending any vector makes it dependent |
-| Minimal spanning set | Spanning, and removing any vector makes it no longer spanning |
+Subtracting: $(a_1 - b_1)v_1 + \cdots + (a_n - b_n)v_n = \mathbf{0}$. By linear independence, $a_i - b_i = 0$ for all $i$, so $a_i = b_i$.
 
-**Why basis $\implies$ maximal linearly independent:**
-If $B$ is a basis and you append any vector $v$, then $v \in \text{span}(B)$ (since $B$ spans $V$). So $v$ is a linear combination of vectors in $B$, making $B \cup \{v\}$ linearly dependent.
+### Equivalent Characterisations
 
-**Why basis $\implies$ minimal spanning:**
-If $B$ is a basis and you remove a vector $v_k$, then $v_k$ cannot be a linear combination of the remaining vectors (since $B$ is linearly independent). So $v_k \notin \text{span}(B \setminus \{v_k\})$, meaning $B \setminus \{v_k\}$ no longer spans $V$.
+The following conditions on a subset $B \subseteq V$ are all equivalent: [▶ W4_L2 @ 01:31](https://www.youtube.com/watch?v=SxPhClO9zSU&t=91)
 
-**Why maximal linearly independent $\implies$ basis:**
-Suppose $B$ is maximal linearly independent. Take any $v \in V$. Since $B \cup \{v\}$ is linearly dependent, $v$ must be a linear combination of vectors in $B$ (otherwise $B$ itself would be dependent, contradicting the assumption). So $B$ spans $V$.
+| Condition | Meaning |
+|---|---|
+| $B$ is linearly independent and $\text{span}(B) = V$ | Definition of basis |
+| $B$ is a **maximal linearly independent set** | $B$ is linearly independent, and appending any vector to $B$ destroys independence |
+| $B$ is a **minimal spanning set** | $B$ spans $V$, and removing any vector from $B$ destroys the spanning property |
 
-### The Standard Basis
+**Sketch of proof that these are equivalent:**
 
-For $\mathbb{R}^n$, the **standard basis** is $\{e_1, e_2, \ldots, e_n\}$ where:
+*Basis $\Rightarrow$ maximal linearly independent:* Since $B$ is a basis, it is linearly independent. If we append any $v \in V$ to $B$, then $v \in \text{span}(B)$, so $v = a_1 v_1 + \cdots + a_n v_n$. This gives the non-trivial relation $1 \cdot v - a_1 v_1 - \cdots - a_n v_n = \mathbf{0}$, so $B \cup \{v\}$ is linearly dependent.
 
-$$e_i = (0, \ldots, 0, \underbrace{1}_{i\text{-th}}, 0, \ldots, 0)$$
+*Basis $\Rightarrow$ minimal spanning:* Since $B$ is a basis, it spans $V$. If we remove some $v_j$ from $B$, and $v_j$ were still in the span of the remaining vectors, then $v_j$ would be a linear combination of the others, contradicting the linear independence of $B$. So removing $v_j$ breaks the spanning property.
 
-**Why it's a basis:**
-- **Spanning:** Any $(x_1, x_2, \ldots, x_n) = x_1 e_1 + x_2 e_2 + \cdots + x_n e_n$ ✓
-- **Independent:** If $a_1 e_1 + \cdots + a_n e_n = 0$, then $(a_1, a_2, \ldots, a_n) = (0, 0, \ldots, 0)$, so all $a_i = 0$ ✓
+*Maximal linearly independent $\Rightarrow$ basis:* $B$ is linearly independent by assumption. For any $v \in V$, appending $v$ to $B$ makes it linearly dependent. This means $v$ is a linear combination of vectors in $B$ (if it were not, the enlarged set would still be independent — see [[6 - INDEPENDENCE]]). Hence $\text{span}(B) = V$.
 
-**Examples:**
-- Standard basis for $\mathbb{R}^2$: $\{(1,0), (0,1)\}$
-- Standard basis for $\mathbb{R}^3$: $\{(1,0,0), (0,1,0), (0,0,1)\}$
-
-### Non-Standard Bases
-
-The standard basis is not the only basis! For example:
-- $\{(1, 1), (0, 1)\}$ is also a basis for $\mathbb{R}^2$ (linearly independent and spanning)
-- $\{(1, 2), (2, 3)\}$ is also a basis for $\mathbb{R}^2$
+> **Clarification:** A basis is not unique. A vector space typically has infinitely many different bases — but, as we shall see, they all have the same number of elements.
 
 ---
 
-## 3. Finding Bases
-
-### Method 1: Append (Build Up)
-
-Start with the empty set and keep appending vectors that are **not in the span** of the current set:
-
-1. Start with $S_0 = \emptyset$
-2. Choose any nonzero vector $v_1$; set $S_1 = \{v_1\}$
-3. Choose $v_2 \notin \text{span}(S_1)$; set $S_2 = \{v_1, v_2\}$
-4. Continue until $\text{span}(S_k) = V$
-
-The resulting set is a basis (linearly independent by construction, spanning by termination).
-
-**Example:** Find a basis for $\mathbb{R}^2$ starting from scratch:
-1. Choose $(1, 2)$: $\text{span}\{(1,2)\}$ = line $y = 2x$, not all of $\mathbb{R}^2$
-2. Choose $(2, 3) \notin \text{span}\{(1,2)\}$: $\text{span}\{(1,2), (2,3)\} = \mathbb{R}^2$ ✓
-
-So $\{(1,2), (2,3)\}$ is a basis for $\mathbb{R}^2$.
-
-### Method 2: Delete (Trim Down)
-
-Start with a spanning set and keep **removing** vectors that are linear combinations of the others:
-
-1. Start with a spanning set $S$
-2. Find a vector $v \in S$ that is a linear combination of the others
-3. Remove $v$ from $S$
-4. Repeat until no vector can be removed
-
-The resulting set is a basis (spanning is maintained, linear independence is achieved at termination).
-
-> **ERROR FIX:** In the lectures, "spending set" appears in place of "spanning set" — the correct term is **spanning set**.
-
-**Example:** Find a basis for $\mathbb{R}^3$ from the spanning set $S = \{(1,0,0), (1,2,0), (1,0,3), (0,2,3), (0,4,2)\}$:
-
-1. Observe: $(0,4,2) = 2(1,2,0) + \frac{2}{3}(1,0,3) - \frac{8}{3}(1,0,0)$ → delete $(0,4,2)$
-2. Observe: $(0,2,3) = (1,2,0) + (1,0,3) - 2(1,0,0)$ → delete $(0,2,3)$
-3. Remaining: $\{(1,0,0), (1,2,0), (1,0,3)\}$ — none is a combination of the others ✓
-
-So $\{(1,0,0), (1,2,0), (1,0,3)\}$ is a basis for $\mathbb{R}^3$.
-
----
-
-## 4. Dimension
+## 4. The Standard Basis
 
 ### Definition
 
-The **dimension** (or **rank**) of a vector space $V$, denoted $\dim(V)$, is the **number of elements in any basis** of $V$.
+For each $i \in \{1, 2, \ldots, n\}$, define the **standard basis vector** $e_i \in \mathbb{R}^n$ as the vector whose $i$-th coordinate is $1$ and all other coordinates are $0$: [▶ W4_L1 @ 21:30](https://www.youtube.com/watch?v=lhAQIaFOPxA&t=1290)
 
-### Why This Is Well-Defined (NEW)
+$$e_1 = \begin{bmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{bmatrix}, \quad e_2 = \begin{bmatrix} 0 \\ 1 \\ \vdots \\ 0 \end{bmatrix}, \quad \ldots, \quad e_n = \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 1 \end{bmatrix}$$
 
-This definition only makes sense because of the following theorem:
+The set $\mathcal{E} = \{e_1, e_2, \ldots, e_n\}$ is called the **standard basis** for $\mathbb{R}^n$.
 
-> **Theorem:** All bases of a vector space $V$ have the **same number of elements**.
+### Proof that $\mathcal{E}$ is a Basis for $\mathbb{R}^n$
 
-**Proof sketch:** Suppose $B = \{v_1, \ldots, v_m\}$ and $B' = \{w_1, \ldots, w_n\}$ are both bases for $V$. Since $B$ is linearly independent and $B'$ spans $V$, we must have $m \leq n$ (a linearly independent set cannot be larger than a spanning set — this follows from the fact that more than $n$ vectors in $\mathbb{R}^n$ are always dependent). By symmetry (swapping the roles of $B$ and $B'$), $n \leq m$. Therefore $m = n$.
+**Spanning:** Any $(x_1, x_2, \ldots, x_n) \in \mathbb{R}^n$ can be written as:
 
-### Key Examples
+$$\begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix} = x_1 e_1 + x_2 e_2 + \cdots + x_n e_n$$
 
-| Vector Space | Standard Basis | Dimension |
-|---|---|---|
-| $\mathbb{R}^n$ | $\{e_1, e_2, \ldots, e_n\}$ | $n$ |
-| $\mathbb{R}^2$ | $\{(1,0), (0,1)\}$ | 2 |
-| $\mathbb{R}^3$ | $\{(1,0,0), (0,1,0), (0,0,1)\}$ | 3 |
-| $\{0\}$ (zero space) | $\emptyset$ | 0 |
+**Linear independence:** Suppose $a_1 e_1 + a_2 e_2 + \cdots + a_n e_n = \mathbf{0}$. The $j$-th coordinate of the left-hand side is $a_j$, and the $j$-th coordinate of the right-hand side is $0$. Hence $a_j = 0$ for all $j$.
 
-### Dimension of Subspaces
+Since $\mathcal{E}$ is both spanning and linearly independent, it is a basis for $\mathbb{R}^n$.
 
-**Example:** Find $\dim(W)$ where $W = \text{span}\{(1,0,0), (0,1,0), (3,5,0)\}$ in $\mathbb{R}^3$.
+### Explicit Low-Dimensional Cases
 
-Since $(3,5,0) = 3(1,0,0) + 5(0,1,0)$, delete it. The remaining $\{(1,0,0), (0,1,0)\}$ is linearly independent and spans $W$.
+**$\mathbb{R}^2$:**
 
-So $\dim(W) = 2$. Geometrically, $W$ is the xy-plane.
+$$\mathcal{E} = \left\{ \begin{bmatrix} 1 \\ 0 \end{bmatrix},\; \begin{bmatrix} 0 \\ 1 \end{bmatrix} \right\}$$
 
----
+**$\mathbb{R}^3$:**
 
-## 5. Column Space and Row Space
-
-### Column Space
-
-The **column space** of a matrix $A$ (denoted $\text{Col}(A)$) is the subspace of $\mathbb{R}^m$ spanned by the **columns** of $A$:
-
-$$\text{Col}(A) = \text{span}\{\text{columns of } A\} = \{Ax \mid x \in \mathbb{R}^n\}$$
-
-### Row Space
-
-The **row space** of a matrix $A$ (denoted $\text{Row}(A)$) is the subspace of $\mathbb{R}^n$ spanned by the **rows** of $A$:
-
-$$\text{Row}(A) = \text{span}\{\text{rows of } A\}$$
-
-### Column Rank and Row Rank
-
-| Concept | Definition |
-|---------|-----------|
-| **Column rank** | $\dim(\text{Col}(A))$ = dimension of the column space |
-| **Row rank** | $\dim(\text{Row}(A))$ = dimension of the row space |
-
-### Column Rank Equals Row Rank (NEW)
-
-> **Theorem:** For any matrix $A$, the column rank equals the row rank.
-
-This is a fundamental result. We call this common value the **rank of A**.
-
-**Why this is true (intuitive justification):**
-When you row reduce $A$ to REF, the number of pivots equals:
-- The number of nonzero rows (which determines the row rank)
-- The number of pivot columns (which determines the column rank)
-
-Since both are counted by the same set of pivots, they must be equal.
-
-**More precisely:** Row operations do not change the row space (each new row is a linear combination of the old rows). After row reduction to REF, the nonzero rows are linearly independent (due to the staircase pattern of pivots), so their count gives the row rank. Meanwhile, the pivot columns of the RREF identify which original columns of $A$ are linearly independent, and their count gives the column rank. Both counts equal the number of pivots.
+$$\mathcal{E} = \left\{ \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix},\; \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix},\; \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \right\}$$
 
 ---
 
-## 6. Prerequisites
+## 5. Finding a Basis: Two Approaches
 
-The computations below use **elementary row operations** (defined in [[1 - MATRICES]], Section 8) to reduce matrices to **REF/RREF** (defined in [[1 - MATRICES]], Section 12). The full row reduction algorithm is covered in [[2 - SOLVING SYSTEMS]].
+Given a vector space (typically presented as the span of some set of vectors), there are two fundamental strategies for extracting a basis. [▶ W4_L2 @ 09:15](https://www.youtube.com/watch?v=SxPhClO9zSU&t=555)
 
-**Key fact:** Row operations preserve the row space and linear dependency relations among columns, which is why they can be used to find bases and compute rank.
+### Method 1: Build Up (Append Vectors)
+
+Start with $S_0 = \varnothing$ and repeatedly append vectors that are **not** in the span of the current set:
+
+1. Set $S_0 = \varnothing$.
+2. Choose any non-zero $v_1 \in V$; set $S_1 = \{v_1\}$.
+3. If $\text{span}(S_1) \neq V$, choose $v_2 \notin \text{span}(S_1)$; set $S_2 = \{v_1, v_2\}$.
+4. Continue until $\text{span}(S_k) = V$.
+
+Because each new vector lies outside the previous span, the set remains linearly independent at every stage. When the process terminates, the result is a **maximal linearly independent set**, hence a basis.
+
+**Example:** Find a basis for $\mathbb{R}^2$ by appending.
+
+**Solution:**
+- Start with $S_0 = \varnothing$.
+- Append $(1, 2)$: $S_1 = \{(1,2)\}$. The span is the line $y = 2x$, not all of $\mathbb{R}^2$.
+- Choose $(2, 3) \notin \text{span}(S_1)$ (since $(2,3) \neq a(1,2)$ for any $a$). Set $S_2 = \{(1,2),\;(2,3)\}$.
+- $\text{span}(S_2) = \mathbb{R}^2$ (check: any $(x,y) = (2y - 3x)(1,2) + \frac{1}{2}(3x - 2y + y)(2,3)$... or more directly, the matrix $\begin{bmatrix} 1 & 2 \\ 2 & 3 \end{bmatrix}$ has determinant $3 - 4 = -1 \neq 0$, so the columns are linearly independent and span $\mathbb{R}^2$).
+
+Therefore $\{(1,2),\;(2,3)\}$ is a basis for $\mathbb{R}^2$.
+
+### Method 2: Trim Down (Delete Vectors)
+
+Start with a spanning set $S$ and repeatedly remove vectors that are linear combinations of the remaining ones: [▶ W4_L2 @ 13:03](https://www.youtube.com/watch?v=SxPhClO9zSU&t=783)
+
+1. Start with a spanning set $S$.
+2. If some $v_j \in S$ can be written as a linear combination of the other vectors in $S$, remove $v_j$.
+3. Repeat until no vector can be removed.
+
+The resulting set is a **minimal spanning set**, hence a basis.
+
+**Example:** Let $S = \{(1,0,0),\;(1,2,0),\;(1,0,3),\;(0,2,3),\;(0,4,2)\}$ span a subspace of $\mathbb{R}^3$. Find a basis.
+
+**Solution:**
+
+- Observe that $(0,4,2) = 2(1,2,0) + \tfrac{2}{3}(1,0,3) - \tfrac{8}{3}(1,0,0)$. Delete $(0,4,2)$.
+- Remaining: $\{(1,0,0),\;(1,2,0),\;(1,0,3),\;(0,2,3)\}$.
+- Observe that $(0,2,3) = (1,2,0) + (1,0,3) - 2(1,0,0)$. Delete $(0,2,3)$.
+- Remaining: $\{(1,0,0),\;(1,2,0),\;(1,0,3)\}$.
+- None of these three vectors is a linear combination of the other two (check by attempting to solve the relevant system). This is a basis.
+
+> **Clarification:** The "trim down" method can be ad hoc when done by observation. The systematic algorithmic approaches using Gaussian elimination (Sections 6 and 7 below) are far more reliable.
 
 ---
 
-## 7. Rank of a Matrix
-
-> **Basic definition and properties** of matrix rank are covered in [[1 - MATRICES]], Section 14. Here we connect rank to the column space, row space, and basis-finding methods developed in this file.
-
-The rank of $A$ equals:
-- The dimension of $\text{Col}(A)$ (column rank)
-- The dimension of $\text{Row}(A)$ (row rank)
-- The number of pivots in the REF of $A$
-- The number of nonzero rows after row reduction
-
----
-
-## 8. Finding Bases Using Gaussian Elimination
+## 6. Finding Bases and Dimension via Row Reduction
 
 ### The Row Method
 
-Place the spanning vectors as **rows** of a matrix, row reduce, and take the **nonzero rows** as a basis.
+This is the primary algorithmic method for finding a basis and dimension of a subspace given by a spanning set. [▶ W4_L4 @ 00:46](https://www.youtube.com/watch?v=0yEKEavVQJE&t=46)
 
 **Procedure:**
-1. Form matrix $A$ with spanning vectors as rows
-2. Row reduce to REF (or RREF)
-3. **Dimension** = number of nonzero rows
-4. **Basis** = the nonzero rows of the reduced matrix
 
-**Example:** Find a basis for $W = \text{span}\{(1,0,1), (-2,-3,1), (3,3,0)\}$.
+1. Write the spanning vectors as the **rows** of a matrix $A$.
+2. Row reduce $A$ to row echelon form (REF) or reduced row echelon form (RREF).
+3. The **number of non-zero rows** in the echelon form equals the dimension of the subspace.
+4. The **non-zero rows** themselves form a basis for the subspace.
+
+**Why this works:** Elementary row operations do not change the row space of a matrix. That is, if $A$ row reduces to $R$, then $\text{row space}(A) = \text{row space}(R)$. In echelon form, the non-zero rows are automatically linearly independent (each has a leading $1$ in a column where all other rows have $0$), so they form a basis for the common row space.
+
+For background on row reduction, see [[2 - SOLVING SYSTEMS]].
+
+### Worked Example 1 (in $\mathbb{R}^3$)
+
+**Example:** Find the dimension and a basis for the subspace $W$ of $\mathbb{R}^3$ spanned by $S = \{(1,0,1),\;(-2,-3,1),\;(3,3,0)\}$. [▶ W4_L4 @ 02:43](https://www.youtube.com/watch?v=0yEKEavVQJE&t=163)
+
+**Solution:** Form the matrix with these vectors as rows:
 
 $$A = \begin{bmatrix} 1 & 0 & 1 \\ -2 & -3 & 1 \\ 3 & 3 & 0 \end{bmatrix}$$
 
-Row reduce:
-- $R_2 \to R_2 + 2R_1$, $R_3 \to R_3 - 3R_1$:
+**Step 1:** Eliminate below the $(1,1)$ pivot.
+
+$R_2 \leftarrow R_2 + 2R_1$:
+
+$$\begin{bmatrix} 1 & 0 & 1 \\ 0 & -3 & 3 \\ 3 & 3 & 0 \end{bmatrix}$$
+
+$R_3 \leftarrow R_3 - 3R_1$:
 
 $$\begin{bmatrix} 1 & 0 & 1 \\ 0 & -3 & 3 \\ 0 & 3 & -3 \end{bmatrix}$$
 
-- $R_2 \to -\frac{1}{3}R_2$:
+**Step 2:** Scale $R_2$. $R_2 \leftarrow -\tfrac{1}{3}R_2$:
 
 $$\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & -1 \\ 0 & 3 & -3 \end{bmatrix}$$
 
-- $R_3 \to R_3 - 3R_2$:
+**Step 3:** Eliminate below the $(2,2)$ pivot. $R_3 \leftarrow R_3 - 3R_2$:
 
 $$\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & -1 \\ 0 & 0 & 0 \end{bmatrix}$$
 
-Two nonzero rows → $\dim(W) = 2$.
+This is in RREF. There are **2 non-zero rows**, so $\dim(W) = 2$.
 
-Basis: $\{(1, 0, 1), (0, 1, -1)\}$.
+A basis for $W$ is:
 
-**Note:** The row method produces basis vectors that may **differ** from the original spanning vectors.
+$$\{(1, 0, 1),\; (0, 1, -1)\}$$
 
-### The Column Method (NEW)
+### Worked Example 2 (in $\mathbb{R}^4$)
 
-Place the spanning vectors as **columns** of a matrix, row reduce, and identify the **pivot columns**. The corresponding **original vectors** form a basis.
+**Example:** Find the dimension and a basis for the subspace $W$ spanned by $S = \{(1,-2,0,4),\;(3,1,1,0),\;(-1,-5,-1,8),\;(3,8,2,-12)\}$. [▶ W4_L4 @ 07:25](https://www.youtube.com/watch?v=0yEKEavVQJE&t=445)
 
-**Procedure:**
-1. Form matrix $A$ with spanning vectors as **columns**
-2. Row reduce to REF (or RREF)
-3. Identify which columns contain **pivots**
-4. The corresponding columns of the **original** matrix $A$ form a basis
+**Solution:** Form the matrix:
 
-### Why Pivot Columns Form a Basis (NEW)
+$$A = \begin{bmatrix} 1 & -2 & 0 & 4 \\ 3 & 1 & 1 & 0 \\ -1 & -5 & -1 & 8 \\ 3 & 8 & 2 & -12 \end{bmatrix}$$
 
-This is a key fact that deserves explanation:
+**Step 1:** Eliminate below the $(1,1)$ pivot.
 
-> **Theorem:** The pivot columns of $A$ (i.e., the columns of the original matrix $A$ corresponding to pivot positions in the RREF) form a basis for $\text{Col}(A)$.
+$R_2 \leftarrow R_2 - 3R_1$, $\;R_3 \leftarrow R_3 + R_1$, $\;R_4 \leftarrow R_4 - 3R_1$:
 
-**Why it works:**
-- **Linear independence:** If the pivot columns of $A$ were linearly dependent, say $\sum a_i c_i = 0$ (nontrivially), then the same coefficients would give a nontrivial solution to $Ax = 0$ with nonzero entries only in pivot positions. But in the RREF, each pivot variable is determined uniquely — the system $Rx = 0$ forces all pivot variables to zero when free variables are zero. Contradiction.
-- **Spanning:** Any non-pivot column of the RREF can be written as a linear combination of the pivot columns (read off the RREF). Because row reduction preserves linear dependency relations among columns, the same relationship holds for the original columns. So every column of $A$ is a linear combination of the pivot columns, and thus the pivot columns span $\text{Col}(A)$.
+$$\begin{bmatrix} 1 & -2 & 0 & 4 \\ 0 & 7 & 1 & -12 \\ 0 & -7 & -1 & 12 \\ 0 & 14 & 2 & -24 \end{bmatrix}$$
 
-**Important:** Use the columns of the **original** matrix $A$, not the RREF! Row reduction changes the actual column vectors but preserves which columns are linearly independent.
+**Step 2:** Scale $R_2$. $R_2 \leftarrow \tfrac{1}{7}R_2$:
 
-### Column Method Example 1
+$$\begin{bmatrix} 1 & -2 & 0 & 4 \\ 0 & 1 & \tfrac{1}{7} & -\tfrac{12}{7} \\ 0 & -7 & -1 & 12 \\ 0 & 14 & 2 & -24 \end{bmatrix}$$
 
-Find a basis for $W = \text{span}\{(1,0,1), (-2,-3,1), (3,3,0)\}$ using the column method.
+**Step 3:** Eliminate below the $(2,2)$ pivot.
 
-Form matrix with vectors as **columns**:
+$R_3 \leftarrow R_3 + 7R_2$, $\;R_4 \leftarrow R_4 - 14R_2$:
+
+$$\begin{bmatrix} 1 & -2 & 0 & 4 \\ 0 & 1 & \tfrac{1}{7} & -\tfrac{12}{7} \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
+
+This is in REF. There are **2 non-zero rows**, so $\dim(W) = 2$.
+
+A basis for $W$ is:
+
+$$\left\{(1, -2, 0, 4),\;\left(0, 1, \tfrac{1}{7}, -\tfrac{12}{7}\right)\right\}$$
+
+Equivalently, scaling the second basis vector by $7$:
+
+$$\{(1, -2, 0, 4),\;(0, 7, 1, -12)\}$$
+
+> **Clarification:** You do not need to reach RREF — REF is sufficient to read off the dimension and obtain a basis. However, RREF sometimes yields "cleaner" basis vectors.
+
+---
+
+## 7. The Column Method: Basis from the Original Spanning Set
+
+The row method produces a basis, but the basis vectors may differ from the original spanning vectors. If we want a basis consisting of vectors from the original set $S$, we use the **column method**. [▶ W4_L4 @ 11:49](https://www.youtube.com/watch?v=0yEKEavVQJE&t=709)
+
+### Key Fact
+
+Let $A$ be a matrix, and let $R$ be the row echelon form of $A$. Then the **columns of $A$** corresponding to the **pivot columns of $R$** form a basis for the column space of $A$.
+
+### Procedure
+
+1. Write the spanning vectors as the **columns** of a matrix $A$.
+2. Row reduce $A$ to REF (or RREF).
+3. Identify the **pivot columns** (the columns containing the leading $1$s).
+4. The corresponding **original vectors** (columns of $A$) form a basis.
+5. The number of pivot columns equals the dimension.
+
+### Worked Example 1 (in $\mathbb{R}^3$)
+
+**Example:** Find a basis for $W = \text{span}\{(1,0,1),\;(-2,-3,1),\;(3,3,0)\}$ consisting of vectors from this spanning set.
+
+**Solution:** Write the vectors as columns:
 
 $$A = \begin{bmatrix} 1 & -2 & 3 \\ 0 & -3 & 3 \\ 1 & 1 & 0 \end{bmatrix}$$
 
 Row reduce:
-- $R_3 \to R_3 - R_1$:
+
+$R_3 \leftarrow R_3 - R_1$:
 
 $$\begin{bmatrix} 1 & -2 & 3 \\ 0 & -3 & 3 \\ 0 & 3 & -3 \end{bmatrix}$$
 
-- $R_2 \to -\frac{1}{3}R_2$:
+$R_2 \leftarrow -\tfrac{1}{3}R_2$:
 
 $$\begin{bmatrix} 1 & -2 & 3 \\ 0 & 1 & -1 \\ 0 & 3 & -3 \end{bmatrix}$$
 
-- $R_3 \to R_3 - 3R_2$:
+$R_3 \leftarrow R_3 - 3R_2$:
 
 $$\begin{bmatrix} 1 & -2 & 3 \\ 0 & 1 & -1 \\ 0 & 0 & 0 \end{bmatrix}$$
 
-Pivots in columns 1 and 2. So the **original** vectors corresponding to columns 1 and 2 form a basis:
+The pivots are in **columns 1 and 2**. Therefore the first and second original vectors form a basis:
 
-$$\text{Basis} = \{(1, 0, 1), (-2, -3, 1)\}$$
+$$\{(1, 0, 1),\; (-2, -3, 1)\}$$
 
-$\dim(W) = 2$.
+and $\dim(W) = 2$.
 
-### Column Method Example 2
+### Worked Example 2 (in $\mathbb{R}^4$)
 
-Find a basis for $W = \text{span}\{(1,-2,0,4), (3,1,1,0), (-1,-5,-1,8), (3,8,2,-12)\}$ in $\mathbb{R}^4$.
+**Example:** Find a basis for $W = \text{span}\{(1,-2,0,4),\;(3,1,1,0),\;(-1,-5,-1,8),\;(3,8,2,-12)\}$ from the original spanning set. [▶ W4_L4 @ 17:52](https://www.youtube.com/watch?v=0yEKEavVQJE&t=1072)
 
-Form matrix with vectors as columns:
+**Solution:** Write as columns:
 
 $$A = \begin{bmatrix} 1 & 3 & -1 & 3 \\ -2 & 1 & -5 & 8 \\ 0 & 1 & -1 & 2 \\ 4 & 0 & 8 & -12 \end{bmatrix}$$
 
-Row reduce:
-- $R_2 \to R_2 + 2R_1$, $R_4 \to R_4 - 4R_1$:
+Row reduce. $R_2 \leftarrow R_2 + 2R_1$, $\;R_4 \leftarrow R_4 - 4R_1$:
 
 $$\begin{bmatrix} 1 & 3 & -1 & 3 \\ 0 & 7 & -7 & 14 \\ 0 & 1 & -1 & 2 \\ 0 & -12 & 12 & -24 \end{bmatrix}$$
 
-- $R_2 \to \frac{1}{7}R_2$:
+$R_2 \leftarrow \tfrac{1}{7}R_2$:
 
 $$\begin{bmatrix} 1 & 3 & -1 & 3 \\ 0 & 1 & -1 & 2 \\ 0 & 1 & -1 & 2 \\ 0 & -12 & 12 & -24 \end{bmatrix}$$
 
-- $R_3 \to R_3 - R_2$, $R_4 \to R_4 + 12R_2$:
+$R_3 \leftarrow R_3 - R_2$, $\;R_4 \leftarrow R_4 + 12R_2$:
 
-$$\begin{bmatrix} 1 & 3 & -1 & 3 \\ 0 & 1 & -1 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{bmatrix}$$
-
-Pivots in columns 1 and 2. So the basis consists of the **original** vectors from columns 1 and 2:
-
-$$\text{Basis} = \{(1, -2, 0, 4), (3, 1, 1, 0)\}$$
-
-$\dim(W) = 2$.
-
-### Row Method vs Column Method
-
-| Feature | Row Method | Column Method |
-|---------|-----------|---------------|
-| Vector placement | Vectors as **rows** | Vectors as **columns** |
-| Basis vectors | Nonzero rows of REF (new vectors) | Original vectors at pivot columns |
-| Preserves original vectors? | **No** | **Yes** |
-| Gives dimension? | Yes (count nonzero rows) | Yes (count pivots) |
-
----
-
-## 9. The Rank-Nullity Theorem (NEW)
-
-### Statement
-
-For an $m \times n$ matrix $A$:
-
-$$\text{rank}(A) + \text{nullity}(A) = n$$
-
-where:
-- $\text{rank}(A)$ = number of pivot columns = dimension of column space
-- $\text{nullity}(A)$ = number of free variables = dimension of null space
-- $n$ = number of columns = number of unknowns
-
-### Why It's True
-
-After row reducing $A$, every column is either a **pivot column** or a **free column**:
-- Pivot columns correspond to **dependent (pivot) variables** → contribute to rank
-- Free columns correspond to **free variables** → contribute to nullity
-
-Since every column is one or the other:
-
-$$\underbrace{\text{pivot columns}}_{\text{rank}} + \underbrace{\text{free columns}}_{\text{nullity}} = \underbrace{\text{total columns}}_{n}$$
-
-### Example
-
-$$A = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 2 & 1 & 3 \end{bmatrix} \xrightarrow{\text{RREF}} \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 0 \end{bmatrix}$$
-
-- Pivots in columns 1 and 2 → $\text{rank}(A) = 2$
-- Column 3 is free → $\text{nullity}(A) = 1$
-- Check: $2 + 1 = 3 = n$ ✓
-
-### Consequences
-
-| If... | Then... |
-|-------|---------|
-| $\text{rank}(A) = n$ | Nullity = 0, so $Ax = 0$ has only the trivial solution |
-| $\text{rank}(A) < n$ | There are free variables, so $Ax = 0$ has infinitely many solutions |
-| $\text{rank}(A) = m$ (full row rank) | Every $b$ gives a solvable system $Ax = b$ |
-| $\text{rank}(A) = m = n$ | $A$ is invertible |
-
----
-
-## 10. Summary
-
-| Concept | Key Point |
-|---|---|
-| Span | Set of all linear combinations; always a subspace |
-| Spanning set | A set whose span equals the full vector space $V$ |
-| Basis | Linearly independent spanning set |
-| Equivalent conditions | Basis = maximal independent = minimal spanning |
-| Standard basis for $\mathbb{R}^n$ | $\{e_1, e_2, \ldots, e_n\}$ |
-| Unique representation | Every vector has a unique expression in terms of a basis |
-| Dimension | Number of elements in any basis; well-defined because all bases have the same size |
-| $\dim(\mathbb{R}^n)$ | $n$ |
-| Column space | $\text{span}$ of columns of $A$; equals $\{Ax : x \in \mathbb{R}^n\}$ |
-| Row space | $\text{span}$ of rows of $A$ |
-| Rank of a matrix | $\dim(\text{Col}(A)) = \dim(\text{Row}(A))$ = number of pivots |
-| Row method | Vectors as rows → row reduce → nonzero rows = basis |
-| Column method | Vectors as columns → row reduce → pivot columns of **original** matrix = basis |
-| Rank-Nullity | $\text{rank}(A) + \text{nullity}(A) = n$ (number of columns) |
+$$\begin{bmatrix} 1 & 3 & -1 & 3 \\ 0 & 1 & -1 & 2 \\ 0 & 0 & 0 & 0 \\ 0 & 

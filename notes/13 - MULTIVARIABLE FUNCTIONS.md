@@ -1,354 +1,319 @@
 # MULTIVARIABLE FUNCTIONS
 
-This file introduces **multivariable functions** — functions whose inputs live in $\mathbb{R}^n$ rather than on the real line $\mathbb{R}$. These are the central objects of multivariable calculus. We define scalar-valued and vector-valued multivariable functions, examine their domains and ranges, develop tools for visualisation (level curves, level surfaces), and extend the notions of **limits** and **continuity** from single-variable calculus to higher dimensions. Mastery of this material is essential for everything that follows: partial derivatives, gradients, optimisation, and integration over regions in $\mathbb{R}^n$.
+This file introduces **multivariable functions** — functions whose inputs live in $\mathbb{R}^n$ rather than on the real line. We cover the classification into scalar-valued and vector-valued functions, how to specify their domains and ranges, how to visualise them via graphs and level sets, and how to extend the fundamental notions of **limits** and **continuity** from single-variable calculus to higher dimensions. These ideas form the foundation for all of multivariable calculus: partial derivatives, gradients, optimisation, and integration over regions in $\mathbb{R}^n$ all depend on a solid understanding of the material here.
 
-For background on vectors, vector spaces, and linear transformations, see [[5 - VECTORS AND SPACES]].
+Prerequisites: familiarity with functions of one variable (polynomials, trigonometric, exponential, logarithmic), basic properties of $\mathbb{R}^n$ as a vector space (see [[5 - VECTORS AND SPACES]]), and single-variable limits and continuity.
 
 ---
 
-## 1. From One Variable to Many
+## 1. From One Variable to Several Variables
 
-### 1.1 Recap: Functions of One Variable
+### Recall: Functions of One Variable
 
-A **function of one variable** is a map $f: D \to \mathbb{R}$ where $D \subseteq \mathbb{R}$. Familiar families include:
+A **function of one variable** is a map $f: D \to \mathbb{R}$, where $D \subseteq \mathbb{R}$. For each input $x \in D$, the function produces a single real number $f(x)$. Standard families include: [▶ W9_L1 @ 00:44](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=44)
 
-| Family | Form | Domain |
+| Family | Form | Domain notes |
 |---|---|---|
-| Linear | $f(x) = ax + b$ | $\mathbb{R}$ |
-| Polynomial | $f(x) = a_n x^n + \cdots + a_1 x + a_0$ | $\mathbb{R}$ |
+| Linear | $f(x) = ax + b$ | All of $\mathbb{R}$ |
+| Polynomial | $f(x) = a_nx^n + \cdots + a_1x + a_0$ | All of $\mathbb{R}$ |
 | Rational | $f(x) = p(x)/q(x)$, polynomials $p,q$ | $\{x \in \mathbb{R} : q(x) \neq 0\}$ |
-| Trigonometric | $\sin x,\;\cos x,\;\tan x, \ldots$ | varies |
-| Exponential | $f(x) = e^x$ | $\mathbb{R}$ |
+| Trigonometric | $\sin x,\;\cos x,\;\tan x, \ldots$ | Varies ($\tan x$ excludes odd multiples of $\pi/2$) |
+| Exponential | $f(x) = e^x$ | All of $\mathbb{R}$ |
 | Logarithmic | $f(x) = \ln x$ | $(0, \infty)$ |
 
-New functions are built from these via **arithmetic operations** (addition, subtraction, multiplication, division where the denominator is nonzero) and **composition** (applying one function to the output of another, provided the range of the inner function lies in the domain of the outer function).
+New functions can be built from these by **arithmetic combinations** (sums, differences, products, quotients where the denominator is nonzero) and **compositions** (e.g. $\ln(x^2 + 1)$, $e^{\sin x}$), provided domains are compatible.
 
-**Example:** $f(x) = \ln(x^2 + 1)$ is the composition $g \circ h$ where $h(x) = x^2 + 1$ and $g(u) = \ln u$. Since the range of $h$ is $[1, \infty) \subset (0, \infty) = \text{dom}(g)$, the composition is well-defined on all of $\mathbb{R}$.
+### Why Several Variables?
 
-### 1.2 Why Move to Several Variables?
-
-In applications — physics, statistics, machine learning, economics — quantities almost always depend on **multiple** inputs simultaneously. Temperature depends on three spatial coordinates and time. A joint probability density for two random variables is a function of two variables. A loss function in machine learning depends on all model parameters at once. Single-variable calculus is insufficient for these settings; we need the theory of multivariable functions.
+In applications — data science, physics, economics — quantities almost always depend on more than one input. Temperature depends on latitude, longitude, and altitude; a cost function in machine learning depends on many parameters simultaneously. We therefore need a calculus that handles functions of $n$ variables, where $n$ can be $2, 3$, or much larger.
 
 ---
 
 ## 2. Scalar-Valued Multivariable Functions
 
-### 2.1 Definition
+A **scalar-valued multivariable function** is a function [▶ W9_L1 @ 04:16](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=256)
 
-A **scalar-valued multivariable function** is a function
+$$f: D \to \mathbb{R}, \quad D \subseteq \mathbb{R}^n, \quad n > 1.$$
 
-$$f: D \to \mathbb{R}, \qquad D \subseteq \mathbb{R}^n, \quad n \geq 2.$$
+The input is a point (or vector) $\tilde{x} = (x_1, x_2, \ldots, x_n) \in \mathbb{R}^n$ and the output is a single real number $f(\tilde{x}) \in \mathbb{R}$.
 
-The input is an $n$-tuple $(x_1, x_2, \ldots, x_n) \in \mathbb{R}^n$ and the output is a single real number. We often write $f(x_1, x_2, \ldots, x_n)$ or, when we do not need to reference individual coordinates, $f(\tilde{x})$, where $\tilde{x} = (x_1, \ldots, x_n)$.
+> **Notation convention.** Throughout these notes we write $\tilde{x}$ (or sometimes $\mathbf{x}$) to denote an element of $\mathbb{R}^n$ when we do not wish to spell out all $n$ coordinates. So $f(\tilde{x})$ means $f(x_1, x_2, \ldots, x_n)$.
 
-> **Clarification:** The tilde notation $\tilde{x}$ is a shorthand emphasising that $\tilde{x}$ is a **vector** in $\mathbb{R}^n$, not a single real number. Some texts use bold $\mathbf{x}$ instead.
+### Standard Families in Several Variables
 
-### 2.2 Domain and Range
+**Linear functions.** A linear function $T: \mathbb{R}^n \to \mathbb{R}$ has the form
 
-The **domain** $D$ is the largest subset of $\mathbb{R}^n$ on which the expression defining $f$ makes sense (unless a smaller domain is specified explicitly). The **range** (or image) is
+$$T(x_1, x_2, \ldots, x_n) = a_1 x_1 + a_2 x_2 + \cdots + a_n x_n$$
 
-$$\text{range}(f) = \{f(\tilde{x}) : \tilde{x} \in D\} \subseteq \mathbb{R}.$$
+for fixed scalars $a_1, \ldots, a_n \in \mathbb{R}$. This is a $1 \times n$ matrix (a row vector) acting on a column vector — a concept studied in detail in [[5 - VECTORS AND SPACES]].
 
-**Example:** Let $f(x, y) = \dfrac{xy}{x^2 + y^2}$.
+**Polynomial functions.** A polynomial in $n$ variables is a finite sum of **monomials** $c \, x_1^{\alpha_1} x_2^{\alpha_2} \cdots x_n^{\alpha_n}$ where $c \in \mathbb{R}$ and each $\alpha_i$ is a non-negative integer.
 
-**Solution:** The expression is undefined when $x^2 + y^2 = 0$, i.e., at the origin $(0, 0)$. Therefore
+**Example:**
+$$f(x_1, x_2, x_3) = x_1 x_2 x_3 + x_1^2 x_2^3 x_3^4 - x_1^5 x_3^6$$
+is a polynomial in three variables. Its **total degree** is the maximum of $1{+}1{+}1 = 3$, $2{+}3{+}4 = 9$, and $5{+}0{+}6 = 11$, which is $11$.
 
-$$D = \mathbb{R}^2 \setminus \{(0,0)\} = \{(x,y) \in \mathbb{R}^2 : (x,y) \neq (0,0)\}.$$
+**Rational functions.** A quotient $p(\tilde{x})/q(\tilde{x})$ of two polynomials, defined wherever $q(\tilde{x}) \neq 0$.
 
-**Example:** Let $f(x, y, z) = \ln(x^2 + y^2 + z^2)$.
+**Compositions and combinations.** Just as in one variable, we can build new functions by applying known single-variable functions to multivariable expressions:
 
-**Solution:** We need $x^2 + y^2 + z^2 > 0$, so $D = \mathbb{R}^3 \setminus \{(0,0,0)\}$.
+| Function | Expression | Domain restriction |
+|---|---|---|
+| $f(x,y) = \sin(x^2 + y^2)$ | composition of $g(x,y)=x^2+y^2$ with $\sin$ | $\mathbb{R}^2$ |
+| $f(x,y) = \ln(x^2 + y^2)$ | composition with $\ln$ | $\mathbb{R}^2 \setminus \{(0,0)\}$ |
+| $f(x,y) = \frac{1}{2\pi}\,e^{-(x^2+y^2)/2}$ | standard bivariate normal density | $\mathbb{R}^2$ |
+| $f(x,y) = \frac{xy}{x^2 + y^2}$ | rational function | $\mathbb{R}^2 \setminus \{(0,0)\}$ |
 
-**Example:** Let $f(x, y) = \sqrt{1 - x^2 - y^2}$.
-
-**Solution:** We need $1 - x^2 - y^2 \geq 0$, i.e., $x^2 + y^2 \leq 1$. So $D$ is the closed unit disk in $\mathbb{R}^2$, and the range is $[0, 1]$.
-
-### 2.3 Families and Examples
-
-Just as for one variable, the principal families are:
-
-**Linear functions.** $f(x_1, \ldots, x_n) = a_1 x_1 + a_2 x_2 + \cdots + a_n x_n + b$ where $a_i, b \in \mathbb{R}$. When $b = 0$ this is a linear transformation $\mathbb{R}^n \to \mathbb{R}$ (a $1 \times n$ matrix acting on a column vector — see [[5 - VECTORS AND SPACES]]).
-
-**Example:** $f(x, y) = 2.5x - 3.9y$. Domain: $\mathbb{R}^2$. Range: $\mathbb{R}$.
-
-**Polynomial functions.** Sums of terms of the form $c\, x_1^{k_1} x_2^{k_2} \cdots x_n^{k_n}$ where $c \in \mathbb{R}$ and $k_i \in \mathbb{Z}_{\geq 0}$. The **degree** of a monomial term is $k_1 + k_2 + \cdots + k_n$.
-
-**Example:** $f(x, y) = 2x^3 - 3y^2 + 4.8x^2 - x^2 y - 9.9xy + \pi$ is a polynomial in two variables. Domain: $\mathbb{R}^2$.
-
-**Example:** $f(x_1, x_2, x_3) = x_1 x_2 x_3 + x_1^2 x_2^3 x_3^4 - x_1^5 x_3^6$ is a polynomial in three variables.
-
-**Rational functions.** Quotients $p(\tilde{x})/q(\tilde{x})$ of polynomials, defined wherever $q(\tilde{x}) \neq 0$.
-
-**Compositions and combinations.** By composing multivariable polynomials with single-variable functions ($\sin$, $\cos$, $\exp$, $\ln$, etc.) and taking arithmetic combinations, we obtain rich families of functions.
-
-**Example (Composition):** $f(x, y) = \sin(x^2 + y^2)$. Here $h(x,y) = x^2 + y^2$ maps $\mathbb{R}^2 \to [0, \infty)$ and $g(u) = \sin u$ maps $\mathbb{R} \to [-1, 1]$. Then $f = g \circ h$.
-
-**Example (Bivariate normal density):**
-
-$$f(x, y) = \frac{1}{2\pi}\, e^{-(x^2 + y^2)/2}.$$
-
-Domain: $\mathbb{R}^2$. Range: $(0, \frac{1}{2\pi}]$. This arises as the joint density of two independent standard normal random variables.
-
-**Example (Bivariate exponential density):**
-
-$$f(x, y) = \lambda_1 \lambda_2\, e^{-\lambda_1 x - \lambda_2 y}, \qquad x > 0,\; y > 0.$$
-
-**Piecewise-defined functions.** The "pieces" are now **subsets of $\mathbb{R}^n$**, not intervals of $\mathbb{R}$.
+**Piecewise-defined functions.** Functions may be defined by different expressions on different regions of $\mathbb{R}^n$.
 
 **Example (Uniform density on the unit square):**
-
-$$f(x, y) = \begin{cases} 1 & \text{if } 0 \leq x \leq 1 \text{ and } 0 \leq y \leq 1, \\ 0 & \text{otherwise.} \end{cases}$$
+$$f(x,y) = \begin{cases} 1 & \text{if } 0 \le x \le 1 \text{ and } 0 \le y \le 1, \\ 0 & \text{otherwise.} \end{cases}$$
 
 ---
 
 ## 3. Vector-Valued Multivariable Functions
 
-### 3.1 Definition
+A **vector-valued multivariable function** is a function [▶ W9_L1 @ 06:51](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=411)
 
-A **vector-valued multivariable function** is a function
+$$f: D \to \mathbb{R}^m, \quad D \subseteq \mathbb{R}^n, \quad n > 1, \; m > 1.$$
 
-$$\mathbf{f}: D \to \mathbb{R}^m, \qquad D \subseteq \mathbb{R}^n, \quad n \geq 2,\; m \geq 2.$$
+Such a function can be written in terms of its **component functions** $f_1, f_2, \ldots, f_m$, each of which is a scalar-valued multivariable function:
 
-Each output is a vector with $m$ components. We can always decompose $\mathbf{f}$ into its **component functions**:
+$$f(\tilde{x}) = \bigl(f_1(\tilde{x}),\; f_2(\tilde{x}),\; \ldots,\; f_m(\tilde{x})\bigr).$$
 
-$$\mathbf{f}(\tilde{x}) = \bigl(f_1(\tilde{x}),\; f_2(\tilde{x}),\; \ldots,\; f_m(\tilde{x})\bigr),$$
+**Example:**
+$$f(x, y, z) = \bigl(x^2 + y^2,\; y^2 + z^2,\; z^2 + x^2\bigr)$$
+is a function $f: \mathbb{R}^3 \to \mathbb{R}^3$ with component functions $f_1(x,y,z) = x^2+y^2$, $f_2(x,y,z) = y^2+z^2$, $f_3(x,y,z) = z^2+x^2$.
 
-where each $f_i: D \to \mathbb{R}$ is a scalar-valued multivariable function.
+**Example (mixed composition):**
+$$f(x,y,z) = \bigl(\sin x \cos y,\; \tan(y+z),\; \ln(x^2+y^2+z^2),\; e^{xyz}\bigr)$$
+is a function from a domain $D \subseteq \mathbb{R}^3$ to $\mathbb{R}^4$. The domain $D$ must exclude points where $\tan(y+z)$ is undefined (i.e. $y+z \neq (2k+1)\pi/2$ for integer $k$) and where $\ln(x^2+y^2+z^2)$ is undefined (i.e. $(x,y,z) \neq (0,0,0)$).
 
-> **Clarification:** A vector-valued multivariable function is nothing more than a **vector of scalar-valued multivariable functions** bundled together.
+### Terminology Summary
 
-### 3.2 Examples
-
-**Example:** $\mathbf{f}(x, y, z) = (x^2 + y^2,\; y^2 + z^2,\; z^2 + x^2)$ maps $\mathbb{R}^3 \to \mathbb{R}^3$. This is **not** a linear transformation.
-
-**Example:** $\mathbf{f}(x, y, z) = (2x,\; 2y,\; 2z)$ maps $\mathbb{R}^3 \to \mathbb{R}^3$. This **is** a linear transformation (scalar multiplication by 2).
-
-**Example:** $\mathbf{f}(x, y, z) = \bigl(\sin x \cos y,\; \tan(y+z),\; \ln(x^2+y^2+z^2),\; e^{xyz}\bigr)$ maps a domain $D \subset \mathbb{R}^3$ to $\mathbb{R}^4$. The domain excludes the origin (for the logarithm) and points where $y + z$ is an odd multiple of $\pi/2$ (for the tangent).
-
-### 3.3 Terminology Summary
-
-| Name | Domain | Codomain | Constraint |
-|---|---|---|---|
-| Single-variable function | $D \subseteq \mathbb{R}$ | $\mathbb{R}$ | $n=1, m=1$ |
-| Scalar-valued multivariable function | $D \subseteq \mathbb{R}^n$ | $\mathbb{R}$ | $n \geq 2, m=1$ |
-| Vector-valued multivariable function | $D \subseteq \mathbb{R}^n$ | $\mathbb{R}^m$ | $n \geq 2, m \geq 2$ |
-| Curve in $\mathbb{R}^m$ | $D \subseteq \mathbb{R}$ | $\mathbb{R}^m$ | $n=1, m \geq 2$ |
-
-A **multivariable function** (or **function of several variables**) refers to any function with $n \geq 2$, regardless of whether $m = 1$ or $m \geq 2$.
+A **multivariable function** (or **function of several variables**) is any function $f: D \to \mathbb{R}^m$ where $D \subseteq \mathbb{R}^n$ with $n > 1$. If $m = 1$, we call it scalar-valued; if $m > 1$, we call it vector-valued.
 
 ---
 
-## 4. Arithmetic Operations and Composition
+## 4. Domain and Range
 
-### 4.1 Arithmetic on Multivariable Functions
+### Domain
 
-Let $f, g: D \to \mathbb{R}^m$ be multivariable functions on the same domain $D \subseteq \mathbb{R}^n$.
+The **domain** of a multivariable function $f$ is the set $D \subseteq \mathbb{R}^n$ on which $f$ is defined. When no domain is explicitly stated, the **natural domain** is the largest subset of $\mathbb{R}^n$ for which the defining expression makes sense.
+
+**Example:** For $f(x,y) = \dfrac{xy}{x^2 + y^2}$, the natural domain is $\mathbb{R}^2 \setminus \{(0,0)\}$, since the denominator vanishes only at the origin.
+
+**Example:** For $f(x,y) = \sqrt{1 - x^2 - y^2}$, we need $1 - x^2 - y^2 \ge 0$, so the domain is the closed unit disk $\{(x,y) \in \mathbb{R}^2 : x^2 + y^2 \le 1\}$.
+
+### Range
+
+The **range** (or **image**) of $f$ is the set
+
+$$\text{range}(f) = \{f(\tilde{x}) : \tilde{x} \in D\} \subseteq \mathbb{R}^m.$$
+
+**Example:** For $f(x,y) = x^2 + y^2$, the domain is $\mathbb{R}^2$ and the range is $[0, \infty)$, since $x^2 + y^2 \ge 0$ and every non-negative value is attained (e.g. $f(r,0) = r^2$ for $r \ge 0$).
+
+**Example:** For $f(x,y) = \dfrac{1}{2\pi} e^{-(x^2+y^2)/2}$, the range is $(0, \frac{1}{2\pi}]$ since the exponential is always positive, achieves its maximum $\frac{1}{2\pi}$ at the origin, and approaches $0$ as $x^2+y^2 \to \infty$ but never equals $0$.
+
+> **Clarification:** The domain of a multivariable function is a subset of $\mathbb{R}^n$ — a region in the plane, in space, etc. — not an interval on the real line. When defining functions piecewise, the "pieces" are regions in $\mathbb{R}^n$, not intervals.
+
+---
+
+## 5. Arithmetic Operations and Composition
+
+### Arithmetic on Multivariable Functions
+
+Let $f, g: D \to \mathbb{R}^m$ be multivariable functions defined on the same domain $D \subseteq \mathbb{R}^n$, and let $c \in \mathbb{R}$. [▶ W9_L1 @ 22:01](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=1321)
 
 | Operation | Definition | Conditions |
 |---|---|---|
-| **Sum** | $(f + g)(\tilde{x}) = f(\tilde{x}) + g(\tilde{x})$ | Vector addition in $\mathbb{R}^m$ |
+| **Sum** | $(f+g)(\tilde{x}) = f(\tilde{x}) + g(\tilde{x})$ | Vector addition in $\mathbb{R}^m$ |
 | **Scalar multiple** | $(cf)(\tilde{x}) = c \cdot f(\tilde{x})$ | Scalar multiplication in $\mathbb{R}^m$ |
-| **Product** (scalar-valued only, $m=1$) | $(fg)(\tilde{x}) = f(\tilde{x})\, g(\tilde{x})$ | Ordinary multiplication in $\mathbb{R}$ |
-| **Quotient** (scalar-valued only, $m=1$) | $\displaystyle\left(\frac{f}{g}\right)(\tilde{x}) = \frac{f(\tilde{x})}{g(\tilde{x})}$ | Defined on $\{\tilde{x} \in D : g(\tilde{x}) \neq 0\}$ |
+| **Product** ($m=1$ only) | $(fg)(\tilde{x}) = f(\tilde{x}) \cdot g(\tilde{x})$ | Multiplication in $\mathbb{R}$ |
+| **Quotient** ($m=1$ only) | $(f/g)(\tilde{x}) = f(\tilde{x}) / g(\tilde{x})$ | Defined on $\{\tilde{x} \in D : g(\tilde{x}) \neq 0\}$ |
 
-> **Clarification:** Multiplication and division of function **values** require those values to be real numbers (scalars), which is why we restrict to $m = 1$. For vector-valued functions, pointwise product is not defined in the same way.
+> **Clarification:** Products and quotients of functions are defined only for scalar-valued functions ($m = 1$), because multiplication of arbitrary vectors in $\mathbb{R}^m$ (for $m > 1$) is not defined in the usual sense.
 
-### 4.2 Composition
+### Composition
 
-If $f: D \to \mathbb{R}^m$ (with $D \subseteq \mathbb{R}^n$) and $g: E \to \mathbb{R}^p$ (with $E \subseteq \mathbb{R}^m$) are such that $\text{range}(f) \subseteq E$, then the **composition** $g \circ f: D \to \mathbb{R}^p$ is defined by
+If $f: D \to \mathbb{R}^m$ (with $D \subseteq \mathbb{R}^n$) and $g: E \to \mathbb{R}^p$ (with $E \subseteq \mathbb{R}^m$) are such that the range of $f$ is contained in $E$, then the **composition** $g \circ f: D \to \mathbb{R}^p$ is defined by [▶ W9_L1 @ 24:06](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=1446)
 
 $$(g \circ f)(\tilde{x}) = g\bigl(f(\tilde{x})\bigr).$$
 
-**Example:** Let $f(x,y) = x^2 + y^2$ (a map $\mathbb{R}^2 \to [0, \infty)$) and $g(u) = \sqrt{u}$ (a map $[0, \infty) \to [0, \infty)$). Then
+**Example:** Let $f(x,y) = x^2 + y^2$ (a function $\mathbb{R}^2 \to \mathbb{R}$) and $g(t) = \sqrt{t}$ (a function $[0,\infty) \to \mathbb{R}$). Since the range of $f$ is $[0,\infty) \subseteq [0,\infty)$, the composition is well defined:
 
-$$(g \circ f)(x, y) = \sqrt{x^2 + y^2},$$
+$$(g \circ f)(x,y) = \sqrt{x^2 + y^2}.$$
 
-which is the Euclidean distance from $(x, y)$ to the origin.
-
-**Example:** Let $f(x,y,z) = xyz$ and $g(u) = e^u$. Then $(g \circ f)(x,y,z) = e^{xyz}$.
-
----
-
-## 5. Visualisation
-
-### 5.1 Graphs
-
-For a function $f: D \to \mathbb{R}$ with $D \subseteq \mathbb{R}^n$, the **graph** of $f$ is
-
-$$\Gamma_f = \{(\tilde{x}, f(\tilde{x})) : \tilde{x} \in D\} \subseteq \mathbb{R}^{n+1}.$$
-
-Since humans can visualise at most three dimensions, we can directly graph only functions $f: D \subseteq \mathbb{R}^2 \to \mathbb{R}$. The graph lives in $\mathbb{R}^3$ and is a **surface** above (or below) the $xy$-plane.
-
-**Example:** The graph of $f(x,y) = ax + by$ is the plane $z = ax + by$ in $\mathbb{R}^3$. As $a$ and $b$ vary, the plane tilts in different directions.
-
-**Example:** The graph of $f(x,y) = \sin(x^2 + y^2)$ is a surface with circular oscillations radiating outward from the origin. Along any circle $x^2 + y^2 = r^2$ the function value is the constant $\sin(r^2)$, so the surface has **circular symmetry**. The first peak occurs at $r = \sqrt{\pi/2}$ (where $\sin(\pi/2) = 1$), and the first zero after the origin is at $r = \sqrt{\pi}$.
-
-**Example:** The bivariate normal density $f(x,y) = \frac{1}{2\pi} e^{-(x^2+y^2)/2}$ has a single "bell-shaped hill" centred at the origin, decaying rapidly to zero in all directions.
-
-For functions $f: \mathbb{R}^n \to \mathbb{R}$ with $n \geq 3$, the graph lives in $\mathbb{R}^{n+1}$ and cannot be directly plotted. We use the alternative techniques below.
-
-### 5.2 Level Curves
-
-For a function $f: D \subseteq \mathbb{R}^2 \to \mathbb{R}$ and a constant $c \in \mathbb{R}$, the **level curve** (or **contour**) at height $c$ is
-
-$$L_c = \{(x, y) \in D : f(x, y) = c\}.$$
-
-A **contour plot** displays several level curves for different values of $c$ in the $xy$-plane.
-
-**Example:** For $f(x, y) = x^2 + y^2$, the level curve $f(x,y) = c$ is:
-- empty if $c < 0$,
-- the single point $(0,0)$ if $c = 0$,
-- the circle $x^2 + y^2 = c$ of radius $\sqrt{c}$ if $c > 0$.
-
-The contour plot consists of concentric circles centred at the origin.
-
-**Example:** For $f(x, y) = x^2 - y^2$, the level curves $x^2 - y^2 = c$ are hyperbolas (for $c \neq 0$) and the pair of lines $y = \pm x$ (for $c = 0$).
-
-**Example:** For a linear function $f(x, y) = ax + by$, the level curves $ax + by = c$ are parallel straight lines with slope $-a/b$ (assuming $b \neq 0$).
-
-> **Clarification:** Level curves are subsets of the **domain** $\mathbb{R}^2$, not of $\mathbb{R}^3$. They represent "horizontal slices" of the graph at height $z = c$, projected down onto the $xy$-plane. Think of them as contour lines on a topographic map.
-
-### 5.3 Level Surfaces
-
-For a function $f: D \subseteq \mathbb{R}^3 \to \mathbb{R}$ and a constant $c \in \mathbb{R}$, the **level surface** at value $c$ is
-
-$$S_c = \{(x, y, z) \in D : f(x, y, z) = c\}.$$
-
-Since the domain is $\mathbb{R}^3$, each level surface is a two-dimensional surface sitting inside three-dimensional space, which **can** be visualised.
-
-**Example:** For $f(x, y, z) = x^2 + y^2 + z^2$, the level surface $f = c$ is:
-- empty if $c < 0$,
-- the single point $(0,0,0)$ if $c = 0$,
-- the sphere $x^2 + y^2 + z^2 = c$ of radius $\sqrt{c}$ if $c > 0$.
-
-**Example:** For $f(x, y, z) = x + 2y + 3z$, the level surfaces are parallel planes $x + 2y + 3z = c$.
-
-### 5.4 Summary of Visualisation Strategies
-
-| Input dimension $n$ | Output dimension $m$ | Graph dimension | Visualisation method |
-|---|---|---|---|
-| 2 | 1 | 3 | Surface plot in $\mathbb{R}^3$; contour plot (level curves) in $\mathbb{R}^2$ |
-| 3 | 1 | 4 | Cannot plot graph; use level surfaces in $\mathbb{R}^3$ |
-| $n \geq 4$ | 1 | $n + 1 \geq 5$ | Cannot directly visualise; rely on level sets, cross-sections, numerical methods |
+This gives the Euclidean distance from the origin — the "radius" in polar coordinates.
 
 ---
 
 ## 6. Curves in $\mathbb{R}^m$
 
-Although curves are not multivariable functions (their domain is one-dimensional), they appear naturally alongside multivariable functions — for instance, when studying limits along paths. We include a brief treatment for completeness.
+A **curve in $\mathbb{R}^m$** is the range of a function $\gamma: I \to \mathbb{R}^m$, where $I \subseteq \mathbb{R}$ is an interval. The function $\gamma$ is called a **parametrisation** of the curve, and the variable $t \in I$ is the **parameter**. [▶ W9_L1 @ 26:35](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=1595)
 
-### 6.1 Definition
+This is the case $n = 1$, $m > 1$ — complementary to the multivariable functions we are mainly studying (where $n > 1$).
 
-A **curve** in $\mathbb{R}^m$ is the range of a function $\mathbf{r}: D \to \mathbb{R}^m$ where $D \subseteq \mathbb{R}$. The function $\mathbf{r}$ is called a **parametrisation** of the curve, and the variable (often $t$) is the **parameter**.
+### Examples
 
-### 6.2 Examples
+**Lines.** A line through point $\mathbf{p}$ in direction $\mathbf{d}$ is parametrised by $\gamma(t) = \mathbf{p} + t\mathbf{d}$.
 
-**Lines.** $\mathbf{r}(t) = \mathbf{a} + t\,\mathbf{d}$, where $\mathbf{a}$ is a point and $\mathbf{d}$ is a direction vector.
+**Circle.** The unit circle in $\mathbb{R}^2$: $\gamma(t) = (\cos t, \sin t)$ for $t \in [0, 2\pi)$.
 
-**Circles/Ellipses.** The ellipse $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$ has the parametrisation $\mathbf{r}(t) = (a\cos t,\; b\sin t)$ for $t \in [0, 2\pi)$. Setting $a = b$ yields a circle.
+**Ellipse.** $\gamma(t) = (a\cos t,\; b\sin t)$ traces the ellipse $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$.
 
-**Helix.** $\mathbf{r}(t) = (\cos t,\; \sin t,\; t)$ for $t \in \mathbb{R}$. The curve spirals upward, projecting onto a circle in the $xy$-plane while increasing linearly in the $z$-direction.
+**Helix.** $\gamma(t) = (\cos t, \sin t, t)$ for $t \in \mathbb{R}$ traces a helix in $\mathbb{R}^3$ — a curve that spirals upward around the $z$-axis.
 
-**Graph of a single-variable function.** For $y = f(x)$, the parametrisation is $\mathbf{r}(t) = (t, f(t))$, giving a curve in $\mathbb{R}^2$.
-
-> **Clarification:** A curve can be described either **parametrically** (e.g., $\mathbf{r}(t) = (a\cos t, a\sin t)$) or **implicitly** by an equation (e.g., $x^2 + y^2 = a^2$). Parametric descriptions are more flexible and work in any dimension $m$.
+> **Clarification (parametric vs. implicit).** A curve can be described **parametrically** (as above, via $\gamma(t)$) or **implicitly** (via an equation such as $x^2 + y^2 = 1$). One can often convert between the two representations.
 
 ---
 
-## 7. Limits of Multivariable Functions
+## 7. Visualisation
 
-### 7.1 Sequences in $\mathbb{R}^p$
+### Graphs of Functions $f: \mathbb{R}^2 \to \mathbb{R}$
 
-Before defining limits of functions, we need limits of **sequences** in higher-dimensional spaces.
+The **graph** of a function $f: D \to \mathbb{R}^m$ is the set
 
-**Definition.** Let $\{\tilde{a}_n\}$ be a sequence in $\mathbb{R}^p$, with coordinates $\tilde{a}_n = (a_{n1}, a_{n2}, \ldots, a_{np})$. We say
+$$\Gamma_f = \{(\tilde{x},\, f(\tilde{x})) : \tilde{x} \in D\} \subseteq \mathbb{R}^{n+m}.$$
 
-$$\lim_{n \to \infty} \tilde{a}_n = \tilde{a} = (a_1, a_2, \ldots, a_p)$$
+For a scalar-valued function $f: D \subseteq \mathbb{R}^2 \to \mathbb{R}$, the graph lives in $\mathbb{R}^3$ and can be visualised as a **surface** $z = f(x,y)$. This is the only case where direct graphing is feasible with our three-dimensional intuition. [▶ W9_L1 @ 16:18](https://www.youtube.com/watch?v=MfrAPZRrqxw&t=978)
 
-if and only if, **for each coordinate** $i = 1, 2, \ldots, p$,
+**Example (Linear function):** $f(x,y) = ax + by$. The graph is the plane $z = ax + by$ passing through the origin.
 
-$$\lim_{n \to \infty} a_{ni} = a_i.$$
+**Example (Sine ripple):** $f(x,y) = \sin(x^2 + y^2)$. The value depends only on $r^2 = x^2 + y^2$, so the surface has **circular symmetry** about the $z$-axis. Moving outward from the origin, the height oscillates between $-1$ and $1$, creating a "ripple" pattern. The first peak ($z = 1$) occurs on the circle $x^2 + y^2 = \pi/2$.
 
-In other words, convergence in $\mathbb{R}^p$ is **coordinate-wise convergence**.
+**Example (Bivariate normal density):**
+$$f(x,y) = \frac{1}{2\pi}\,e^{-(x^2+y^2)/2}.$$
+This is a "bell-shaped" surface with a single maximum of $\frac{1}{2\pi}$ at the origin, decaying rapidly to $0$ in all directions.
 
-A sequence is **convergent** if it has a limit, and **divergent** otherwise.
+**Example (Rational function with singularity):**
+$$f(x,y) = \frac{xy}{x^2 + y^2}, \quad (x,y) \neq (0,0).$$
+Near the origin, the surface exhibits different behaviour depending on the direction of approach — hills in some directions, troughs in others — foreshadowing the failure of the limit at the origin.
 
-**Example:** $\tilde{a}_n = \left(\frac{1}{n},\; n\sin\frac{1}{n}\right)$ in $\mathbb{R}^2$.
+### Level Curves and Level Surfaces
+
+When direct graphing is impossible (e.g. for functions $f: \mathbb{R}^3 \to \mathbb{R}$, whose graphs live in $\mathbb{R}^4$), we use **level sets**.
+
+**Definition.** Let $f: D \subseteq \mathbb{R}^n \to \mathbb{R}$. For each constant $c \in \mathbb{R}$, the **level set** of $f$ at height $c$ is
+
+$$L_c = \{\tilde{x} \in D : f(\tilde{x}) = c\}.$$
+
+- When $n = 2$, these are called **level curves** (or **contour lines**). They are curves in the $xy$-plane.
+- When $n = 3$, these are called **level surfaces**. They are surfaces in $xyz$-space.
+
+**Example:** For $f(x,y) = x^2 + y^2$, the level curve at height $c > 0$ is the circle $x^2 + y^2 = c$, i.e. a circle of radius $\sqrt{c}$. At $c = 0$ the level set is the single point $(0,0)$. For $c < 0$ the level set is empty.
+
+**Example:** For $f(x,y,z) = x^2 + y^2 + z^2$, the level surface at height $c > 0$ is the sphere of radius $\sqrt{c}$. Topographic maps and weather charts (isobars, isotherms) are everyday examples of level curves.
+
+> **Clarification:** A level curve of $f(x,y)$ is **not** the same as the graph of $f$. The graph lives in $\mathbb{R}^3$; a level curve lives in $\mathbb{R}^2$ and represents all points where $f$ takes a particular constant value.
+
+---
+
+## 8. Limits of Sequences in $\mathbb{R}^p$
+
+Before defining limits of multivariable functions, we need limits of **sequences** in higher-dimensional spaces. [▶ W9_L4 @ 03:54](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=234)
+
+### Definition
+
+Let $(\tilde{a}_n)_{n \ge 1}$ be a sequence in $\mathbb{R}^p$, with coordinate representation
+
+$$\tilde{a}_n = (a_{n1},\, a_{n2},\, \ldots,\, a_{np}).$$
+
+We say $\tilde{a}_n$ **converges** to $\tilde{a} = (a_1, a_2, \ldots, a_p) \in \mathbb{R}^p$, and write $\tilde{a}_n \to \tilde{a}$ as $n \to \infty$, if **each coordinate sequence** converges to the corresponding coordinate:
+
+$$a_{ni} \to a_i \quad \text{as } n \to \infty, \quad \text{for every } i = 1, 2, \ldots, p.$$
+
+In other words, convergence in $\mathbb{R}^p$ reduces to $p$ separate convergences in $\mathbb{R}$.
+
+A sequence is **divergent** if it is not convergent — which happens when at least one coordinate sequence fails to converge.
+
+### Worked Examples
+
+**Example 1:** $\tilde{a}_n = \left(\dfrac{1}{n},\; n\sin\dfrac{1}{n}\right)$ in $\mathbb{R}^2$. [▶ W9_L4 @ 07:57](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=477)
+
+**Solution:** First coordinate: $1/n \to 0$. Second coordinate: $n\sin(1/n) = \dfrac{\sin(1/n)}{1/n} \to 1$ as $n \to \infty$ (by the standard limit $\lim_{u \to 0} \frac{\sin u}{u} = 1$). Therefore $\tilde{a}_n \to (0, 1)$.
+
+**Example 2:** $\tilde{a}_n = \bigl((-1)^n,\; n\sin(1/n)\bigr)$ in $\mathbb{R}^2$.
+
+**Solution:** The first coordinate $(-1)^n$ oscillates between $-1$ and $1$ and does not converge. Therefore $\tilde{a}_n$ **diverges**, even though the second coordinate converges.
+
+**Example 3:** $\tilde{a}_n = \left(\dfrac{\cos n}{n},\;\displaystyle\sum_{i=1}^{n}\dfrac{5}{i!},\;\displaystyle\sum_{i=0}^{n}\dfrac{1}{i!},\; n\cos\dfrac{1}{n}\right)$ in $\mathbb{R}^4$.
 
 **Solution:**
-- First coordinate: $\frac{1}{n} \to 0$.
-- Second coordinate: $n \sin\frac{1}{n} = \frac{\sin(1/n)}{1/n} \to 1$ (using the standard limit $\lim_{u \to 0} \frac{\sin u}{u} = 1$).
+- Coordinate 1: $|\cos n / n| \le 1/n \to 0$. Limit: $0$.
+- Coordinate 2: $5\sum_{i=1}^{n} 1/i! \to 5(e - 1)$.
+- Coordinate 3: $\sum_{i=0}^{n} 1/i! \to e$.
+- Coordinate 4: $\cos(1/n) \to 1$ but is multiplied by $n \to \infty$, so $n\cos(1/n) \to \infty$. Diverges.
 
-Therefore $\lim_{n \to \infty} \tilde{a}_n = (0, 1)$.
+Since coordinate 4 diverges, the sequence in $\mathbb{R}^4$ **does not converge**.
 
-**Example:** $\tilde{b}_n = \left((-1)^n,\; n\sin\frac{1}{n}\right)$ in $\mathbb{R}^2$.
+---
 
-**Solution:**
-- First coordinate: $(-1)^n$ oscillates between $-1$ and $1$; it does not converge.
-- Since one coordinate sequence diverges, the sequence $\tilde{b}_n$ in $\mathbb{R}^2$ **diverges**.
+## 9. Limits of Scalar-Valued Multivariable Functions
 
-**Example:** $\tilde{c}_n = \left(\frac{\cos n}{n},\; 5\sum_{i=1}^{n}\frac{1}{i!},\; \sum_{i=0}^{n}\frac{1}{i!},\; n\cos\frac{1}{n}\right)$ in $\mathbb{R}^4$.
+### Definition
 
-**Solution:**
-- $\frac{\cos n}{n} \to 0$ (by the squeeze theorem, since $|\cos n| \leq 1$).
-- $5\sum_{i=1}^{n}\frac{1}{i!} \to 5(e - 1)$.
-- $\sum_{i=0}^{n}\frac{1}{i!} \to e$.
-- $n\cos\frac{1}{n}$: as $n \to \infty$, $\cos(1/n) \to 1$ but $n \to \infty$, so $n\cos(1/n) \to \infty$ (diverges).
+Let $f: D \to \mathbb{R}$ be a scalar-valued multivariable function, with $D \subseteq \mathbb{R}^k$, and let $\tilde{a}$ be a point such that there exists at least one sequence in $D$ converging to $\tilde{a}$. We say that the **limit of $f$ at $\tilde{a}$ exists and equals $L \in \mathbb{R}$** if [▶ W9_L4 @ 14:01](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=841)
 
-Since the fourth coordinate diverges, the limit **does not exist** in $\mathbb{R}^4$.
+$$\text{for every sequence } (\tilde{a}_n) \text{ in } D \text{ with } \tilde{a}_n \to \tilde{a}, \quad f(\tilde{a}_n) \to L.$$
 
-### 7.2 Limit of a Scalar-Valued Multivariable Function at a Point
+We write
 
-**Definition.** Let $f: D \to \mathbb{R}$ with $D \subseteq \mathbb{R}^k$, and let $\tilde{a}$ be a point such that there exists a sequence in $D$ converging to $\tilde{a}$. We say
+$$\lim_{\tilde{x} \to \tilde{a}} f(\tilde{x}) = L.$$
 
-$$\lim_{\tilde{x} \to \tilde{a}} f(\tilde{x}) = L \qquad (L \in \mathbb{R})$$
+If no such $L$ exists, we say the **limit does not exist**.
 
-if for **every** sequence $\{\tilde{a}_n\}$ in $D$ with $\tilde{a}_n \to \tilde{a}$, we have $f(\tilde{a}_n) \to L$.
+> **Clarification:** The point $\tilde{a}$ need not belong to $D$ itself — we only require that $\tilde{a}$ can be approached by sequences from $D$. This mirrors single-variable calculus where we can discuss $\lim_{x \to 0} \frac{\sin x}{x}$ even though the function is undefined at $x = 0$.
 
-If no such $L$ exists, we say the limit **does not exist**.
+### Basic Limits
 
-> **Clarification:** The definition requires $f(\tilde{a}_n) \to L$ for **all** sequences approaching $\tilde{a}$, not just for one particular sequence. This is the source of much of the subtlety in multivariable limits — there are infinitely many directions (and curves) along which one can approach $\tilde{a}$.
+For $\tilde{a} = (a_1, \ldots, a_k)$, the following limits hold directly from coordinate-wise convergence:
 
-### 7.3 Basic Limits
+| Expression | Limit | Condition |
+|---|---|---|
+| $x_i^k$ | $a_i^k$ | $k \ge 0$ integer |
+| $x_i^k$ (negative $k$) | $a_i^k$ | $a_i \neq 0$ |
+| $e^{x_i}$ | $e^{a_i}$ | — |
+| $\ln(x_i)$ | $\ln(a_i)$ | $a_i > 0$ |
+| $\sin(x_i)$ | $\sin(a_i)$ | — |
+| $\tan(x_i)$ | $\tan(a_i)$ | $a_i \in (-\pi/2, \pi/2)$ |
 
-The following limits hold as $\tilde{x} \to \tilde{a}$ (with appropriate domain restrictions):
+### Limit Laws
 
-| Function | Limit |
-|---|---|
-| $x_i^k$ ($k \in \mathbb{Z}_{>0}$) | $a_i^k$ |
-| $x_i^k$ ($k < 0$, $a_i \neq 0$) | $a_i^k$ |
-| $e^{x_i}$ | $e^{a_i}$ |
-| $\ln x_i$ ($a_i > 0$) | $\ln a_i$ |
-| $\sin x_i$ | $\sin a_i$ |
-| $\cos x_i$ | $\cos a_i$ |
-| $\tan x_i$ ($a_i \neq \pm\frac{\pi}{2} + k\pi$) | $\tan a_i$ |
+Let $f, g: D \to \mathbb{R}$ with $\lim_{\tilde{x}\to\tilde{a}} f(\tilde{x}) = F$ and $\lim_{\tilde{x}\to\tilde{a}} g(\tilde{x}) = G$, and let $c \in \mathbb{R}$. [▶ W9_L4 @ 17:13](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=1033)
 
-These follow directly from the corresponding single-variable limits and the fact that $\tilde{x} \to \tilde{a}$ implies $x_i \to a_i$.
+1. **Linearity:** $\displaystyle\lim_{\tilde{x}\to\tilde{a}} \bigl[c\,f(\tilde{x}) + g(\tilde{x})\bigr] = cF + G.$
 
-### 7.4 Limit Laws
+2. **Product:** $\displaystyle\lim_{\tilde{x}\to\tilde{a}} \bigl[f(\tilde{x})\,g(\tilde{x})\bigr] = F \cdot G.$
 
-Let $f, g: D \to \mathbb{R}$ with $\lim_{\tilde{x} \to \tilde{a}} f(\tilde{x}) = F$ and $\lim_{\tilde{x} \to \tilde{a}} g(\tilde{x}) = G$, and let $c \in \mathbb{R}$.
+3. **Quotient:** If $G \neq 0$, then $\displaystyle\lim_{\tilde{x}\to\tilde{a}} \frac{f(\tilde{x})}{g(\tilde{x})} = \frac{F}{G}.$
 
-| Rule | Statement |
-|---|---|
-| **Linearity** | $\lim_{\tilde{x} \to \tilde{a}} \bigl[c\,f(\tilde{x}) + g(\tilde{x})\bigr] = cF + G$ |
-| **Product** | $\lim_{\tilde{x} \to \tilde{a}} \bigl[f(\tilde{x})\, g(\tilde{x})\bigr] = F \cdot G$ |
-| **Quotient** | $\lim_{\tilde{x} \to \tilde{a}} \dfrac{f(\tilde{x})}{g(\tilde{x})} = \dfrac{F}{G}$, provided $G \neq 0$ |
-| **Composition** | If $g$ is single-variable with $\lim_{u \to F} g(u) = L$, then $\lim_{\tilde{x} \to \tilde{a}} g(f(\tilde{x})) = L$ |
-| **Squeeze (Sandwich)** | If $f(\tilde{x}) \leq h(\tilde{x}) \leq g(\tilde{x})$ near $\tilde{a}$ and $F = G = L$, then $\lim_{\tilde{x} \to \tilde{a}} h(\tilde{x}) = L$ |
+4. **Composition:** If $h: E \to \mathbb{R}$ is a single-variable function with $\lim_{u \to F} h(u) = L$, and the range of $f$ near $\tilde{a}$ lies in $E$, then [▶ W9_L4 @ 22:42](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=1362)
 
-### 7.5 Worked Examples: Computing Limits
+$$\lim_{\tilde{x}\to\tilde{a}} h\bigl(f(\tilde{x})\bigr) = L.$$
 
-**Example:** Find $\displaystyle\lim_{(x,y,z) \to (1,2,3)} \bigl(x^2 y^3 + y^3 z^2 + xyz\bigr)$.
+5. **Sandwich (Squeeze) Principle:** If $f(\tilde{x}) \le h(\tilde{x}) \le g(\tilde{x})$ near $\tilde{a}$ and both $f$ and $g$ have limit $L$ at $\tilde{a}$, then $\lim_{\tilde{x}\to\tilde{a}} h(\tilde{x}) = L.$
 
-**Solution:** This is a polynomial, so we may substitute directly:
+### Worked Example: Polynomial
 
-$$1^2 \cdot 2^3 + 2^3 \cdot 3^2 + 1 \cdot 2 \cdot 3 = 8 + 72 + 6 = 86.$$
+**Example:** Compute $\displaystyle\lim_{(x,y,z)\to(1,2,3)} \bigl(x^2 y^3 + y^3 z^2 + xyz\bigr)$.
 
-**Example:** Find $\displaystyle\lim_{(x,y,z) \to (1,2,3)} e^{xyz}$.
+**Solution:** Each monomial is a product of coordinate powers, and each coordinate limit can be substituted directly. By the product and sum rules:
 
-**Solution:** Write $e^{xyz} = g(f(x,y,z))$ where $f(x,y,z) = xyz$ and $g(u) = e^u$. By the product rule, $\lim f = 1 \cdot 2 \cdot 3 = 6$. By the composition rule, $\lim e^{xyz} = e^6$.
+$$= 1^2 \cdot 2^3 + 2^3 \cdot 3^2 + 1 \cdot 2 \cdot 3 = 8 + 72 + 6 = 86.$$
 
-**Example:** Find $\displaystyle\lim_{(x,y) \to (1,1)} \frac{x}{y}$.
+### Worked Example: Composition
 
-**Solution:** The denominator's limit is $1 \neq 0
+**Example:** Compute $\displaystyle\lim_{(x,y,z)\to(1,2,3)} e^{xyz}$.
+
+**Solution:** Write $e^{xyz} = h(f(x,y,z))$ where $f(x,y,z) = xyz$ and $h(u) = e^u$. By the product rule, $\lim f = 1 \cdot 2 \cdot 3 = 6$. By the composition rule, $\lim e^{xyz} = e^6$.
+
+### When Substitution Fails
+
+Substitution works whenever the function is built from polynomials, rational functions (with nonzero denominator at the limit point), and compositions with standard continuous functions. It **fails** when the expression yields an indeterminate form such as $\frac{0}{0}$.
+
+**Example:** Consider $\displaystyle\lim_{(x,y)\to(0,0)} \frac{x^3 - y^2 x}{(x^2+y^2)^2}$. [▶ W9_L4 @ 26:53](https://www.youtube.com/watch?v=Uvv8-Ujgqjo&t=1613)
+
+**Solution:** Direct substitution gives $\frac{0}{0}$. We test specific sequences.
+
+*Along the $x$-axis* ($y = 0$): $f(1/n, 0) = \dfrac{(1/n)^3}{(1/n)^4} = n \to \infty

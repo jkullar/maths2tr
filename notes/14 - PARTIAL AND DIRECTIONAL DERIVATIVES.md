@@ -1,373 +1,378 @@
 # PARTIAL DERIVATIVES AND THE GRADIENT
 
-This file develops the machinery for measuring how a function of several variables changes. In single-variable calculus, the derivative captures the rate of change of a function at a point. For a function $f : \mathbb{R}^n \to \mathbb{R}$ with $n > 1$, there is no single "direction" in which to measure change — there are infinitely many. We begin with **partial derivatives**, which measure the rate of change along each coordinate axis, then generalise to **directional derivatives**, which measure the rate of change in an arbitrary direction. The **gradient vector** ties everything together: it packages all partial derivatives into a single vector that both determines every directional derivative and points in the direction of steepest ascent. These ideas are foundational to optimisation, differential geometry, and machine learning.
+This file develops the theory of **partial derivatives**, **directional derivatives**, and the **gradient vector** for scalar-valued multivariable functions. These tools extend the idea of "rate of change" from single-variable calculus to functions of several variables, answering the fundamental question: *how fast does $f$ change, and in which direction?* The gradient, in particular, is one of the most important objects in applied mathematics — it drives optimisation algorithms such as gradient descent, which lies at the heart of machine learning.
 
-Prerequisites: familiarity with single-variable differentiation, vectors and dot products ([[11 - INNER PRODUCTS]]), and multivariable functions and limits ([[13 - MULTIVARIABLE FUNCTIONS]]).
+**Prerequisites.** Familiarity with multivariable functions (see [[13 - MULTIVARIABLE FUNCTIONS]]) and the dot product and norms on $\mathbb{R}^n$ (see [[11 - INNER PRODUCTS]]).
 
 ---
 
-## 1. Preliminaries and Notation
+## 1. Recall: Derivatives in One Variable
 
-Throughout this file, the following conventions are in force unless stated otherwise.
+Before introducing partial derivatives, we briefly recall the single-variable derivative that motivates everything that follows.
+
+Let $f: \mathbb{R} \to \mathbb{R}$ be defined on an open interval containing $a$. The function $f$ is **differentiable at $a$** if the following limit exists:
+
+$$f'(a) = \lim_{h \to 0} \frac{f(a+h) - f(a)}{h}$$
+
+The number $f'(a)$ is the **derivative of $f$ at $a$** and represents the instantaneous rate of change of $f$ at $a$. Collecting all points where $f$ is differentiable produces the **derivative function** $f'$.
+
+The strategy for multivariable calculus is: reduce to this one-variable setup by holding all variables constant except one (for partial derivatives) or by restricting to a line through a point (for directional derivatives).
+
+---
+
+## 2. Notation and Conventions
+
+Throughout this file, the following conventions are in force.
 
 | Symbol | Meaning |
-|---|---|
-| $f$ | A **scalar-valued multivariable function** $f : D \subseteq \mathbb{R}^n \to \mathbb{R}$, $n \geq 2$ |
-| $\tilde{a} = (a_1, a_2, \dots, a_n)$ | A point in $\mathbb{R}^n$ |
-| $B_r(\tilde{a})$ | The **open ball** of radius $r > 0$ centred at $\tilde{a}$: $B_r(\tilde{a}) = \{\tilde{x} \in \mathbb{R}^n : \|\tilde{x} - \tilde{a}\| < r\}$ |
-| $e_1, e_2, \dots, e_n$ | The **standard ordered basis** of $\mathbb{R}^n$ (see [[11 - INNER PRODUCTS]]) |
-| $\|v\|$ | The Euclidean norm of $v \in \mathbb{R}^n$ |
+|--------|---------|
+| $f$ (unqualified) | A scalar-valued multivariable function $f: D \subseteq \mathbb{R}^n \to \mathbb{R}$ |
+| $\widetilde{a} = (a_1, a_2, \ldots, a_n)$ | A point in $\mathbb{R}^n$ |
+| $B_r(\widetilde{a})$ | The **open ball** of radius $r$ around $\widetilde{a}$: $\{\widetilde{x} \in \mathbb{R}^n : \|\widetilde{x} - \widetilde{a}\| < r\}$ |
+| $e_1, e_2, \ldots, e_n$ | The **standard ordered basis** of $\mathbb{R}^n$ |
+| $\|v\|$ | The Euclidean norm (length) of the vector $v$ |
 
-The requirement that the domain $D$ contains an open ball around the point $\tilde{a}$ ensures that we can approach $\tilde{a}$ from every direction — a necessary condition for limits defining derivatives.
-
----
-
-## 2. Partial Derivatives
-
-### 2.1 Motivation: Rate of Change Along One Variable
-
-Recall from single-variable calculus: if $f : \mathbb{R} \to \mathbb{R}$ is defined on an open interval containing $a$, the **derivative** of $f$ at $a$ is
-
-$$f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h},$$
-
-provided this limit exists. This number measures the instantaneous rate of change of $f$ at $a$.
-
-For a function $f(x_1, x_2, \dots, x_n)$ of several variables, we can ask a simpler question first: *what is the rate of change of $f$ at a point $\tilde{a}$ when only the variable $x_i$ changes and all other variables are held fixed?* This is exactly what a partial derivative computes.
-
-### 2.2 Definition of the Partial Derivative
-
-Let $f(x_1, x_2, \dots, x_n)$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing the point $\tilde{a} = (a_1, \dots, a_n)$ and an open ball around it.
-
-**Definition.** The **partial derivative of $f$ with respect to $x_i$** at $\tilde{a}$ is
-
-$$\frac{\partial f}{\partial x_i}(\tilde{a}) = \lim_{h \to 0} \frac{f(\tilde{a} + h\,e_i) - f(\tilde{a})}{h},$$
-
-provided this limit exists. Equivalently, writing out coordinates:
-
-$$\frac{\partial f}{\partial x_i}(\tilde{a}) = \lim_{h \to 0} \frac{f(a_1, \dots, a_{i-1},\; a_i + h,\; a_{i+1}, \dots, a_n) - f(a_1, \dots, a_n)}{h}.$$
-
-Common notations include $f_{x_i}(\tilde{a})$, $\partial_{x_i} f(\tilde{a})$, and $\frac{\partial f}{\partial x_i}\big|_{\tilde{a}}$.
-
-By letting the point $\tilde{a}$ vary, we obtain the **partial derivative function**
-
-$$\frac{\partial f}{\partial x_i} : D_i \to \mathbb{R},$$
-
-where $D_i \subseteq D$ is the set of all points at which the limit exists.
-
-### 2.3 Reduction to Single-Variable Calculus
-
-The key insight is that computing a partial derivative reduces to a problem in single-variable calculus. Define the auxiliary function
-
-$$g(t) = f(a_1, \dots, a_{i-1},\; t,\; a_{i+1}, \dots, a_n).$$
-
-Then $g$ is a function of the single variable $t$, and
-
-$$\frac{\partial f}{\partial x_i}(\tilde{a}) = g'(a_i).$$
-
-This means: **to compute $\frac{\partial f}{\partial x_i}$, treat $f$ as a function of $x_i$ alone, regarding all other variables as constants, and differentiate using the ordinary rules of single-variable calculus.**
-
-> **Clarification:** The symbol $\partial$ (read "del" or "partial") is used instead of $d$ to emphasise that we are differentiating with respect to one variable while holding the others fixed. It does *not* denote a different kind of limit — the underlying limit definition is identical to that of the single-variable derivative.
-
-### 2.4 Geometric Interpretation
-
-Consider $f : \mathbb{R}^2 \to \mathbb{R}$ and a point $(a, b)$. The graph of $f$ is a surface $z = f(x, y)$ in $\mathbb{R}^3$.
-
-- **$\frac{\partial f}{\partial x}(a, b)$:** Intersect the surface with the plane $y = b$ (a vertical plane parallel to the $xz$-plane). The intersection is a curve $z = f(x, b)$. The partial derivative is the slope of the tangent line to this curve at $x = a$.
-
-- **$\frac{\partial f}{\partial y}(a, b)$:** Intersect the surface with the plane $x = a$. The intersection is a curve $z = f(a, y)$. The partial derivative is the slope of the tangent line to this curve at $y = b$.
-
-### 2.5 Worked Examples
-
-**Example 1.** Let $f(x, y) = x + y$. Compute $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$.
-
-**Solution.** *Using the limit definition for* $\frac{\partial f}{\partial x}$ *at the point* $(x, y)$:
-
-$$\frac{\partial f}{\partial x}(x, y) = \lim_{h \to 0} \frac{f(x + h, y) - f(x, y)}{h} = \lim_{h \to 0} \frac{(x + h + y) - (x + y)}{h} = \lim_{h \to 0} \frac{h}{h} = 1.$$
-
-By the shortcut: treat $y$ as a constant and differentiate $x + y$ with respect to $x$. The derivative of $x$ is $1$; the derivative of the constant $y$ is $0$. So $\frac{\partial f}{\partial x} = 1$. By symmetry, $\frac{\partial f}{\partial y} = 1$.
+In $\mathbb{R}^2$, the open ball $B_r(\widetilde{a})$ is an open disk of radius $r$ centred at $\widetilde{a}$. In $\mathbb{R}^3$ it is an open solid sphere.
 
 ---
 
-**Example 2.** Let $f(x, y, z) = xy + yz + zx$. Compute all three partial derivatives.
+## 3. Partial Derivatives
 
-**Solution.** Treat two variables as constants in each case:
+### Definition
 
-$$\frac{\partial f}{\partial x}(x,y,z) = y + z, \qquad \frac{\partial f}{\partial y}(x,y,z) = x + z, \qquad \frac{\partial f}{\partial z}(x,y,z) = x + y.$$
+Let $f(x_1, x_2, \ldots, x_n)$ be a function defined on a domain $D \subseteq \mathbb{R}^n$ such that $D$ contains some open ball around the point $\widetilde{a} = (a_1, \ldots, a_n)$. The **partial derivative of $f$ with respect to $x_i$ at $\widetilde{a}$** is [▶ W9_L2 @ 06:01](https://www.youtube.com/watch?v=GoJoNFBuCJ8&t=361)
 
-*Verification from the limit definition for $\frac{\partial f}{\partial y}$ at $(1, 2, 3)$:*
+$$\frac{\partial f}{\partial x_i}(\widetilde{a}) = \lim_{h \to 0} \frac{f(\widetilde{a} + h\,e_i) - f(\widetilde{a})}{h}$$
 
-$$\frac{\partial f}{\partial y}(1,2,3) = \lim_{h \to 0} \frac{f(1,\, 2+h,\, 3) - f(1,2,3)}{h}.$$
+provided this limit exists. Written out in coordinates:
 
-We compute $f(1, 2+h, 3) = 1 \cdot (2+h) + (2+h) \cdot 3 + 3 \cdot 1 = 2 + h + 6 + 3h + 3 = 11 + 4h$ and $f(1,2,3) = 2 + 6 + 3 = 11$. Therefore
+$$\frac{\partial f}{\partial x_i}(\widetilde{a}) = \lim_{h \to 0} \frac{f(a_1, \ldots, a_{i-1},\, a_i + h,\, a_{i+1}, \ldots, a_n) - f(a_1, \ldots, a_n)}{h}$$
 
-$$\frac{\partial f}{\partial y}(1,2,3) = \lim_{h \to 0} \frac{11 + 4h - 11}{h} = \lim_{h \to 0} \frac{4h}{h} = 4.$$
+The notation $f_{x_i}(\widetilde{a})$ is used interchangeably with $\dfrac{\partial f}{\partial x_i}(\widetilde{a})$. The symbol $\partial$ is read "**del**" (or sometimes "partial").
 
-This matches $x + z = 1 + 3 = 4$. $\checkmark$
+### The Partial Derivative as a Function
 
----
+By computing the above limit at every point $\widetilde{x} \in D$ where it exists, we obtain the **partial derivative function**:
 
-**Example 3.** Let $f(x, y) = \sin(xy)$. Compute $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$.
+$$\frac{\partial f}{\partial x_i} : D_i \subseteq D \to \mathbb{R}, \qquad \widetilde{x} \mapsto \lim_{h \to 0} \frac{f(\widetilde{x} + h\,e_i) - f(\widetilde{x})}{h}$$
 
-**Solution.** By the chain rule (treating $y$ as a constant):
+where $D_i$ is the set of points in $D$ at which the limit exists. This is itself a scalar-valued multivariable function.
 
-$$\frac{\partial f}{\partial x}(x, y) = \cos(xy) \cdot y = y\cos(xy).$$
+### Key Idea: Reduction to One Variable
 
-Similarly, treating $x$ as a constant:
+The partial derivative $\frac{\partial f}{\partial x_i}$ at $\widetilde{a}$ is computed by defining the single-variable function [▶ W9_L2 @ 08:20](https://www.youtube.com/watch?v=GoJoNFBuCJ8&t=500)
 
-$$\frac{\partial f}{\partial y}(x, y) = \cos(xy) \cdot x = x\cos(xy).$$
+$$g(t) = f(a_1, \ldots, a_{i-1},\, t,\, a_{i+1}, \ldots, a_n)$$
 
-*Verification at $(1, 0)$:*
+Then $\frac{\partial f}{\partial x_i}(\widetilde{a}) = g'(a_i)$.
 
-- $\frac{\partial f}{\partial x}(1, 0) = 0 \cdot \cos(0) = 0.$
+**In words:** to compute the partial derivative with respect to $x_i$, **treat all other variables as constants** and differentiate as a function of $x_i$ alone using the usual rules of single-variable calculus.
 
-Using the limit definition directly: $\lim_{h \to 0} \frac{\sin((1+h)\cdot 0) - \sin(0)}{h} = \lim_{h \to 0} \frac{0}{h} = 0$. $\checkmark$
+> **Clarification:** The word "partial" reflects the fact that we are only looking at variation in *one* direction at a time, not capturing the full behaviour of the function simultaneously.
 
-- $\frac{\partial f}{\partial y}(1, 0) = 1 \cdot \cos(0) = 1.$
+### Geometric Interpretation
 
-Using the limit definition: $\lim_{h \to 0} \frac{\sin(1 \cdot h) - \sin(0)}{h} = \lim_{h \to 0} \frac{\sin h}{h} = 1$. $\checkmark$
+For a function $f: \mathbb{R}^2 \to \mathbb{R}$ with graph $z = f(x,y)$:
 
----
+- $\frac{\partial f}{\partial x}(a, b)$ is the slope of the curve obtained by **intersecting** the surface $z = f(x,y)$ with the plane $y = b$ (a plane parallel to the $xz$-plane), evaluated at $x = a$.
+- $\frac{\partial f}{\partial y}(a, b)$ is the slope of the curve obtained by intersecting the surface with the plane $x = a$ (a plane parallel to the $yz$-plane), evaluated at $y = b$.
 
-**Example 4 (Piecewise-defined function).** Let
+### Worked Examples
 
-$$f(x,y) = \begin{cases} \dfrac{xy}{x^2 + y^2} & \text{if } (x,y) \neq (0,0), \\[6pt] 0 & \text{if } (x,y) = (0,0). \end{cases}$$
+**Example 1:** Let $f(x,y) = x + y$. Compute $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$.
 
-Compute $\frac{\partial f}{\partial x}(0,0)$ and $\frac{\partial f}{\partial y}(0,0)$.
+**Solution:** Treating $y$ as a constant: $\frac{\partial f}{\partial x}(x,y) = 1$. Treating $x$ as a constant: $\frac{\partial f}{\partial y}(x,y) = 1$.
 
-**Solution.** Away from the origin, the function is a quotient of polynomials with nonzero denominator, so standard differentiation rules apply. At the origin, we must use the limit definition:
+*Verification from the limit definition:*
 
-$$\frac{\partial f}{\partial x}(0,0) = \lim_{h \to 0} \frac{f(h,0) - f(0,0)}{h} = \lim_{h \to 0} \frac{\frac{h \cdot 0}{h^2 + 0} - 0}{h} = \lim_{h \to 0} \frac{0}{h} = 0.$$
-
-By symmetry, $\frac{\partial f}{\partial y}(0,0) = 0$. Both partial derivatives exist at the origin and equal zero.
-
-> **Clarification:** For piecewise-defined functions (especially those with a special definition at a single point), the shortcut of "treat other variables as constants and differentiate" may not apply at the special point. Always fall back on the limit definition in such cases.
-
-### 2.6 Summary Table — Partial Derivatives
-
-| Aspect | Detail |
-|---|---|
-| **What it measures** | Rate of change of $f$ with respect to $x_i$, all other variables held fixed |
-| **Definition** | $\displaystyle \frac{\partial f}{\partial x_i}(\tilde{a}) = \lim_{h \to 0} \frac{f(\tilde{a} + he_i) - f(\tilde{a})}{h}$ |
-| **Shortcut** | Treat all variables except $x_i$ as constants; differentiate with respect to $x_i$ |
-| **Output** | A scalar (at a point) or a scalar-valued function (as the point varies) |
-| **Notation** | $f_{x_i}$, $\partial_{x_i}f$, $\frac{\partial f}{\partial x_i}$ |
+$$\frac{\partial f}{\partial x}(0,0) = \lim_{h \to 0} \frac{f(h, 0) - f(0,0)}{h} = \lim_{h \to 0} \frac{h}{h} = 1 \checkmark$$
 
 ---
 
-## 3. Directional Derivatives
+**Example 2:** Let $f(x,y,z) = xy + yz + zx$. Compute all three partial derivatives. [▶ W9_L2 @ 26:34](https://www.youtube.com/watch?v=GoJoNFBuCJ8&t=1594)
 
-### 3.1 Motivation
+**Solution:** Treat two variables as constants in each case:
 
-Partial derivatives measure the rate of change along the coordinate axes only. But in $\mathbb{R}^n$ there are infinitely many directions. If we stand at a point $\tilde{a}$ and walk in some direction $u$ that is not aligned with any axis, how fast does $f$ change?
+$$\frac{\partial f}{\partial x}(x,y,z) = y + z, \qquad \frac{\partial f}{\partial y}(x,y,z) = x + z, \qquad \frac{\partial f}{\partial z}(x,y,z) = x + y$$
 
-### 3.2 Definition
+*Verification at $(1,2,3)$ with respect to $y$ from the limit:*
 
-Let $f(x_1, \dots, x_n)$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing $\tilde{a}$ and an open ball around it. Let $u = (u_1, u_2, \dots, u_n)$ be a **unit vector** (i.e., $\|u\| = 1$).
+$$\lim_{h \to 0} \frac{f(1, 2+h, 3) - f(1,2,3)}{h} = \lim_{h \to 0} \frac{[1(2+h) + (2+h)3 + 3 \cdot 1] - [2 + 6 + 3]}{h} = \lim_{h \to 0} \frac{4h}{h} = 4$$
 
-**Definition.** The **directional derivative of $f$ at $\tilde{a}$ in the direction of $u$** is
-
-$$f_u(\tilde{a}) = D_u f(\tilde{a}) = \lim_{h \to 0} \frac{f(\tilde{a} + hu) - f(\tilde{a})}{h},$$
-
-provided this limit exists. Writing out coordinates:
-
-$$f_u(\tilde{a}) = \lim_{h \to 0} \frac{f(a_1 + hu_1,\; a_2 + hu_2,\; \dots,\; a_n + hu_n) - f(a_1, a_2, \dots, a_n)}{h}.$$
-
-As with partial derivatives, letting $\tilde{a}$ vary produces the **directional derivative function** $f_u : D_u \to \mathbb{R}$, where $D_u$ is the set of points at which the limit exists.
-
-> **Clarification:** We insist that $u$ is a unit vector so that $h$ measures actual distance traveled in the direction of $u$. If you are given a non-unit vector $v$, first normalise: $u = \frac{v}{\|v\|}$.
-
-### 3.3 Partial Derivatives as Special Directional Derivatives
-
-When $u = e_i$ (the $i$-th standard basis vector), the directional derivative reduces to the partial derivative:
-
-$$f_{e_i}(\tilde{a}) = \frac{\partial f}{\partial x_i}(\tilde{a}).$$
-
-Thus partial derivatives are directional derivatives in the coordinate directions. The directional derivative is the natural generalisation.
-
-### 3.4 Reduction to a Single-Variable Derivative
-
-Define
-
-$$g(t) = f(\tilde{a} + tu).$$
-
-Then $g : \mathbb{R} \to \mathbb{R}$ is a function of one variable, and
-
-$$f_u(\tilde{a}) = g'(0).$$
-
-Geometrically, $g$ describes how $f$ behaves along the line through $\tilde{a}$ in the direction of $u$. The directional derivative is the derivative of this restriction at $t = 0$.
-
-### 3.5 Geometric Interpretation (Two Variables)
-
-For $f : \mathbb{R}^2 \to \mathbb{R}$ with graph $z = f(x, y)$:
-
-1. Draw the line through $(a, b)$ in the $xy$-plane in the direction of $u$.
-2. Erect the vertical plane containing this line (perpendicular to the $xy$-plane).
-3. Intersect this plane with the surface $z = f(x, y)$ to obtain a curve.
-4. $f_u(a, b)$ is the slope of the tangent line to this curve at the point $(a, b, f(a, b))$.
-
-### 3.6 Worked Examples
-
-**Example 5.** Find the rate of change of $f(x, y) = x + y$ at $(0, 0)$ in the direction of the line $y = x$.
-
-**Solution.** The line $y = x$ makes an angle of $45°$ with the positive $x$-axis. A unit vector in this direction is
-
-$$u = (\cos 45°,\, \sin 45°) = \left(\frac{1}{\sqrt{2}},\, \frac{1}{\sqrt{2}}\right).$$
-
-Using the limit definition:
-
-$$f_u(0,0) = \lim_{h \to 0} \frac{f\!\left(\frac{h}{\sqrt{2}},\, \frac{h}{\sqrt{2}}\right) - f(0,0)}{h} = \lim_{h \to 0} \frac{\frac{h}{\sqrt{2}} + \frac{h}{\sqrt{2}}}{h} = \lim_{h \to 0} \frac{\sqrt{2}\,h}{h} = \sqrt{2}.$$
+And indeed $\frac{\partial f}{\partial y}(1,2,3) = 1 + 3 = 4$. $\checkmark$
 
 ---
 
-**Example 6.** Find the directional derivative of $f(x, y, z) = xy + yz + zx$ at $(1, 2, 3)$ in the direction of the vector $v = (4, 3, 0)$.
+**Example 3:** Let $f(x,y) = \sin(xy)$. Compute $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$. [▶ W9_L2 @ 26:50](https://www.youtube.com/watch?v=GoJoNFBuCJ8&t=1610)
 
-**Solution.** First, normalise: $\|v\| = \sqrt{16 + 9 + 0} = 5$, so $u = \frac{1}{5}(4, 3, 0)$.
+**Solution:** Using the chain rule (treating $y$ as a constant):
 
-By the limit definition (or computing $g'(0)$ where $g(h) = f(1 + \tfrac{4h}{5},\; 2 + \tfrac{3h}{5},\; 3)$), expanding and cancelling:
+$$\frac{\partial f}{\partial x}(x,y) = y\cos(xy), \qquad \frac{\partial f}{\partial y}(x,y) = x\cos(xy)$$
 
-$$f_u(1,2,3) = \lim_{h \to 0} \frac{f\!\left(1 + \tfrac{4h}{5},\; 2 + \tfrac{3h}{5},\; 3\right) - f(1,2,3)}{h}.$$
+*Check at $(1,0)$:*
 
-Computing $f\!\left(1 + \tfrac{4h}{5},\; 2 + \tfrac{3h}{5},\; 3\right)$:
+- $\frac{\partial f}{\partial x}(1,0) = 0 \cdot \cos(0) = 0$.
+- $\frac{\partial f}{\partial y}(1,0) = 1 \cdot \cos(0) = 1$.
 
-$$= \left(1 + \tfrac{4h}{5}\right)\!\left(2 + \tfrac{3h}{5}\right) + \left(2 + \tfrac{3h}{5}\right)(3) + (3)\!\left(1 + \tfrac{4h}{5}\right).$$
+From the limit definition for $\frac{\partial f}{\partial y}(1,0)$:
 
-Expanding and subtracting $f(1,2,3) = 2 + 6 + 3 = 11$:
+$$\lim_{h \to 0} \frac{\sin(1 \cdot h) - \sin(0)}{h} = \lim_{h \to 0} \frac{\sin h}{h} = 1 \checkmark$$
 
-$$= 2 + \tfrac{3h}{5} + \tfrac{8h}{5} + \tfrac{12h^2}{25} + 6 + \tfrac{9h}{5} + 3 + \tfrac{12h}{5} - 11 = \tfrac{32h}{5} + \tfrac{12h^2}{25}.$$
+---
+
+**Example 4 (Piecewise function):** Let
+
+$$f(x,y) = \begin{cases} \dfrac{xy}{x^2 + y^2} & \text{if } (x,y) \neq (0,0) \\[6pt] 0 & \text{if } (x,y) = (0,0) \end{cases}$$
+
+Compute the partial derivatives at $(0,0)$. [▶ W9_L2 @ 28:47](https://www.youtube.com/watch?v=GoJoNFBuCJ8&t=1727)
+
+**Solution:** Away from the origin, the usual quotient rule applies. At the origin, we must compute from the definition:
+
+$$\frac{\partial f}{\partial x}(0,0) = \lim_{h \to 0} \frac{f(h,0) - f(0,0)}{h} = \lim_{h \to 0} \frac{0 - 0}{h} = 0$$
+
+By symmetry (or direct computation), $\frac{\partial f}{\partial y}(0,0) = 0$.
+
+> **Clarification:** For piecewise-defined functions, especially at boundary points of the pieces, you **must** return to the limit definition. The "treat other variables as constants" shortcut applies only when the function has a single, smooth expression in a neighbourhood of the point.
+
+### Computation Rules Summary
+
+| Rule | Formula |
+|------|---------|
+| **Constant multiple** | $\frac{\partial}{\partial x_i}[cf] = c\,\frac{\partial f}{\partial x_i}$ |
+| **Sum** | $\frac{\partial}{\partial x_i}[f + g] = \frac{\partial f}{\partial x_i} + \frac{\partial g}{\partial x_i}$ |
+| **Product** | $\frac{\partial}{\partial x_i}[fg] = f\,\frac{\partial g}{\partial x_i} + g\,\frac{\partial f}{\partial x_i}$ |
+| **Quotient** | $\frac{\partial}{\partial x_i}\!\left[\frac{f}{g}\right] = \frac{g\,\frac{\partial f}{\partial x_i} - f\,\frac{\partial g}{\partial x_i}}{g^2}$, provided $g \neq 0$ |
+| **Chain rule** | $\frac{\partial}{\partial x_i}[h(f(\widetilde{x}))] = h'(f(\widetilde{x})) \cdot \frac{\partial f}{\partial x_i}(\widetilde{x})$ |
+
+All of these follow from the corresponding single-variable rules, applied while treating all variables except $x_i$ as constants.
+
+---
+
+## 4. Directional Derivatives
+
+Partial derivatives measure the rate of change along the coordinate axes. But there are infinitely many other directions in $\mathbb{R}^n$. The **directional derivative** generalises partial derivatives to an arbitrary direction.
+
+### Rate of Change in a Given Direction
+
+Let $f$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing an open ball around $\widetilde{a}$, and let $u \in \mathbb{R}^n$ be a **unit vector** ($\|u\| = 1$). The **rate of change of $f$ at $\widetilde{a}$ in the direction of $u$** is [▶ W9_L3 @ 05:30](https://www.youtube.com/watch?v=uhUqybTaGns&t=330)
+
+$$\lim_{h \to 0} \frac{f(\widetilde{a} + hu) - f(\widetilde{a})}{h}$$
+
+provided the limit exists.
+
+**Geometric picture.** The expression $\widetilde{a} + hu$ traces out a line through $\widetilde{a}$ in the direction of $u$. Define
+
+$$g(h) = f(\widetilde{a} + hu)$$
+
+Then $g$ is a function of one real variable, and the limit above is simply $g'(0)$. So the directional derivative is the ordinary derivative of $f$ restricted to the line through $\widetilde{a}$ in direction $u$.
+
+> **Clarification:** We require $u$ to be a **unit vector** so that the parameter $h$ measures actual distance along the direction. If a problem gives a non-unit vector $v$, first normalise: $u = \frac{v}{\|v\|}$.
+
+### The Directional Derivative Function
+
+The **directional derivative of $f$ in the direction of the unit vector $u$** is the function denoted $f_u$ (or $D_u f$), defined by [▶ W9_L3 @ 22:46](https://www.youtube.com/watch?v=uhUqybTaGns&t=1366)
+
+$$f_u(\widetilde{x}) = \lim_{h \to 0} \frac{f(\widetilde{x} + hu) - f(\widetilde{x})}{h}$$
+
+Its domain consists of those points in $D$ where the limit exists.
+
+**Connection to partial derivatives.** When $u = e_i$, the $i$-th standard basis vector, the directional derivative $f_{e_i}$ is exactly the partial derivative $\frac{\partial f}{\partial x_i}$. Partial derivatives are directional derivatives in the coordinate directions.
+
+### Worked Examples
+
+**Example 5:** Find the rate of change of $f(x,y) = x + y$ at $(0,0)$ in the direction of the line $y = x$. [▶ W9_L3 @ 08:56](https://www.youtube.com/watch?v=uhUqybTaGns&t=536)
+
+**Solution:** The line $y = x$ makes an angle of $45°$ with the positive $x$-axis. The corresponding unit vector is:
+
+$$u = (\cos 45°, \sin 45°) = \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)$$
+
+Compute the limit:
+
+$$\lim_{h \to 0} \frac{f\!\left(\frac{h}{\sqrt{2}}, \frac{h}{\sqrt{2}}\right) - f(0,0)}{h} = \lim_{h \to 0} \frac{\frac{h}{\sqrt{2}} + \frac{h}{\sqrt{2}}}{h} = \lim_{h \to 0} \frac{\sqrt{2}\,h}{h} = \sqrt{2}$$
+
+---
+
+**Example 6:** Find the rate of change of $f(x,y,z) = xy + yz + zx$ at $(1,2,3)$ in the direction of $(4, 3, 0)$. [▶ W9_L3 @ 10:40](https://www.youtube.com/watch?v=uhUqybTaGns&t=640)
+
+**Solution:** First normalise:
+
+$$\|v\| = \sqrt{16 + 9 + 0} = 5, \qquad u = \frac{1}{5}(4, 3, 0)$$
+
+Then:
+
+$$f_u(1,2,3) = \lim_{h \to 0} \frac{f\!\left(1 + \frac{4h}{5},\; 2 + \frac{3h}{5},\; 3\right) - f(1,2,3)}{h}$$
+
+Expanding (using $f = xy + yz + zx$) and cancelling the constant terms:
+
+$$\text{Numerator} = h^2 \cdot \frac{12}{25} + h\!\left(\frac{8}{5} + \frac{3}{5} + \frac{9}{5} + \frac{12}{5}\right)$$
 
 Dividing by $h$ and taking $h \to 0$:
 
-$$f_u(1,2,3) = \frac{32}{5}.$$
+$$f_u(1,2,3) = \frac{8 + 3 + 9 + 12}{5} = \frac{32}{5}$$
 
 ---
 
-**Example 7.** Find the directional derivative of $f(x,y) = \sin(xy)$ at $(1, 0)$ in the direction making $60°$ with the positive $x$-axis.
+**Example 7:** Find the rate of change of $f(x,y) = \sin(xy)$ at $(1, 0)$ in the direction making $60°$ with the positive $x$-axis. [▶ W9_L3 @ 14:41](https://www.youtube.com/watch?v=uhUqybTaGns&t=881)
 
-**Solution.** The unit vector is $u = (\cos 60°,\, \sin 60°) = \left(\frac{1}{2},\, \frac{\sqrt{3}}{2}\right)$.
+**Solution:** The unit vector is $u = (\cos 60°, \sin 60°) = \left(\frac{1}{2}, \frac{\sqrt{3}}{2}\right)$.
 
-Define $g(h) = f\!\left(1 + \frac{h}{2},\; \frac{\sqrt{3}}{2}h\right) = \sin\!\left(\left(1 + \frac{h}{2}\right)\frac{\sqrt{3}}{2}h\right)$.
+Define $g(h) = \sin\!\left[\left(1 + \frac{h}{2}\right)\!\left(\frac{\sqrt{3}}{2}h\right)\right]$. Differentiating with respect to $h$ using the chain and product rules:
 
-Then
+$$g'(h) = \cos\!\left[\left(1 + \tfrac{h}{2}\right)\tfrac{\sqrt{3}h}{2}\right] \cdot \left[\tfrac{\sqrt{3}h}{2} \cdot \tfrac{1}{2} + \left(1 + \tfrac{h}{2}\right)\cdot\tfrac{\sqrt{3}}{2}\right]$$
 
-$$f_u(1,0) = g'(0).$$
+Setting $h = 0$:
 
-Using the chain rule: $g(h) = \sin\!\left(\frac{\sqrt{3}}{2}h + \frac{\sqrt{3}}{4}h^2\right)$. Set $\phi(h) = \frac{\sqrt{3}}{2}h + \frac{\sqrt{3}}{4}h^2$. Then $\phi(0) = 0$ and $\phi'(h) = \frac{\sqrt{3}}{2} + \frac{\sqrt{3}}{2}h$, so $\phi'(0) = \frac{\sqrt{3}}{2}$.
+$$g'(0) = \cos(0) \cdot \frac{\sqrt{3}}{2} = \frac{\sqrt{3}}{2}$$
 
-By the chain rule: $g'(h) = \cos(\phi(h)) \cdot \phi'(h)$, hence
+### Properties of Directional Derivatives
 
-$$g'(0) = \cos(0) \cdot \frac{\sqrt{3}}{2} = \frac{\sqrt{3}}{2}.$$
+The following properties hold whenever all relevant directional derivatives exist at the point $\widetilde{a}$ in the direction of the unit vector $u$:
+
+| Property | Formula |
+|----------|---------|
+| **Linearity** | $(cf + g)_u(\widetilde{a}) = c\,f_u(\widetilde{a}) + g_u(\widetilde{a})$ |
+| **Product rule** | $(fg)_u(\widetilde{a}) = f_u(\widetilde{a})\,g(\widetilde{a}) + f(\widetilde{a})\,g_u(\widetilde{a})$ |
+| **Quotient rule** | $\left(\frac{f}{g}\right)_u(\widetilde{a}) = \frac{f_u(\widetilde{a})\,g(\widetilde{a}) - f(\widetilde{a})\,g_u(\widetilde{a})}{[g(\widetilde{a})]^2}$, provided $g(\widetilde{a}) \neq 0$ |
+
+These follow directly from the corresponding single-variable derivative rules applied to $g(h) = f(\widetilde{a} + hu)$.
+
+### A Cautionary Example
+
+**Example 8:** Consider the piecewise function from Example 4:
+
+$$f(x,y) = \begin{cases} \frac{xy}{x^2 + y^2} & (x,y) \neq (0,0) \\ 0 & (x,y) = (0,0) \end{cases}$$
+
+At $(0,0)$, for a unit vector $u = (u_1, u_2)$: [▶ W9_L3 @ 34:26](https://www.youtube.com/watch?v=uhUqybTaGns&t=2066)
+
+$$f_u(0,0) = \lim_{h \to 0} \frac{f(hu_1, hu_2)}{h} = \lim_{h \to 0} \frac{h^2 u_1 u_2}{h^2(u_1^2 + u_2^2)} \cdot \frac{1}{h} = \lim_{h \to 0} \frac{u_1 u_2}{h}$$
+
+(using $u_1^2 + u_2^2 = 1$). This limit **does not exist** whenever both $u_1 \neq 0$ and $u_2 \neq 0$.
+
+- If $u_1 = 0$ or $u_2 = 0$ (i.e., along the coordinate axes), the directional derivative is $0$.
+- In **every other direction**, the directional derivative fails to exist.
+
+This shows that partial derivatives can exist at a point even when most directional derivatives do not.
 
 ---
 
-**Example 8 (A cautionary example).** Consider the piecewise function from Example 4:
+## 5. The Gradient Vector
 
-$$f(x,y) = \begin{cases} \frac{xy}{x^2 + y^2} & (x,y) \neq (0,0), \\ 0 & (x,y) = (0,0). \end{cases}$$
+The gradient packages all partial derivative information into a single vector. It is one of the most important objects in multivariable calculus and its applications.
 
-Compute the directional derivative at $(0,0)$ in the direction of a general unit vector $u = (u_1, u_2)$.
+### Definition
 
-**Solution.**
+Let $f(x_1, x_2, \ldots, x_n)$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing an open ball around $\widetilde{a}$. Suppose all partial derivatives of $f$ at $\widetilde{a}$ exist. The **gradient vector of $f$ at $\widetilde{a}$** is [▶ W9_L6 @ 10:06](https://www.youtube.com/watch?v=2eYER90_4wA&t=606)
 
-$$f_u(0,0) = \lim_{h \to 0} \frac{f(hu_1,\, hu_2) - 0}{h} = \lim_{h \to 0} \frac{1}{h} \cdot \frac{h^2 u_1 u_2}{h^2(u_1^2 + u_2^2)} = \lim_{h \to 0} \frac{u_1 u_2}{h \cdot 1} = \lim_{h \to 0} \frac{u_1 u_2}{h}.$$
+$$\nabla f(\widetilde{a}) = \left(\frac{\partial f}{\partial x_1}(\widetilde{a}),\; \frac{\partial f}{\partial x_2}(\widetilde{a}),\; \ldots,\; \frac{\partial f}{\partial x_n}(\widetilde{a})\right)$$
 
-(We used $u_1^2 + u_2^2 = 1$ since $u$ is a unit vector.)
+This is a vector in $\mathbb{R}^n$. It is also written $\text{grad}\,f(\widetilde{a})$ or $\nabla f(\widetilde{a})$, where the symbol $\nabla$ is called **nabla** (or "del").
 
-- If $u_1 = 0$ or $u_2 = 0$ (i.e., along a coordinate axis), the limit equals $0$. These are the partial derivatives.
-- If $u_1 \neq 0$ and $u_2 \neq 0$, the limit $\frac{u_1 u_2}{h}$ **does not exist**.
+> **Clarification:** Depending on context, the gradient may be written as a row vector or column vector. The mathematical content is the same; the choice is dictated by how it will be used (e.g., row for dot products written left-to-right, column for matrix multiplication).
 
-**Conclusion:** The partial derivatives exist at the origin, but the directional derivative fails to exist in every non-axis direction. This shows that existence of all partial derivatives does *not* guarantee existence of all directional derivatives.
+### The Gradient Function
 
-### 3.7 Properties of Directional Derivatives
+The **gradient function** of $f$ is the vector-valued function [▶ W9_L6 @ 12:44](https://www.youtube.com/watch?v=2eYER90_4wA&t=764)
 
-Suppose $f_u(\tilde{a})$ and $g_u(\tilde{a})$ both exist, $c \in \mathbb{R}$, and $u$ is a unit vector. Then:
+$$\nabla f : D' \subseteq D \to \mathbb{R}^n, \qquad \widetilde{x} \mapsto \nabla f(\widetilde{x})$$
+
+where $D'$ is the set of points in $D$ at which **all** partial derivatives exist. Note the important shift: $f$ is scalar-valued ($\mathbb{R}^n \to \mathbb{R}$), but $\nabla f$ is vector-valued ($\mathbb{R}^n \to \mathbb{R}^n$).
+
+### Worked Examples
+
+**Example 9:** $f(x,y) = \sin(xy)$. [▶ W9_L6 @ 14:18](https://www.youtube.com/watch?v=2eYER90_4wA&t=858)
+
+**Solution:**
+
+$$\nabla f(x,y) = \left(y\cos(xy),\; x\cos(xy)\right)$$
+
+Evaluating at specific points:
+
+$$\nabla f(0,0) = (0, 0), \qquad \nabla f(\pi, 1) = (\cos\pi,\; \pi\cos\pi) = (-1, -\pi)$$
+
+---
+
+**Example 10:** $f(x,y,z) = x^2 + y^2 + z^2$.
+
+**Solution:**
+
+$$\nabla f(x,y,z) = (2x, 2y, 2z)$$
+
+At $(1,2,3)$: $\nabla f(1,2,3) = (2, 4, 6)$.
+
+Note that $\nabla f(x,y,z) = 2(x,y,z)$, so the gradient at any point is a vector pointing **radially outward** from the origin, with magnitude $2\|\widetilde{x}\|$.
+
+---
+
+**Example 11:** $f(x,y,z) = xy + yz + zx$.
+
+**Solution:**
+
+$$\nabla f(x,y,z) = (y+z,\; x+z,\; x+y)$$
+
+---
+
+**Example 12:** The piecewise function from Example 4.
+
+**Solution:**
+
+$$\nabla f(x,y) = \begin{cases} \displaystyle\frac{1}{(x^2+y^2)^2}\left(x^3 - xy^2,\; y^3 - x^2y\right) & (x,y) \neq (0,0) \\[8pt] (0,0) & (x,y) = (0,0) \end{cases}$$
+
+The gradient exists everywhere, but as we will see, its behaviour at the origin is crucial.
+
+### Properties of the Gradient
+
+These follow directly from the corresponding rules for partial derivatives. [▶ W9_L6 @ 21:55](https://www.youtube.com/watch?v=2eYER90_4wA&t=1315)
 
 | Rule | Formula |
-|---|---|
-| **Linearity** | $(cf + g)_u(\tilde{a}) = c \cdot f_u(\tilde{a}) + g_u(\tilde{a})$ |
-| **Product rule** | $(fg)_u(\tilde{a}) = f_u(\tilde{a})\, g(\tilde{a}) + f(\tilde{a})\, g_u(\tilde{a})$ |
-| **Quotient rule** ($g(\tilde{a}) \neq 0$) | $\displaystyle\left(\frac{f}{g}\right)_{\!u}(\tilde{a}) = \frac{f_u(\tilde{a})\, g(\tilde{a}) - f(\tilde{a})\, g_u(\tilde{a})}{[g(\tilde{a})]^2}$ |
-
-These follow immediately from the corresponding single-variable rules applied to $\phi(t) = f(\tilde{a} + tu)$ and $\psi(t) = g(\tilde{a} + tu)$.
-
----
-
-## 4. The Gradient Vector
-
-### 4.1 Definition
-
-Let $f(x_1, x_2, \dots, x_n)$ be defined on $D \subseteq \mathbb{R}^n$ and suppose all partial derivatives of $f$ exist at $\tilde{a}$.
-
-**Definition.** The **gradient vector of $f$ at $\tilde{a}$** is
-
-$$\nabla f(\tilde{a}) = \left(\frac{\partial f}{\partial x_1}(\tilde{a}),\; \frac{\partial f}{\partial x_2}(\tilde{a}),\; \dots,\; \frac{\partial f}{\partial x_n}(\tilde{a})\right).$$
-
-This is a vector in $\mathbb{R}^n$. The symbol $\nabla$ is called **nabla** (or **del**). Alternative notations include $\text{grad}\, f(\tilde{a})$.
-
-The **gradient function** $\nabla f : D' \to \mathbb{R}^n$ is defined by associating to each point $\tilde{x} \in D'$ its gradient vector $\nabla f(\tilde{x})$, where $D' \subseteq D$ is the set of points at which all partial derivatives exist.
-
-> **Clarification:** Note the type change: $f$ is a *scalar*-valued function ($f : \mathbb{R}^n \to \mathbb{R}$), while $\nabla f$ is a *vector*-valued function ($\nabla f : \mathbb{R}^n \to \mathbb{R}^n$). The gradient assembles $n$ scalar functions (the partial derivatives) into a single vector-valued function.
-
-### 4.2 Worked Examples
-
-**Example 9.** $f(x, y) = \sin(xy)$.
-
-**Solution.** We computed $\frac{\partial f}{\partial x} = y\cos(xy)$ and $\frac{\partial f}{\partial y} = x\cos(xy)$. Therefore
-
-$$\nabla f(x, y) = \big(y\cos(xy),\; x\cos(xy)\big).$$
-
-Evaluating: $\nabla f(0, 0) = (0, 0)$; $\nabla f(\pi, 1) = (\cos \pi,\; \pi \cos \pi) = (-1, -\pi)$.
-
----
-
-**Example 10.** $f(x, y, z) = x^2 + y^2 + z^2$.
-
-**Solution.** $\frac{\partial f}{\partial x} = 2x$, $\frac{\partial f}{\partial y} = 2y$, $\frac{\partial f}{\partial z} = 2z$. Therefore
-
-$$\nabla f(x,y,z) = (2x,\, 2y,\, 2z).$$
-
-At $(1, 2, 3)$: $\nabla f(1,2,3) = (2, 4, 6)$.
-
-Note that $\nabla f = 2(x, y, z) = 2\tilde{x}$: the gradient points radially outward from the origin, which makes sense since $f$ measures the squared distance from the origin.
-
----
-
-**Example 11.** $f(x, y, z) = xy + yz + zx$.
-
-**Solution.**
-
-$$\nabla f(x,y,z) = (y + z,\; x + z,\; x + y).$$
-
----
-
-**Example 12 (Piecewise function).** The function from Example 4:
-
-$$\nabla f(x,y) = \begin{cases} \displaystyle \frac{1}{(x^2+y^2)^2}\big(x^3 - xy^2,\; y^3 - x^2 y\big) & (x,y) \neq (0,0), \\[6pt] (0,\, 0) & (x,y) = (0,0). \end{cases}$$
-
-Away from the origin, this is a quotient of polynomials with nonzero denominator, hence continuous. At the origin, the component functions are *not* continuous (this can be verified by approaching $(0,0)$ along different paths — see [[13 - MULTIVARIABLE FUNCTIONS]] for the path-testing technique). This discontinuity has important consequences, as we shall see.
-
-### 4.3 Properties of the Gradient
-
-Let $f, g : D \subseteq \mathbb{R}^n \to \mathbb{R}$ be functions whose gradients exist, and let $c \in \mathbb{R}$.
-
-| Rule | Formula |
-|---|---|
+|------|---------|
 | **Linearity** | $\nabla(cf + g) = c\,\nabla f + \nabla g$ |
 | **Product rule** | $\nabla(fg) = g\,\nabla f + f\,\nabla g$ |
-| **Quotient rule** ($g \neq 0$) | $\displaystyle \nabla\!\left(\frac{f}{g}\right) = \frac{g\,\nabla f - f\,\nabla g}{g^2}$ |
+| **Quotient rule** | $\nabla\!\left(\frac{f}{g}\right) = \frac{g\,\nabla f - f\,\nabla g}{g^2}$, provided $g \neq 0$ |
 
-These are the direct vector analogues of the familiar single-variable differentiation rules. Each identity should be understood component-by-component; the $i$-th component of $\nabla(fg)$ is $g \cdot \frac{\partial f}{\partial x_i} + f \cdot \frac{\partial g}{\partial x_i}$, which is precisely the product rule for $\frac{\partial}{\partial x_i}$.
-
-> **Clarification:** In the product rule $\nabla(fg) = g\,\nabla f + f\,\nabla g$, the terms $g\,\nabla f$ and $f\,\nabla g$ are scalar–vector multiplications: $g(\tilde{x})$ is a scalar and $\nabla f(\tilde{x})$ is a vector. We write the scalar first by convention.
+Here the right-hand sides involve scalar multiplication and vector addition in $\mathbb{R}^n$, exactly as studied in [[11 - INNER PRODUCTS]]. These rules mirror the single-variable derivative rules — indeed, the gradient can be viewed as the natural generalisation of the derivative to several variables.
 
 ---
 
-## 5. Directional Derivatives in Terms of the Gradient
+## 6. Directional Derivatives in Terms of the Gradient
 
-### 5.1 The Central Theorem
+Computing directional derivatives from the limit definition is tedious (as the examples in Section 4 showed). The following theorem provides a far easier method, using the gradient and the dot product.
 
-This is the key result connecting the gradient to directional derivatives, and the principal reason the gradient is so important.
+### The Fundamental Theorem
 
-**Theorem (Directional derivative via the gradient).** Let $f(x_1, \dots, x_n)$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing an open ball around $\tilde{a}$. Suppose $\nabla f$ exists and is **continuous** on some open ball around $\tilde{a}$. Then for every unit vector $u \in \mathbb{R}^n$, the directional derivative $f_u(\tilde{a})$ exists and
+**Theorem.** Let $f$ be defined on a domain $D \subseteq \mathbb{R}^n$ containing an open ball around $\widetilde{a}$. Suppose $\nabla f$ exists and is **continuous** on some open ball around $\widetilde{a}$. Then for every unit vector $u \in \mathbb{R}^n$, the directional derivative $f_u(\widetilde{a})$ exists and equals [▶ W9_L6 @ 25:42](https://www.youtube.com/watch?v=2eYER90_4wA&t=1542)
 
-$$\boxed{f_u(\tilde{a}) = \nabla f(\tilde{a}) \cdot u}$$
+$$\boxed{f_u(\widetilde{a}) = \nabla f(\widetilde{a}) \cdot u}$$
 
-where $\cdot$ denotes the dot product (see [[11 - INNER
+where $\cdot$ denotes the standard dot product in $\mathbb{R}^n$.
+
+This is one of the central results of multivariable calculus. It says:
+
+> **The directional derivative equals the dot product of the gradient with the direction vector.**
+
+### Proof Sketch
+
+For a function of two variables $f(x,y)$ at a point $(a,b)$ with $u = (u_1, u_2)$:
+
+$$f_u(a,b) = \lim_{h \to 0} \frac{f(a + hu_1, b + hu_2) - f(a,b)}{h}$$
+
+Add and subtract $f(a + hu_1, b)$:
+
+$$= \lim_{h \to 0} \left[\frac{f(a+hu_1, b+hu_2) - f(a+hu_1, b)}{h} + \frac{f(a+hu_1, b) - f(a,b)}{h}\right]$$
+
+The second fraction equals $\frac{f(a+hu_1, b) - f(a,b)}{hu_1} \cdot u_1$, which tends to $\frac{\partial f}{\partial x}(a,b) \cdot u_1$ as $h \to 0$.
+
+For the first fraction, by the Mean Value Theorem there exists a value $c_h$ between $b$ and $b + hu_2$ such that
+
+$$f(a+hu_1, b+hu_2) - f(a+hu_1, b) = \frac{\partial f}{\partial y}(a+hu_1, c_h) \cdot hu_2$$
+
+Dividing by $h$ gives $\frac{\partial f}{\partial y}(a+hu_1, c_h) \cdot u_2$. As $h \to 0$, continuity of $\frac{\partial f}{\partial y}$ ensures this tends to $\frac{\partial f}{\partial y}(a,b) \cdot u_2$.
+
+Therefore:
+
+$$f_u(a,b) = \frac{\partial f}{\partial x}(a,b)\, u_1 + \frac{\partial f}{\partial y}(a,b)\, u_2 = \nabla f(a,b) \cdot u$$
+
+> **Clarification:** The hypothesis that $\nabla f$ is **continuous** (not merely existent) is essential. It is this continuity that allows us to interchange limits in the proof. The cautionary Example 8 shows what can go wrong without it.
+
+### Worked Examples Using the Formula
+
+**Example 13:** $f(x,y) = x + y$, arbitrary unit vector $u = (u_1, u_2)$. [▶ W9_L6 @ 32:06](https://
