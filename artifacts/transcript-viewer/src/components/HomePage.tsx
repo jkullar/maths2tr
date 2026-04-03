@@ -10,7 +10,7 @@ interface Course {
   code: string;
   name: string;
   available: boolean;
-  stats?: { videos: number; transcripts: number; concepts: number };
+  stats?: { videos: number; transcripts: number; concepts: number; notes?: number };
 }
 
 interface Semester {
@@ -54,7 +54,7 @@ const PROGRAMS: Program[] = [
             code: "BSCMA1002",
             name: "Mathematics for Data Science II",
             available: true,
-            stats: { videos: 110, transcripts: 109, concepts: 270 },
+            stats: { videos: 110, transcripts: 109, concepts: 270, notes: 18 },
           },
           { id: "", code: "BSCST1002", name: "Statistics for Data Science II", available: false },
           { id: "", code: "BSCS1002", name: "Introduction to Python", available: false },
@@ -192,6 +192,12 @@ function CourseCard({ course, onOpen }: { course: Course; onOpen: () => void }) 
             <span className="text-[10px] text-muted-foreground">{course.stats.transcripts} transcripts</span>
             <span className="text-muted-foreground/30">·</span>
             <span className="text-[10px] text-muted-foreground">{course.stats.concepts} concepts</span>
+            {course.stats.notes != null && (
+              <>
+                <span className="text-muted-foreground/30">·</span>
+                <span className="text-[10px] text-muted-foreground">{course.stats.notes} notes</span>
+              </>
+            )}
           </div>
         )}
       </div>
