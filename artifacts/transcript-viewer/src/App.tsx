@@ -15,11 +15,12 @@ import { CurriculumView } from "@/components/CurriculumView";
 import { NotesView } from "@/components/NotesView";
 import { HomePage } from "@/components/HomePage";
 import { GlobalSearchResults } from "@/components/GlobalSearchResults";
+import { AIGroupPage } from "@/components/AIGroupPage";
 import { cn } from "@/lib/utils";
 
 const data = transcriptsData as unknown as TranscriptsData;
 
-type AppPage = "home" | "course";
+type AppPage = "home" | "course" | "aigroup";
 type CourseTab = "transcripts" | "curriculum" | "notes";
 type TranscriptsMode = "welcome" | "transcript" | "search";
 
@@ -212,6 +213,19 @@ function App() {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
+          <button
+            onClick={() => { setAppPage("aigroup"); setSidebarOpen(false); }}
+            className={cn(
+              "flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-semibold transition-colors flex-shrink-0",
+              appPage === "aigroup"
+                ? "bg-violet-600 text-white"
+                : "bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 hover:bg-violet-200 dark:hover:bg-violet-900/60"
+            )}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">AI Group</span>
+          </button>
+
           <a
             href="https://chat.whatsapp.com/FFjFQZSHYzyLTu4rdLuwGu?mode=gi_t"
             target="_blank"
@@ -270,6 +284,12 @@ function App() {
             className="md:hidden fixed inset-0 bg-black/50 z-20"
             onClick={() => setSidebarOpen(false)}
           />
+        )}
+
+        {appPage === "aigroup" && (
+          <main className="flex-1 overflow-hidden">
+            <AIGroupPage />
+          </main>
         )}
 
         {appPage === "home" && (
