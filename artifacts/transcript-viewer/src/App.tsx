@@ -204,12 +204,19 @@ function App() {
 
           {/* Course breadcrumb */}
           {!searchExpanded && appPage === "course" && courseMeta && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0 hidden sm:block" />
-              <span className="text-xs font-medium text-foreground truncate max-w-[140px] sm:max-w-xs flex-shrink min-w-0 hidden sm:block">
+            <div className="hidden sm:flex items-center gap-1.5 min-w-0 flex-shrink">
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
+              <button
+                onClick={handleGoHome}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                BS Data Science
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
+              <span className="text-xs font-medium text-foreground truncate min-w-0">
                 {courseMeta.name}
               </span>
-            </>
+            </div>
           )}
 
           <div className="flex-1" />
