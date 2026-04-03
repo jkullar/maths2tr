@@ -1,4 +1,4 @@
-# W1_L4: Determinants - part 1
+# W1_L4: Determinants | part 1
 
 **Week:** Week 1
 **YouTube URL:** https://www.youtube.com/watch?v=A3fxp49I4U8

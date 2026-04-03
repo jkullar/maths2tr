@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 const OUTPUT_DIR = path.join(ROOT, 'transcripts');
+const COURSE_FILE = path.join(ROOT, 'attached_assets', 'LinearAlgebra_Course_ByWeek_1775199084669.md');
 
 interface VideoEntry {
   code: string;
@@ -13,151 +14,80 @@ interface VideoEntry {
   week: string;
 }
 
-const VIDEOS: VideoEntry[] = [
-  // Week 1 - Lectures
-  { code: 'W1_L1', title: 'Vectors', url: 'https://www.youtube.com/watch?v=1So2VV9Tm_A', week: 'week1' },
-  { code: 'W1_L2', title: 'Matrices', url: 'https://www.youtube.com/watch?v=rnIDlZnrCc0', week: 'week1' },
-  { code: 'W1_L3', title: 'Systems of linear equations', url: 'https://www.youtube.com/watch?v=WzR4NKeLHMY', week: 'week1' },
-  { code: 'W1_L4', title: 'Determinants - part 1', url: 'https://www.youtube.com/watch?v=A3fxp49I4U8', week: 'week1' },
-  { code: 'W1_L5', title: 'Determinants - part 2', url: 'https://www.youtube.com/watch?v=wejxX0YYYg4', week: 'week1' },
-  // Week 1 - Tutorials
-  { code: 'W1_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=rMK4GaWpoXU', week: 'week1' },
-  { code: 'W1_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=TL2rliCK_Vg', week: 'week1' },
-  { code: 'W1_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=oB1ws3Vk49E', week: 'week1' },
-  { code: 'W1_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=Zenj3dOF9Hc', week: 'week1' },
-  { code: 'W1_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=OOAEXJsgUBM', week: 'week1' },
+function parseCourseFile(filePath: string): VideoEntry[] {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const lines = content.split('\n');
+  const videos: VideoEntry[] = [];
+  const seen = new Set<string>();
 
-  // Week 2 - Lectures
-  { code: 'W2_L1', title: 'Determinants - part 3', url: 'https://www.youtube.com/watch?v=uO3mocPU9Q4', week: 'week2' },
-  { code: 'W2_L2', title: "Cramer's rule", url: 'https://www.youtube.com/watch?v=sOFHgNXXRFM', week: 'week2' },
-  { code: 'W2_L3', title: 'Solutions to a system of linear equations with an invertible coefficient matrix', url: 'https://www.youtube.com/watch?v=0txe9Mu5OdM', week: 'week2' },
-  { code: 'W2_L4', title: 'The echelon form', url: 'https://www.youtube.com/watch?v=6N8owlkf9AQ', week: 'week2' },
-  { code: 'W2_L5', title: 'Row reduction', url: 'https://www.youtube.com/watch?v=ECRhKDTUxM8', week: 'week2' },
-  { code: 'W2_L6', title: 'The gaussian elimination method', url: 'https://www.youtube.com/watch?v=gdk1_aEe7j4', week: 'week2' },
+  let currentWeek = 'unknown';
 
-  // Week 3 - Lectures
-  { code: 'W3_L1', title: 'Introduction to vector spaces', url: 'https://www.youtube.com/watch?v=dAttVL9a5Go', week: 'week3' },
-  { code: 'W3_L2', title: 'Some properties of vector spaces', url: 'https://www.youtube.com/watch?v=yUISwV4LE20', week: 'week3' },
-  { code: 'W3_L3', title: 'Linear dependence', url: 'https://www.youtube.com/watch?v=1Krnnc6wKyk', week: 'week3' },
-  { code: 'W3_L4', title: 'Linear independence - part 1', url: 'https://www.youtube.com/watch?v=Uf5nqIJv1Fk', week: 'week3' },
-  { code: 'W3_L5', title: 'Linear independence - part 2', url: 'https://www.youtube.com/watch?v=9Adm4c2alAY', week: 'week3' },
+  const weekHeadingRe = /^##\s+\*\*Week\s+(\d+)\*\*/i;
+  const refresherRe = /^##\s+\*\*Refresher\s+Week\*\*/i;
+  const specialRe = /^##\s+\*\*Mathematics\s+for\s+Data\s+Science/i;
+  const videoLineRe = /^\d+\.\s+\*\*([^:]+):\s+([^*]+)\*\*\s+-\s+(https:\/\/www\.youtube\.com\/watch\?v=\S+)/;
+  const refresherLineRe = /^\d+\.\s+\*\*(Refresher\s+week\s+-\s+[^*]+)\*\*\s+-\s+(https:\/\/www\.youtube\.com\/watch\?v=\S+)/i;
+  const mds2LineRe = /^\d+\.\s+\*\*(Mathematics\s+for\s+Data\s+Science\s+II)\*\*\s+-\s+(https:\/\/www\.youtube\.com\/watch\?v=\S+)/i;
 
-  // Week 4 - Lectures
-  { code: 'W4_L1', title: 'What is a basis for a vector space?', url: 'https://www.youtube.com/watch?v=lhAQIaFOPxA', week: 'week4' },
-  { code: 'W4_L2', title: 'Finding bases for vector spaces', url: 'https://www.youtube.com/watch?v=SxPhClO9zSU', week: 'week4' },
-  { code: 'W4_L3', title: 'What is the rank/dimension for a vector space', url: 'https://www.youtube.com/watch?v=oATXqim4F5Q', week: 'week4' },
-  { code: 'W4_L4', title: 'Rank and dimension using gaussian elimination', url: 'https://www.youtube.com/watch?v=0yEKEavVQJE', week: 'week4' },
-  // Week 4 - Tutorials
-  { code: 'W4_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=5wdSQzZDZME', week: 'week4' },
-  { code: 'W4_T7', title: 'Tutorial 7', url: 'https://www.youtube.com/watch?v=deoLXUT9E60', week: 'week4' },
-  { code: 'W4_T8', title: 'Tutorial 8', url: 'https://www.youtube.com/watch?v=kbeuYmC7dp4', week: 'week4' },
+  let mds2Counter = 0;
+  let refresherCounter = 0;
 
-  // Week 5 - Lectures
-  { code: 'W5_L1', title: 'The null space of a matrix - finding nullity and a basis - part 1', url: 'https://www.youtube.com/watch?v=3_U6oMJeklc', week: 'week5' },
-  { code: 'W5_L2', title: 'The null space of a matrix - finding nullity and a basis - part 2', url: 'https://www.youtube.com/watch?v=sDKAGDJlSAE', week: 'week5' },
-  { code: 'W5_L3', title: 'What is a linear mapping - part 1', url: 'https://www.youtube.com/watch?v=MvCkhmYhTkw', week: 'week5' },
-  { code: 'W5_L4', title: 'What is a linear mapping - part 2', url: 'https://www.youtube.com/watch?v=aRNE_GrR0Yk', week: 'week5' },
-  { code: 'W5_L5', title: 'What is a linear transformation', url: 'https://www.youtube.com/watch?v=6jA-RRGbmOw', week: 'week5' },
-  // Week 5 - Tutorials
-  { code: 'W5_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=k5GlgJkdRBU', week: 'week5' },
-  { code: 'W5_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=R5S2bPGErWs', week: 'week5' },
-  { code: 'W5_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=3xjDfMoGlCM', week: 'week5' },
-  { code: 'W5_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=VyoyjXx1UFg', week: 'week5' },
-  { code: 'W5_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=_O0yZXIWWv0', week: 'week5' },
-  { code: 'W5_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=ZCUivTd2yu0', week: 'week5' },
-  { code: 'W5_T7', title: 'Tutorial 7', url: 'https://www.youtube.com/watch?v=zixmz3zRpJE', week: 'week5' },
-  { code: 'W5_T8', title: 'Tutorial 8', url: 'https://www.youtube.com/watch?v=cPJJ_8BY1VY', week: 'week5' },
+  for (const line of lines) {
+    const weekMatch = line.match(weekHeadingRe);
+    if (weekMatch) {
+      currentWeek = `week${weekMatch[1]}`;
+      continue;
+    }
+    if (refresherRe.test(line)) {
+      currentWeek = 'refresher';
+      continue;
+    }
+    if (specialRe.test(line)) {
+      currentWeek = 'special';
+      continue;
+    }
 
-  // Week 6 - Lectures
-  { code: 'W6_L1', title: 'Linear transformations, ordered bases & matrices', url: 'https://www.youtube.com/watch?v=lVX2mih3mcQ', week: 'week6' },
-  { code: 'W6_L2', title: 'Image & kernel of linear transformations', url: 'https://www.youtube.com/watch?v=e4BXKGcntiQ', week: 'week6' },
-  { code: 'W6_L3', title: 'Examples of finding bases for the kernel & image of a linear transformation', url: 'https://www.youtube.com/watch?v=5slY2FjErkc', week: 'week6' },
-  // Week 6 - Tutorials
-  { code: 'W6_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=aKziQ7vYvcs', week: 'week6' },
-  { code: 'W6_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=WxAil6kpPCQ', week: 'week6' },
-  { code: 'W6_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=MbHIGidPL-w', week: 'week6' },
-  { code: 'W6_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=jlB2kQ-ardc', week: 'week6' },
-  { code: 'W6_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=t6PA2E_G0do', week: 'week6' },
-  { code: 'W6_T7', title: 'Tutorial 7', url: 'https://www.youtube.com/watch?v=D3jQmnIzbUM', week: 'week6' },
-  { code: 'W6_T8', title: 'Tutorial 8', url: 'https://www.youtube.com/watch?v=vTrRpFbt4ZU', week: 'week6' },
-  { code: 'W6_T9', title: 'Tutorial 9', url: 'https://www.youtube.com/watch?v=QE0Wq0AWiIE', week: 'week6' },
+    const videoMatch = line.match(videoLineRe);
+    if (videoMatch) {
+      const code = videoMatch[1].trim();
+      const title = videoMatch[2].trim();
+      const url = videoMatch[3].trim();
+      if (!seen.has(url)) {
+        seen.add(url);
+        videos.push({ code, title, url, week: currentWeek });
+      }
+      continue;
+    }
 
-  // Week 7 - Lectures
-  { code: 'W7_L1', title: 'Equivalence & similarity of matrices', url: 'https://www.youtube.com/watch?v=ORWbVJ54hW8', week: 'week7' },
-  { code: 'W7_L2', title: 'Affine subspaces & affine mappings', url: 'https://www.youtube.com/watch?v=RUJInY6skG0', week: 'week7' },
-  { code: 'W7_L3', title: 'Lengths & angles', url: 'https://www.youtube.com/watch?v=TtQ6AQUlwl0', week: 'week7' },
-  { code: 'W7_L4', title: 'Inner products & norms on a vector space', url: 'https://www.youtube.com/watch?v=HH2Md3dBlq4', week: 'week7' },
-  // Week 7 - Tutorials
-  { code: 'W7_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=_Hj2FqJ5xZM', week: 'week7' },
-  { code: 'W7_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=jl12b0JYLbk', week: 'week7' },
-  { code: 'W7_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=fnrOwu-Veoc', week: 'week7' },
-  { code: 'W7_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=FNZ0LJEE-7E', week: 'week7' },
-  { code: 'W7_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=pX5LCYHDJKY', week: 'week7' },
-  { code: 'W7_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=jS2rZVsBqjg', week: 'week7' },
-  { code: 'W7_T7', title: 'Tutorial 7', url: 'https://www.youtube.com/watch?v=5VDV90OpB5Y', week: 'week7' },
+    const refresherMatch = line.match(refresherLineRe);
+    if (refresherMatch && currentWeek === 'refresher') {
+      refresherCounter++;
+      const title = refresherMatch[1].trim();
+      const url = refresherMatch[2].trim();
+      const code = `Refresher_T${refresherCounter}`;
+      if (!seen.has(url)) {
+        seen.add(url);
+        videos.push({ code, title, url, week: 'refresher' });
+      }
+      continue;
+    }
 
-  // Week 8 - Lectures
-  { code: 'W8_L1', title: 'Orthogonality & linear independence', url: 'https://www.youtube.com/watch?v=G9bYPb-qSfw', week: 'week8' },
-  { code: 'W8_L2', title: 'What is an orthonormal basis?', url: 'https://www.youtube.com/watch?v=T646BdbrRm0', week: 'week8' },
-  { code: 'W8_L3', title: 'Projections using inner products', url: 'https://www.youtube.com/watch?v=Qyiw4opSG9U', week: 'week8' },
-  { code: 'W8_L4', title: 'The gram-schmidt process', url: 'https://www.youtube.com/watch?v=WEpy57pYKH4', week: 'week8' },
-  { code: 'W8_L5', title: 'Orthogonal transformations & rotations', url: 'https://www.youtube.com/watch?v=2qruaPxQUJU', week: 'week8' },
-  // Week 8 - Tutorials
-  { code: 'W8_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=AUPInEfil_4', week: 'week8' },
-  { code: 'W8_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=FcWl3vxK_zY', week: 'week8' },
-  { code: 'W8_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=P6tBnX1CdZo', week: 'week8' },
-  { code: 'W8_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=ma3KcWIMHFg', week: 'week8' },
-  { code: 'W8_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=RoJDTZIsOck', week: 'week8' },
+    const mds2Match = line.match(mds2LineRe);
+    if (mds2Match && currentWeek === 'special') {
+      mds2Counter++;
+      const title = `${mds2Match[1].trim()} - Video ${mds2Counter}`;
+      const url = mds2Match[2].trim();
+      const code = `MDS2_${mds2Counter}`;
+      if (!seen.has(url)) {
+        seen.add(url);
+        videos.push({ code, title, url, week: 'special' });
+      }
+      continue;
+    }
+  }
 
-  // Week 9 - Lectures
-  { code: 'W9_L1', title: 'Multivariable functions - visualization', url: 'https://www.youtube.com/watch?v=MfrAPZRrqxw', week: 'week9' },
-  { code: 'W9_L2', title: 'Partial derivatives', url: 'https://www.youtube.com/watch?v=GoJoNFBuCJ8', week: 'week9' },
-  { code: 'W9_L3', title: 'Directional derivatives', url: 'https://www.youtube.com/watch?v=uhUqybTaGns', week: 'week9' },
-  { code: 'W9_L4', title: 'Limits for scalar-valued multivariable functions', url: 'https://www.youtube.com/watch?v=Uvv8-Ujgqjo', week: 'week9' },
-  { code: 'W9_L5', title: 'Continuity for multivariable functions', url: 'https://www.youtube.com/watch?v=_G6UYEZYaGk', week: 'week9' },
-  { code: 'W9_L6', title: 'Directional derivatives in terms of the gradient', url: 'https://www.youtube.com/watch?v=2eYER90_4wA', week: 'week9' },
-  // Week 9 - Tutorials
-  { code: 'W9_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=JYmLAB2eDXo', week: 'week9' },
-  { code: 'W9_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=al01RaBUkIo', week: 'week9' },
-  { code: 'W9_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=vlZIhKlM6bc', week: 'week9' },
-  { code: 'W9_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=CadYHZuxSCg', week: 'week9' },
-  { code: 'W9_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=65wV32DCtVA', week: 'week9' },
-  { code: 'W9_T6', title: 'Tutorial 6', url: 'https://www.youtube.com/watch?v=33BLotzDF0g', week: 'week9' },
-  { code: 'W9_T7', title: 'Tutorial 7', url: 'https://www.youtube.com/watch?v=oHnLq0qzQ9g', week: 'week9' },
-
-  // Week 10 - Lectures
-  { code: 'W10_L1', title: 'The direction of steepest ascent/descent', url: 'https://www.youtube.com/watch?v=0H7ca6dFvQ8', week: 'week10' },
-  { code: 'W10_L2', title: 'Tangents for scalar-valued multivariable functions', url: 'https://www.youtube.com/watch?v=9yeyc472W5Q', week: 'week10' },
-  { code: 'W10_L3', title: 'Finding the tangent hyper(plane)', url: 'https://www.youtube.com/watch?v=bz1gtPvNIAg', week: 'week10' },
-  { code: 'W10_L4', title: 'Critical points for multivariable functions', url: 'https://www.youtube.com/watch?v=9pciPOO19wQ', week: 'week10' },
-
-  // Week 11 - Lectures
-  { code: 'W11_L1', title: 'Higher order partial derivatives and the hessian matrix', url: 'https://www.youtube.com/watch?v=SNAyzb35MAc', week: 'week11' },
-  { code: 'W11_L2', title: 'The hessian matrix & local extrema for f(x,y)', url: 'https://www.youtube.com/watch?v=XJH8RJ5m3OU', week: 'week11' },
-  { code: 'W11_L3', title: 'The hessian matrix & local extrema for f(x,y,z)', url: 'https://www.youtube.com/watch?v=QOqj5I8q_eU', week: 'week11' },
-  { code: 'W11_L4', title: 'Differentiability for multivariable functions', url: 'https://www.youtube.com/watch?v=tbd1xs-ZeU4', week: 'week11' },
-  { code: 'W11_L5', title: 'Review of maths - 2', url: 'https://www.youtube.com/watch?v=_hLYDPQtDKY', week: 'week11' },
-  // Week 11 - Tutorials
-  { code: 'W11_T1', title: 'Tutorial 1', url: 'https://www.youtube.com/watch?v=noecviNSwrA', week: 'week11' },
-  { code: 'W11_T2', title: 'Tutorial 2', url: 'https://www.youtube.com/watch?v=ar_oKHBKiXU', week: 'week11' },
-  { code: 'W11_T3', title: 'Tutorial 3', url: 'https://www.youtube.com/watch?v=SJlhzeiTdEQ', week: 'week11' },
-  { code: 'W11_T4', title: 'Tutorial 4', url: 'https://www.youtube.com/watch?v=JtQC-GpsQZc', week: 'week11' },
-  { code: 'W11_T5', title: 'Tutorial 5', url: 'https://www.youtube.com/watch?v=t93ygun2x2A', week: 'week11' },
-
-  // Refresher Week
-  { code: 'Refresher_T1', title: 'Refresher week - tutorial 1', url: 'https://www.youtube.com/watch?v=x9Dv61Ml910', week: 'refresher' },
-  { code: 'Refresher_T2', title: 'Refresher week - tutorial 2', url: 'https://www.youtube.com/watch?v=S6hzxX1AIBU', week: 'refresher' },
-  { code: 'Refresher_T3', title: 'Refresher week - tutorial 3', url: 'https://www.youtube.com/watch?v=US18ZBaHO1Q', week: 'refresher' },
-  { code: 'Refresher_T4', title: 'Refresher week - tutorial 4', url: 'https://www.youtube.com/watch?v=lBqVQxUYTIs', week: 'refresher' },
-  { code: 'Refresher_T5', title: 'Refresher week - tutorial 5', url: 'https://www.youtube.com/watch?v=Z9jpB1gK-PQ', week: 'refresher' },
-  { code: 'Refresher_T6', title: 'Refresher week - tutorial 6', url: 'https://www.youtube.com/watch?v=nNWcu09Qo04', week: 'refresher' },
-
-  // Mathematics for Data Science II (Special Videos)
-  { code: 'MDS2_1', title: 'Mathematics for Data Science II - Video 1', url: 'https://www.youtube.com/watch?v=UJFe9JIBogc', week: 'special' },
-  { code: 'MDS2_2', title: 'Mathematics for Data Science II - Video 2', url: 'https://www.youtube.com/watch?v=wj73NcPIeZE', week: 'special' },
-  { code: 'MDS2_3', title: 'Mathematics for Data Science II - Video 3', url: 'https://www.youtube.com/watch?v=SEevQPGIJSE', week: 'special' },
-  { code: 'MDS2_4', title: 'Mathematics for Data Science II - Video 4', url: 'https://www.youtube.com/watch?v=qcT49XqFzXo', week: 'special' },
-];
+  return videos;
+}
 
 interface TranscriptItem {
   text: string;
@@ -254,8 +184,8 @@ async function fetchTranscriptViaInnerTube(videoId: string): Promise<TranscriptI
     if (!res.ok) return null;
 
     const data = await res.json() as Record<string, unknown>;
-    const tracks = (data as Record<string, unknown>)?.captions as Record<string, unknown>;
-    const captionTracks = (tracks?.playerCaptionsTracklistRenderer as Record<string, unknown>)?.captionTracks as Array<{ baseUrl: string; languageCode: string }>;
+    const captions = (data?.captions as Record<string, unknown>)?.playerCaptionsTracklistRenderer as Record<string, unknown>;
+    const captionTracks = captions?.captionTracks as Array<{ baseUrl: string; languageCode: string }>;
 
     if (!Array.isArray(captionTracks) || captionTracks.length === 0) return null;
 
@@ -294,7 +224,7 @@ async function fetchTranscriptViaWebPage(videoId: string, videoUrl: string): Pro
   const startIdx = html.indexOf(initStr);
   if (startIdx === -1) throw new Error('Could not find ytInitialPlayerResponse');
 
-  let jsonStart = startIdx + initStr.length;
+  const jsonStart = startIdx + initStr.length;
   let depth = 0;
   let jsonEnd = jsonStart;
   for (let i = jsonStart; i < html.length; i++) {
@@ -407,7 +337,13 @@ interface IndexEntry {
 }
 
 async function main() {
-  console.log(`Starting transcript extraction for ${VIDEOS.length} videos...`);
+  if (!fs.existsSync(COURSE_FILE)) {
+    throw new Error(`Course file not found: ${COURSE_FILE}`);
+  }
+
+  const VIDEOS = parseCourseFile(COURSE_FILE);
+  console.log(`Parsed ${VIDEOS.length} unique videos from course file.`);
+  console.log(`Starting transcript extraction...`);
   console.log(`Output directory: ${OUTPUT_DIR}\n`);
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -443,7 +379,7 @@ async function main() {
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         if (attempt < 3) {
-          console.log(`  Retry ${attempt}/2 after error: ${msg.substring(0, 60)}`);
+          console.log(`  Retry ${attempt}/2: ${msg.substring(0, 60)}`);
           await delay(2000 * attempt);
         } else {
           errorMsg = msg;
@@ -474,7 +410,7 @@ async function main() {
   const weekOrder = ['week1', 'week2', 'week3', 'week4', 'week5', 'week6', 'week7', 'week8', 'week9', 'week10', 'week11', 'refresher', 'special'];
   const weekLabels: Record<string, string> = {
     week1: 'Week 1 — Vectors, Matrices, Systems, Determinants',
-    week2: 'Week 2 — Determinants (cont.), Cramer\'s Rule, Echelon Form, Gaussian Elimination',
+    week2: "Week 2 — Determinants (cont.), Cramer's Rule, Echelon Form, Gaussian Elimination",
     week3: 'Week 3 — Vector Spaces, Linear Dependence/Independence',
     week4: 'Week 4 — Basis, Rank, Dimension',
     week5: 'Week 5 — Null Space, Linear Mappings & Transformations',
@@ -507,7 +443,7 @@ async function main() {
     const entries = indexEntries.filter(e => e.week === week);
     if (entries.length === 0) continue;
 
-    readmeLines.push(`## ${weekLabels[week]}`);
+    readmeLines.push(`## ${weekLabels[week] ?? week}`);
     readmeLines.push('');
 
     const lectures = entries.filter(e => e.code.includes('_L') || e.code.startsWith('MDS2') || e.code.startsWith('Refresher'));

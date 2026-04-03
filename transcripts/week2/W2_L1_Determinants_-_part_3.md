@@ -1,4 +1,4 @@
-# W2_L1: Determinants - part 3
+# W2_L1: Determinants | part 3
 
 **Week:** Week 2
 **YouTube URL:** https://www.youtube.com/watch?v=uO3mocPU9Q4

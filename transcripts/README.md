@@ -17,8 +17,8 @@ Transcripts for the **Linear Algebra & Multivariable Calculus** course, organize
 - ✅ [W1_L1: Vectors](week1/W1_L1_Vectors.md) — [YouTube](https://www.youtube.com/watch?v=1So2VV9Tm_A)
 - ✅ [W1_L2: Matrices](week1/W1_L2_Matrices.md) — [YouTube](https://www.youtube.com/watch?v=rnIDlZnrCc0)
 - ✅ [W1_L3: Systems of linear equations](week1/W1_L3_Systems_of_linear_equations.md) — [YouTube](https://www.youtube.com/watch?v=WzR4NKeLHMY)
-- ✅ [W1_L4: Determinants - part 1](week1/W1_L4_Determinants_-_part_1.md) — [YouTube](https://www.youtube.com/watch?v=A3fxp49I4U8)
-- ✅ [W1_L5: Determinants - part 2](week1/W1_L5_Determinants_-_part_2.md) — [YouTube](https://www.youtube.com/watch?v=wejxX0YYYg4)
+- ✅ [W1_L4: Determinants | part 1](week1/W1_L4_Determinants_-_part_1.md) — [YouTube](https://www.youtube.com/watch?v=A3fxp49I4U8)
+- ✅ [W1_L5: Determinants | part 2](week1/W1_L5_Determinants_-_part_2.md) — [YouTube](https://www.youtube.com/watch?v=wejxX0YYYg4)
 
 **Tutorials:**
 
@@ -32,7 +32,7 @@ Transcripts for the **Linear Algebra & Multivariable Calculus** course, organize
 
 **Lectures:**
 
-- ✅ [W2_L1: Determinants - part 3](week2/W2_L1_Determinants_-_part_3.md) — [YouTube](https://www.youtube.com/watch?v=uO3mocPU9Q4)
+- ✅ [W2_L1: Determinants | part 3](week2/W2_L1_Determinants_-_part_3.md) — [YouTube](https://www.youtube.com/watch?v=uO3mocPU9Q4)
 - ✅ [W2_L2: Cramer's rule](week2/W2_L2_Cramer-s_rule.md) — [YouTube](https://www.youtube.com/watch?v=sOFHgNXXRFM)
 - ✅ [W2_L3: Solutions to a system of linear equations with an invertible coefficient matrix](week2/W2_L3_Solutions_to_a_system_of_linear_equations_with_an_invertible_coefficient_matrix.md) — [YouTube](https://www.youtube.com/watch?v=0txe9Mu5OdM)
 - ✅ [W2_L4: The echelon form](week2/W2_L4_The_echelon_form.md) — [YouTube](https://www.youtube.com/watch?v=6N8owlkf9AQ)
@@ -68,8 +68,8 @@ Transcripts for the **Linear Algebra & Multivariable Calculus** course, organize
 
 **Lectures:**
 
-- ✅ [W5_L1: The null space of a matrix - finding nullity and a basis - part 1](week5/W5_L1_The_null_space_of_a_matrix_-_finding_nullity_and_a_basis_-_part_1.md) — [YouTube](https://www.youtube.com/watch?v=3_U6oMJeklc)
-- ✅ [W5_L2: The null space of a matrix - finding nullity and a basis - part 2](week5/W5_L2_The_null_space_of_a_matrix_-_finding_nullity_and_a_basis_-_part_2.md) — [YouTube](https://www.youtube.com/watch?v=sDKAGDJlSAE)
+- ✅ [W5_L1: The null space of a matrix : finding nullity and a basis - part 1](week5/W5_L1_The_null_space_of_a_matrix_-_finding_nullity_and_a_basis_-_part_1.md) — [YouTube](https://www.youtube.com/watch?v=3_U6oMJeklc)
+- ✅ [W5_L2: The null space of a matrix : finding nullity and a basis - part 2](week5/W5_L2_The_null_space_of_a_matrix_-_finding_nullity_and_a_basis_-_part_2.md) — [YouTube](https://www.youtube.com/watch?v=sDKAGDJlSAE)
 - ✅ [W5_L3: What is a linear mapping - part 1](week5/W5_L3_What_is_a_linear_mapping_-_part_1.md) — [YouTube](https://www.youtube.com/watch?v=MvCkhmYhTkw)
 - ✅ [W5_L4: What is a linear mapping - part 2](week5/W5_L4_What_is_a_linear_mapping_-_part_2.md) — [YouTube](https://www.youtube.com/watch?v=aRNE_GrR0Yk)
 - ✅ [W5_L5: What is a linear transformation](week5/W5_L5_What_is_a_linear_transformation.md) — [YouTube](https://www.youtube.com/watch?v=6jA-RRGbmOw)
@@ -145,7 +145,7 @@ Transcripts for the **Linear Algebra & Multivariable Calculus** course, organize
 
 **Lectures:**
 
-- ✅ [W9_L1: Multivariable functions - visualization](week9/W9_L1_Multivariable_functions_-_visualization.md) — [YouTube](https://www.youtube.com/watch?v=MfrAPZRrqxw)
+- ✅ [W9_L1: Multivariable functions : visualization](week9/W9_L1_Multivariable_functions_-_visualization.md) — [YouTube](https://www.youtube.com/watch?v=MfrAPZRrqxw)
 - ✅ [W9_L2: Partial derivatives](week9/W9_L2_Partial_derivatives.md) — [YouTube](https://www.youtube.com/watch?v=GoJoNFBuCJ8)
 - ✅ [W9_L3: Directional derivatives](week9/W9_L3_Directional_derivatives.md) — [YouTube](https://www.youtube.com/watch?v=uhUqybTaGns)
 - ✅ [W9_L4: Limits for scalar-valued multivariable functions](week9/W9_L4_Limits_for_scalar-valued_multivariable_functions.md) — [YouTube](https://www.youtube.com/watch?v=Uvv8-Ujgqjo)

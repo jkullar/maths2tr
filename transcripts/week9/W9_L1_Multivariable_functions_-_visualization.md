@@ -1,4 +1,4 @@
-# W9_L1: Multivariable functions - visualization
+# W9_L1: Multivariable functions : visualization
 
 **Week:** Week 9
 **YouTube URL:** https://www.youtube.com/watch?v=MfrAPZRrqxw

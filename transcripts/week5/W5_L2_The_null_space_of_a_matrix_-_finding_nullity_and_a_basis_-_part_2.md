@@ -1,4 +1,4 @@
-# W5_L2: The null space of a matrix - finding nullity and a basis - part 2
+# W5_L2: The null space of a matrix : finding nullity and a basis - part 2
 
 **Week:** Week 5
 **YouTube URL:** https://www.youtube.com/watch?v=sDKAGDJlSAE
