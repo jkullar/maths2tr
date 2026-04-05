@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Search, X, Play, Pause, Square, Volume2, PlayCircle } from "lucide-react";
+import { ChevronRight, Search, X, Play, Pause, Square, Volume2, PlayCircle, Glasses } from "lucide-react";
 import notesRaw from "@/data/maths2/notes.json";
 
 interface Note {
@@ -81,6 +81,7 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript 
   const [selectedId, setSelectedId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
   const [ttsState, setTtsState] = useState<"idle" | "playing" | "paused">("idle");
+  const [readingMode, setReadingMode] = useState(false);
   const keepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const filteredNotes = useMemo(() => {
@@ -188,8 +189,10 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript 
       <aside
         className={cn(
           "flex-shrink-0 w-64 border-r border-border bg-card flex flex-col",
-          "md:flex md:relative md:translate-x-0",
-          sidebarOpen
+          "md:relative md:translate-x-0",
+          readingMode
+            ? "hidden"
+            : sidebarOpen
             ? "fixed inset-y-0 left-0 z-30 flex shadow-xl"
             : "hidden md:flex"
         )}
@@ -257,9 +260,15 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript 
         />
       )}
 
-      <main className="flex-1 overflow-y-auto">
+      <main className={cn(
+        "flex-1 overflow-y-auto transition-colors duration-300",
+        readingMode && "bg-amber-50/40 dark:bg-amber-950/10"
+      )}>
         {selectedNote ? (
-          <div className="max-w-3xl mx-auto px-6 py-8">
+          <div className={cn(
+            "mx-auto px-6 py-8 transition-all duration-300",
+            readingMode ? "max-w-2xl py-12 px-8" : "max-w-3xl"
+          )}>
             <div className="md:hidden mb-4 text-xs text-muted-foreground">
               {selectedNote.section} · Note {selectedNote.number}
             </div>
@@ -273,70 +282,89 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript 
                 {selectedNote.title}
               </h1>
 
-              {ttsSupported && (
-                <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
-                  {ttsState === "idle" && (
-                    <button
-                      onClick={handlePlay}
-                      aria-label="Read aloud"
-                      title="Read aloud"
-                      className="flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-border/60"
-                    >
-                      <Volume2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Read aloud</span>
-                    </button>
+              <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                {/* Reading Mode toggle */}
+                <button
+                  onClick={() => setReadingMode((v) => !v)}
+                  aria-label={readingMode ? "Exit reading mode" : "Reading mode"}
+                  title={readingMode ? "Exit reading mode" : "Reading mode"}
+                  className={cn(
+                    "w-8 h-8 flex items-center justify-center rounded-md transition-colors border",
+                    readingMode
+                      ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700"
+                      : "bg-muted text-muted-foreground border-border/60 hover:bg-amber-100/60 hover:text-amber-700 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
                   )}
+                >
+                  <Glasses className="w-3.5 h-3.5" />
+                </button>
 
-                  {ttsState === "playing" && (
-                    <>
-                      <span className="hidden sm:flex items-center gap-1.5 px-2 text-xs text-primary font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        Reading…
-                      </span>
-                      <button
-                        onClick={handlePause}
-                        aria-label="Pause"
-                        title="Pause"
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-border/60"
-                      >
-                        <Pause className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={stopSpeech}
-                        aria-label="Stop"
-                        title="Stop"
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border border-border/60"
-                      >
-                        <Square className="w-3 h-3" />
-                      </button>
-                    </>
-                  )}
-
-                  {ttsState === "paused" && (
-                    <>
+                {/* TTS controls — icon only */}
+                {ttsSupported && (
+                  <>
+                    {ttsState === "idle" && (
                       <button
                         onClick={handlePlay}
-                        aria-label="Resume"
-                        title="Resume"
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/30"
+                        aria-label="Read aloud"
+                        title="Read aloud"
+                        className="w-8 h-8 flex items-center justify-center rounded-md bg-muted text-muted-foreground border border-border/60 hover:bg-primary/10 hover:text-primary transition-colors"
                       >
-                        <Play className="w-3.5 h-3.5" />
+                        <Volume2 className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={stopSpeech}
-                        aria-label="Stop"
-                        title="Stop"
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-muted hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border border-border/60"
-                      >
-                        <Square className="w-3 h-3" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+                    )}
+
+                    {ttsState === "playing" && (
+                      <>
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        <button
+                          onClick={handlePause}
+                          aria-label="Pause"
+                          title="Pause"
+                          className="w-8 h-8 flex items-center justify-center rounded-md bg-muted text-muted-foreground border border-border/60 hover:bg-primary/10 hover:text-primary transition-colors"
+                        >
+                          <Pause className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={stopSpeech}
+                          aria-label="Stop"
+                          title="Stop"
+                          className="w-8 h-8 flex items-center justify-center rounded-md bg-muted text-muted-foreground border border-border/60 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        >
+                          <Square className="w-3 h-3" />
+                        </button>
+                      </>
+                    )}
+
+                    {ttsState === "paused" && (
+                      <>
+                        <button
+                          onClick={handlePlay}
+                          aria-label="Resume"
+                          title="Resume"
+                          className="w-8 h-8 flex items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-colors"
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={stopSpeech}
+                          aria-label="Stop"
+                          title="Stop"
+                          className="w-8 h-8 flex items-center justify-center rounded-md bg-muted text-muted-foreground border border-border/60 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        >
+                          <Square className="w-3 h-3" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
-            <article className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-h1:text-xl prose-h1:hidden prose-h2:text-base prose-h2:mt-8 prose-h2:mb-3 prose-h3:text-sm prose-h3:mt-5 prose-h3:mb-2 prose-p:leading-relaxed prose-li:leading-relaxed prose-table:text-xs prose-th:font-semibold prose-td:py-1.5 prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+            <article className={cn(
+              "prose dark:prose-invert max-w-none prose-headings:font-semibold prose-h1:hidden prose-h2:mt-8 prose-h2:mb-3 prose-h3:mt-5 prose-h3:mb-2 prose-p:leading-relaxed prose-li:leading-relaxed prose-table:text-xs prose-th:font-semibold prose-td:py-1.5 prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-pre:bg-muted prose-pre:border prose-pre:border-border",
+              readingMode
+                ? "prose-base prose-h1:text-2xl prose-h2:text-lg prose-h3:text-base prose-p:text-base prose-p:leading-loose"
+                : "prose-sm prose-h1:text-xl prose-h2:text-base prose-h3:text-sm"
+            )}>
               <ReactMarkdown
                 remarkPlugins={[remarkMath, remarkGfm]}
                 rehypePlugins={[rehypeKatex]}
