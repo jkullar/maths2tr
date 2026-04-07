@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Search, X, Moon, Sun, Menu, ChevronLeft,
-  BookOpen, GraduationCap, FileText, ChevronRight, MessageCircle,
+  BookOpen, GraduationCap, FileText, ChevronRight, MessageCircle, LayoutDashboard, LogIn,
 } from "lucide-react";
 import transcriptsData from "@/data/maths2/transcripts.json";
 import type { TranscriptsData, Video, Week } from "@/types";
@@ -17,6 +17,10 @@ import { NotesView } from "@/components/NotesView";
 import { HomePage } from "@/components/HomePage";
 import { GlobalSearchResults } from "@/components/GlobalSearchResults";
 import { AIGroupPage } from "@/components/AIGroupPage";
+import { LoginPage } from "@/components/LoginPage";
+import { SignupPage } from "@/components/SignupPage";
+import { DashboardPage } from "@/components/DashboardPage";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 const data = transcriptsData as unknown as TranscriptsData;
@@ -38,8 +42,15 @@ const DEGREE_SLUGS = new Set(["bs-data-science"]);
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   const pathParts = location.pathname.split("/").filter(Boolean);
+
+  // Auth-only fullscreen pages — render without the main app shell
+  if (pathParts[0] === "login") return <LoginPage />;
+  if (pathParts[0] === "signup") return <SignupPage />;
+  if (pathParts[0] === "dashboard") return <DashboardPage />;
+
   const appPage: "home" | "course" | "aigroup" =
     pathParts[0] === "ai-group" ? "aigroup" :
     (DEGREE_SLUGS.has(pathParts[0]) && pathParts[1]) ? "course" : "home";
@@ -351,6 +362,25 @@ function App() {
               >
                 {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
+
+              {/* User avatar / Login button */}
+              {user ? (
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/15 hover:bg-primary/25 transition-colors flex-shrink-0"
+                  title={`Dashboard — ${user.name}`}
+                >
+                  <span className="text-xs font-bold text-primary">{user.name.charAt(0).toUpperCase()}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground flex-shrink-0"
+                  title="Sign in"
+                >
+                  <LogIn className="w-4 h-4" />
+                </button>
+              )}
             </div>
           )}
         </div>

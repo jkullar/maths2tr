@@ -1,0 +1,62 @@
+import { Router } from "express";
+import { db, userProgressTable } from "@workspace/db";
+import { eq, and } from "drizzle-orm";
+import { requireAuth, type AuthRequest } from "../middlewares/auth";
+
+const router = Router();
+
+// GET /api/progress?courseId=maths2
+router.get("/progress", requireAuth as any, async (req: AuthRequest, res) => {
+  const { courseId } = req.query;
+  const rows = await db
+    .select()
+    .from(userProgressTable)
+    .where(
+      courseId
+        ? and(
+            eq(userProgressTable.userId, req.userId!),
+            eq(userProgressTable.courseId, String(courseId))
+          )
+        : eq(userProgressTable.userId, req.userId!)
+    );
+  res.json({ progress: rows });
+});
+
+// POST /api/progress  { courseId, videoCode }
+router.post("/progress", requireAuth as any, async (req: AuthRequest, res) => {
+  const { courseId, videoCode } = req.body ?? {};
+  if (!courseId || !videoCode) {
+    res.status(400).json({ error: "courseId and videoCode are required" });
+    return;
+  }
+
+  await db
+    .insert(userProgressTable)
+    .values({ userId: req.userId!, courseId, videoCode, completedAt: new Date() })
+    .onConflictDoNothing();
+
+  res.status(201).json({ ok: true });
+});
+
+// DELETE /api/progress  { courseId, videoCode }
+router.delete("/progress", requireAuth as any, async (req: AuthRequest, res) => {
+  const { courseId, videoCode } = req.body ?? {};
+  if (!courseId || !videoCode) {
+    res.status(400).json({ error: "courseId and videoCode are required" });
+    return;
+  }
+
+  await db
+    .delete(userProgressTable)
+    .where(
+      and(
+        eq(userProgressTable.userId, req.userId!),
+        eq(userProgressTable.courseId, courseId),
+        eq(userProgressTable.videoCode, videoCode)
+      )
+    );
+
+  res.json({ ok: true });
+});
+
+export default router;
