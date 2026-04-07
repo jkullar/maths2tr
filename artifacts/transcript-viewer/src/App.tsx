@@ -18,6 +18,7 @@ import { NotesView } from "@/components/NotesView";
 import { HomePage } from "@/components/HomePage";
 import { GlobalSearchResults } from "@/components/GlobalSearchResults";
 import { AIGroupPage } from "@/components/AIGroupPage";
+import { PaywallModal } from "@/components/PaywallModal";
 import { useAuth } from "@/context/AuthContext";
 import { COURSE_REGISTRY } from "@/lib/courseRegistry";
 import { cn } from "@/lib/utils";
@@ -128,6 +129,10 @@ function App() {
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
   const [subscriptionToggling, setSubscriptionToggling] = useState(false);
 
+  // ─── Payment / paywall state ──────────────────────────────────────────────
+  const [isPaid, setIsPaid] = useState<boolean>(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+
   // ─── Progress state (shared with CurriculumView) ──────────────────────────
   const [progressCodes, setProgressCodes] = useState<Set<string>>(new Set());
   const [togglingCodes, setTogglingCodes] = useState<Set<string>>(new Set());
@@ -136,14 +141,17 @@ function App() {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  // Fetch subscription status whenever course or login state changes
+  // Fetch subscription + payment status whenever course or login state changes
   useEffect(() => {
-    if (!activeCourse || !user) { setIsSubscribed(null); return; }
-    fetch(`/api/subscriptions`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((d) => {
-        const subs: { courseId: string }[] = d.subscriptions ?? [];
+    if (!activeCourse || !user) { setIsSubscribed(null); setIsPaid(false); return; }
+    Promise.all([
+      fetch(`/api/subscriptions`, { credentials: "include" }).then((r) => r.json()),
+      fetch(`/api/payments/status?courseId=${activeCourse}`, { credentials: "include" }).then((r) => r.json()),
+    ])
+      .then(([subData, payData]) => {
+        const subs: { courseId: string }[] = subData.subscriptions ?? [];
         setIsSubscribed(subs.some((s) => s.courseId === activeCourse));
+        setIsPaid(payData.paid === true);
       })
       .catch(() => setIsSubscribed(null));
   }, [activeCourse, user]);
@@ -190,21 +198,31 @@ function App() {
   const toggleProgress = useCallback(async (code: string) => {
     if (!user) { navigate("/login"); return; }
     if (!activeCourse || togglingCodes.has(code)) return;
+
+    // Paywall check — show upgrade modal for unpaid users
+    if (!isPaid) { setShowPaywall(true); return; }
+
     const wasDone = progressCodes.has(code);
     setProgressCodes((prev) => { const n = new Set(prev); wasDone ? n.delete(code) : n.add(code); return n; });
     setTogglingCodes((prev) => new Set(prev).add(code));
     try {
-      await fetch("/api/progress", {
+      const res = await fetch("/api/progress", {
         method: wasDone ? "DELETE" : "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ courseId: activeCourse, videoCode: code }),
       });
+      if (res.status === 402) {
+        // Paid status may have changed externally — show paywall
+        setIsPaid(false);
+        setShowPaywall(true);
+        setProgressCodes((prev) => { const n = new Set(prev); wasDone ? n.add(code) : n.delete(code); return n; });
+      }
     } catch {
       setProgressCodes((prev) => { const n = new Set(prev); wasDone ? n.add(code) : n.delete(code); return n; });
     }
     setTogglingCodes((prev) => { const n = new Set(prev); n.delete(code); return n; });
-  }, [user, activeCourse, progressCodes, togglingCodes, navigate]);
+  }, [user, activeCourse, progressCodes, togglingCodes, navigate, isPaid]);
 
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
@@ -683,6 +701,29 @@ function App() {
           </>
         )}
       </div>
+
+      {/* Paywall modal */}
+      {showPaywall && activeCourse && (
+        <PaywallModal
+          courseId={activeCourse}
+          courseName={COURSE_META[activeCourse]?.name ?? activeCourse}
+          onClose={() => setShowPaywall(false)}
+          onPurchaseSuccess={() => {
+            setIsPaid(true);
+            setShowPaywall(false);
+            // Re-fetch subscription to pick up auto-subscribe
+            if (user && activeCourse) {
+              fetch(`/api/subscriptions`, { credentials: "include" })
+                .then((r) => r.json())
+                .then((d) => {
+                  const subs: { courseId: string }[] = d.subscriptions ?? [];
+                  setIsSubscribed(subs.some((s) => s.courseId === activeCourse));
+                })
+                .catch(() => {});
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

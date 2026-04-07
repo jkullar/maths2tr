@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, userProgressTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../middlewares/auth";
+import { requirePaid } from "../middlewares/requirePaid";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.get("/progress", requireAuth as any, async (req: AuthRequest, res) => {
 });
 
 // POST /api/progress  { courseId, videoCode }
-router.post("/progress", requireAuth as any, async (req: AuthRequest, res) => {
+router.post("/progress", requireAuth as any, requirePaid as any, async (req: AuthRequest, res) => {
   const { courseId, videoCode } = req.body ?? {};
   if (!courseId || !videoCode) {
     res.status(400).json({ error: "courseId and videoCode are required" });
@@ -39,7 +40,7 @@ router.post("/progress", requireAuth as any, async (req: AuthRequest, res) => {
 });
 
 // DELETE /api/progress  { courseId, videoCode }
-router.delete("/progress", requireAuth as any, async (req: AuthRequest, res) => {
+router.delete("/progress", requireAuth as any, requirePaid as any, async (req: AuthRequest, res) => {
   const { courseId, videoCode } = req.body ?? {};
   if (!courseId || !videoCode) {
     res.status(400).json({ error: "courseId and videoCode are required" });

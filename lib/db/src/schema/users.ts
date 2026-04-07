@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp, uuid, jsonb, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -44,6 +44,22 @@ export const courseSubscriptionsTable = pgTable("course_subscriptions", {
     .$type<string[]>()
     .notNull()
     .default(["videos", "concepts", "notes"]),
+});
+
+export const coursePurchasesTable = pgTable("course_purchases", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  courseId: text("course_id").notNull(),
+  degreeId: text("degree_id").notNull(),
+  amountPaise: integer("amount_paise").notNull(),
+  currency: text("currency").notNull().default("INR"),
+  status: text("status").notNull().default("pending"),
+  cashfreeOrderId: text("cashfree_order_id").notNull(),
+  cashfreePaymentId: text("cashfree_payment_id"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(usersTable).omit({
