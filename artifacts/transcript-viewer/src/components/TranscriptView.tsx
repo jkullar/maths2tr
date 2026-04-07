@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { ExternalLink, Copy, Check, Clock, AlertCircle, ChevronUp } from "lucide-react";
+import { ExternalLink, Copy, Check, Clock, AlertCircle, ChevronUp, ArrowLeft } from "lucide-react";
 import type { Video, Week, TranscriptSegment } from "@/types";
 import { highlightText, formatDuration } from "@/lib/search";
 import { cn } from "@/lib/utils";
@@ -9,24 +9,33 @@ interface TranscriptViewProps {
   week: Week;
   searchQuery: string;
   highlightSegmentIndex?: number | null;
+  sourceTab?: "curriculum" | "notes" | null;
+  onGoBack?: () => void;
 }
 
-export function TranscriptView({ video, week, searchQuery, highlightSegmentIndex }: TranscriptViewProps) {
+export function TranscriptView({ video, week, searchQuery, highlightSegmentIndex, sourceTab, onGoBack }: TranscriptViewProps) {
   const [copied, setCopied] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const segmentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Scroll to the highlighted segment. We use a small timeout so this always
+  // runs after the scroll-to-top effect below, preventing the two from racing.
   useEffect(() => {
-    if (highlightSegmentIndex != null && segmentRefs.current[highlightSegmentIndex]) {
+    if (highlightSegmentIndex == null) return;
+    const id = setTimeout(() => {
       segmentRefs.current[highlightSegmentIndex]?.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
-    }
+    }, 50);
+    return () => clearTimeout(id);
   }, [highlightSegmentIndex, video.id]);
 
+  // Reset scroll position when the video changes — but only when we are NOT
+  // jumping to a specific segment (which handles its own scroll above).
   useEffect(() => {
+    if (highlightSegmentIndex != null) return;
     if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
@@ -59,8 +68,27 @@ export function TranscriptView({ video, week, searchQuery, highlightSegmentIndex
     ? video.segments[video.segments.length - 1].time
     : 0;
 
+  const backLabel = sourceTab === "curriculum" ? "Back to Curriculum" : sourceTab === "notes" ? "Back to Notes" : null;
+
   return (
     <div className="h-full flex flex-col">
+      {/* Back-navigation banner — shown when arriving from another tab */}
+      {backLabel && onGoBack && (
+        <div className="flex-shrink-0 flex items-center gap-2 px-4 py-1.5 bg-primary/5 border-b border-primary/20 text-xs text-primary/80">
+          <button
+            onClick={onGoBack}
+            className="flex items-center gap-1.5 font-medium hover:text-primary transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            {backLabel}
+          </button>
+          <span className="text-primary/40">·</span>
+          <span className="text-primary/60 truncate">
+            Jumped to <span className="font-mono font-semibold">{video.code}</span> @ segment {highlightSegmentIndex != null ? highlightSegmentIndex + 1 : "—"}
+          </span>
+        </div>
+      )}
+
       <div className="flex-shrink-0 border-b border-border bg-card px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">

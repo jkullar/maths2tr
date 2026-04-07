@@ -54,6 +54,7 @@ function App() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [selectedWeek, setSelectedWeek] = useState<Week | null>(null);
   const [highlightSegmentIndex, setHighlightSegmentIndex] = useState<number | null>(null);
+  const [sourceTab, setSourceTab] = useState<"curriculum" | "notes" | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const expandedInputRef = useRef<HTMLInputElement>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,12 +130,16 @@ function App() {
     const segmentIndex = found.video.available
       ? findClosestSegmentIndex(found.video, timestamp)
       : null;
+    // Remember which tab the user came from so we can show a back button
+    setCourseTab((prev) => {
+      if (prev === "curriculum" || prev === "notes") setSourceTab(prev);
+      return "transcripts";
+    });
     setSelectedVideo(found.video);
     setSelectedWeek(found.week);
     setHighlightSegmentIndex(segmentIndex);
     setSearchQuery("");
     setDebouncedQuery("");
-    setCourseTab("transcripts");
   }, []);
 
   const clearSearch = () => {
@@ -354,7 +359,7 @@ function App() {
             {COURSE_TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => { setCourseTab(id); setSidebarOpen(false); }}
+                onClick={() => { setCourseTab(id); setSidebarOpen(false); setSourceTab(null); }}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors border-b-2 -mb-px",
                   courseTab === id
@@ -456,6 +461,13 @@ function App() {
                       week={selectedWeek}
                       searchQuery=""
                       highlightSegmentIndex={highlightSegmentIndex}
+                      sourceTab={sourceTab}
+                      onGoBack={() => {
+                        if (sourceTab) {
+                          setCourseTab(sourceTab);
+                          setSourceTab(null);
+                        }
+                      }}
                     />
                   )}
                   {transcriptsMode === "search" && (
