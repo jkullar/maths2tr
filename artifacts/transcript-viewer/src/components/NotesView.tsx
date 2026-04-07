@@ -6,17 +6,7 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { ChevronRight, Search, X, Play, Pause, Square, Volume2, PlayCircle, Glasses, CheckCircle2, Circle, Loader2 } from "lucide-react";
-import notesRaw from "@/data/maths2/notes.json";
-
-interface Note {
-  id: string;
-  number: number;
-  title: string;
-  section: string;
-  content: string;
-}
-
-const notes = notesRaw as Note[];
+import type { CourseNote as Note } from "@/types";
 
 const SECTIONS = [
   "Refresher Week",
@@ -26,7 +16,7 @@ const SECTIONS = [
   "Special Week",
 ];
 
-function toNoteId(link: string): string | null {
+function toNoteId(link: string, notes: Note[]): string | null {
   const m = link.match(/^(\d+)\s*-\s*/);
   if (m) return m[1];
   const found = notes.find(
@@ -61,6 +51,7 @@ function stripForSpeech(markdown: string): string {
 }
 
 interface NotesViewProps {
+  notes: Note[];
   sidebarOpen: boolean;
   onSidebarClose: () => void;
   onNavigateToTranscript: (code: string, timestamp: string) => void;
@@ -80,7 +71,7 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
-export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript, completedCodes, togglingCodes, onToggleVideo }: NotesViewProps) {
+export function NotesView({ notes, sidebarOpen, onSidebarClose, onNavigateToTranscript, completedCodes, togglingCodes, onToggleVideo }: NotesViewProps) {
   const [selectedId, setSelectedId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
   const [ttsState, setTtsState] = useState<"idle" | "playing" | "paused">("idle");
@@ -95,7 +86,7 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript,
         n.title.toLowerCase().includes(q) ||
         n.content.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, notes]);
 
   const selectedNote = notes.find((n) => n.id === selectedId) ?? notes[1];
 
@@ -180,7 +171,7 @@ export function NotesView({ sidebarOpen, onSidebarClose, onNavigateToTranscript,
 
   const processContent = (content: string) =>
     content.replace(/\[\[([^\]]+)\]\]/g, (_, link) => {
-      const id = toNoteId(link);
+      const id = toNoteId(link, notes);
       if (id) return `[${link}](#note-${id})`;
       return `\`${link}\``;
     });

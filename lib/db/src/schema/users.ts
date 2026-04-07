@@ -28,7 +28,7 @@ export const userProgressTable = pgTable("user_progress", {
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
   courseId: text("course_id").notNull(),
-  videoCode: text("video_code").notNull(),
+  itemKey: text("video_code").notNull(),
   completedAt: timestamp("completed_at").notNull().defaultNow(),
 });
 

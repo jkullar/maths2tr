@@ -23,27 +23,27 @@ router.get("/progress", requireAuth as any, async (req: AuthRequest, res) => {
   res.json({ progress: rows });
 });
 
-// POST /api/progress  { courseId, videoCode }
+// POST /api/progress  { courseId, itemKey }
 router.post("/progress", requireAuth as any, requirePaid as any, async (req: AuthRequest, res) => {
-  const { courseId, videoCode } = req.body ?? {};
-  if (!courseId || !videoCode) {
-    res.status(400).json({ error: "courseId and videoCode are required" });
+  const { courseId, itemKey } = req.body ?? {};
+  if (!courseId || !itemKey) {
+    res.status(400).json({ error: "courseId and itemKey are required" });
     return;
   }
 
   await db
     .insert(userProgressTable)
-    .values({ userId: req.userId!, courseId, videoCode, completedAt: new Date() })
+    .values({ userId: req.userId!, courseId, itemKey, completedAt: new Date() })
     .onConflictDoNothing();
 
   res.status(201).json({ ok: true });
 });
 
-// DELETE /api/progress  { courseId, videoCode }
+// DELETE /api/progress  { courseId, itemKey }
 router.delete("/progress", requireAuth as any, requirePaid as any, async (req: AuthRequest, res) => {
-  const { courseId, videoCode } = req.body ?? {};
-  if (!courseId || !videoCode) {
-    res.status(400).json({ error: "courseId and videoCode are required" });
+  const { courseId, itemKey } = req.body ?? {};
+  if (!courseId || !itemKey) {
+    res.status(400).json({ error: "courseId and itemKey are required" });
     return;
   }
 
@@ -53,7 +53,7 @@ router.delete("/progress", requireAuth as any, requirePaid as any, async (req: A
       and(
         eq(userProgressTable.userId, req.userId!),
         eq(userProgressTable.courseId, courseId),
-        eq(userProgressTable.videoCode, videoCode)
+        eq(userProgressTable.itemKey, itemKey)
       )
     );
 

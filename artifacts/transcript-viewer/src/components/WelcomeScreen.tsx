@@ -1,15 +1,7 @@
 import { useMemo } from "react";
 import { BookOpen, Search, Video, GraduationCap, FileText, Map, ChevronRight } from "lucide-react";
-import type { TranscriptsData, Video as VideoType, Week } from "@/types";
+import type { TranscriptsData, Video as VideoType, Week, CurriculumData } from "@/types";
 import { cn } from "@/lib/utils";
-import curriculumData from "@/data/maths2/curriculum.json";
-import type { CurriculumData } from "@/types";
-
-const curriculum = curriculumData as unknown as CurriculumData;
-
-const weekThemeMap: Record<string, { theme: string; concepts: number }> = Object.fromEntries(
-  curriculum.weeks.map((w) => [w.week, { theme: w.theme, concepts: w.concepts.length }])
-);
 
 const WEEK_COLORS: Record<string, { bg: string; border: string; text: string; dot: string; hover: string }> = {
   refresher: { bg: "bg-teal-50 dark:bg-teal-950/30",    border: "border-teal-200 dark:border-teal-800",      text: "text-teal-700 dark:text-teal-300",    dot: "bg-teal-500",    hover: "hover:border-teal-400 dark:hover:border-teal-600" },
@@ -31,13 +23,24 @@ const WEEK_ORDER = ["refresher", "week1", "week2", "week3", "week4", "week5", "w
 
 interface WelcomeScreenProps {
   data: TranscriptsData;
+  curriculum: CurriculumData;
+  courseName: string;
+  courseSubtitle?: string;
+  courseCode?: string;
+  level?: string;
+  semester?: string;
+  totalNotes: number;
   onSearchFocus: () => void;
   onSelectVideo: (video: VideoType, week: Week) => void;
   onOpenNotes: () => void;
   onOpenCurriculum: () => void;
 }
 
-export function WelcomeScreen({ data, onSearchFocus, onSelectVideo, onOpenNotes, onOpenCurriculum }: WelcomeScreenProps) {
+export function WelcomeScreen({ data, curriculum, courseName, courseSubtitle, courseCode, level, semester, totalNotes, onSearchFocus, onSelectVideo, onOpenNotes, onOpenCurriculum }: WelcomeScreenProps) {
+  const weekThemeMap: Record<string, { theme: string; concepts: number }> = useMemo(() => Object.fromEntries(
+    curriculum.weeks.map((w) => [w.week, { theme: w.theme, concepts: w.concepts.length }])
+  ), [curriculum]);
+
   const orderedWeeks = useMemo(() => {
     return WEEK_ORDER.map((key) => data.weeks.find((w) => w.key === key)).filter(Boolean) as Week[];
   }, [data.weeks]);
@@ -51,22 +54,20 @@ export function WelcomeScreen({ data, onSearchFocus, onSelectVideo, onOpenNotes,
 
         <div className="mb-6">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1.5">
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Foundation</span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs text-muted-foreground">Semester 2</span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs font-mono text-muted-foreground">BSCMA1002</span>
+            {level && <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">{level}</span>}
+            {semester && <><span className="text-xs text-muted-foreground">·</span><span className="text-xs text-muted-foreground">{semester}</span></>}
+            {courseCode && <><span className="text-xs text-muted-foreground">·</span><span className="text-xs font-mono text-muted-foreground">{courseCode}</span></>}
           </div>
-          <h1 className="text-2xl font-bold text-foreground leading-tight">Mathematics for Data Science II</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Linear Algebra &amp; Multivariable Calculus</p>
+          <h1 className="text-2xl font-bold text-foreground leading-tight">{courseName}</h1>
+          {courseSubtitle && <p className="text-sm text-muted-foreground mt-0.5">{courseSubtitle}</p>}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
           {[
             { label: "Weeks",       value: data.weeks.length,       icon: GraduationCap, color: "text-primary",       sub: "of content"       },
             { label: "Transcripts", value: data.availableVideos,    icon: Video,          color: "text-blue-500",     sub: "videos available"  },
-            { label: "Concepts",    value: 270,                      icon: BookOpen,       color: "text-violet-500",   sub: "mapped & linked"   },
-            { label: "Notes",       value: 18,                       icon: FileText,       color: "text-emerald-500",  sub: "with timestamps"   },
+            { label: "Concepts",    value: curriculum.total_concepts, icon: BookOpen,       color: "text-violet-500",   sub: "mapped & linked"   },
+            { label: "Notes",       value: totalNotes,               icon: FileText,       color: "text-emerald-500",  sub: "with timestamps"   },
           ].map(({ label, value, icon: Icon, color, sub }) => (
             <div key={label} className="bg-card border border-border rounded-xl p-3.5 flex items-center gap-3 sm:flex-col sm:items-center sm:text-center sm:gap-1.5 sm:p-4">
               <Icon className={cn("w-4 h-4 flex-shrink-0 sm:mx-auto", color)} />
@@ -93,7 +94,7 @@ export function WelcomeScreen({ data, onSearchFocus, onSelectVideo, onOpenNotes,
           >
             <FileText className="w-3.5 h-3.5 text-emerald-500" />
             Browse Notes
-            <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-semibold">18</span>
+            <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-semibold">{totalNotes}</span>
           </button>
           <button
             onClick={onOpenCurriculum}
@@ -101,7 +102,7 @@ export function WelcomeScreen({ data, onSearchFocus, onSelectVideo, onOpenNotes,
           >
             <Map className="w-3.5 h-3.5 text-violet-500" />
             Curriculum Map
-            <span className="text-[10px] bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 px-1.5 py-0.5 rounded-full font-semibold">270 concepts</span>
+            <span className="text-[10px] bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 px-1.5 py-0.5 rounded-full font-semibold">{curriculum.total_concepts} concepts</span>
           </button>
         </div>
 

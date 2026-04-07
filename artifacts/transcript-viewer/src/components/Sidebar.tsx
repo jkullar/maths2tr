@@ -2,19 +2,15 @@ import { useState } from "react";
 import { BookOpen, ChevronDown, ChevronRight, GraduationCap, Video, AlertCircle, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import type { Week, Video as VideoType } from "@/types";
 import { cn } from "@/lib/utils";
-import curriculumData from "@/data/maths2/curriculum.json";
-import type { CurriculumData } from "@/types";
-
-const curriculum = curriculumData as unknown as CurriculumData;
-const weekThemes: Record<string, string> = Object.fromEntries(
-  curriculum.weeks.map((w) => [w.week, w.theme])
-);
 
 interface SidebarProps {
   weeks: Week[];
   selectedVideoId: string | null;
   onSelectVideo: (video: VideoType, week: Week) => void;
   searchQuery: string;
+  weekThemes?: Record<string, string>;
+  courseName?: string;
+  courseSubtitle?: string;
   completedCodes?: Set<string>;
   togglingCodes?: Set<string>;
   onToggleVideo?: (code: string) => void;
@@ -44,7 +40,7 @@ function getVideoType(code: string): "L" | "T" | null {
 
 const WEEK_ORDER = ["refresher", "week1", "week2", "week3", "week4", "week5", "week6", "week7", "week8", "week9", "week10", "week11", "special"];
 
-export function Sidebar({ weeks, selectedVideoId, onSelectVideo, searchQuery, completedCodes, togglingCodes, onToggleVideo }: SidebarProps) {
+export function Sidebar({ weeks, selectedVideoId, onSelectVideo, searchQuery, weekThemes = {}, courseName = "Course", courseSubtitle, completedCodes, togglingCodes, onToggleVideo }: SidebarProps) {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(() => {
     const initial = new Set<string>();
     const ordered = WEEK_ORDER.filter((k) => weeks.find((w) => w.key === k));
@@ -74,8 +70,8 @@ export function Sidebar({ weeks, selectedVideoId, onSelectVideo, searchQuery, co
           <GraduationCap className="w-4 h-4 text-primary-foreground" />
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-sidebar-foreground truncate leading-snug">Maths for Data Science II</p>
-          <p className="text-[10px] text-sidebar-foreground/50 truncate">Lin. Algebra &amp; Multivariable Calc</p>
+          <p className="text-xs font-semibold text-sidebar-foreground truncate leading-snug">{courseName}</p>
+          {courseSubtitle && <p className="text-[10px] text-sidebar-foreground/50 truncate">{courseSubtitle}</p>}
         </div>
       </div>
 

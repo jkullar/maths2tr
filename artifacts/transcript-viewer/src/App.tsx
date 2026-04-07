@@ -5,8 +5,7 @@ import {
   BookOpen, GraduationCap, FileText, ChevronRight, MessageCircle, LogIn,
   BookmarkCheck, BookmarkPlus, Loader2,
 } from "lucide-react";
-import transcriptsData from "@/data/maths2/transcripts.json";
-import type { TranscriptsData, Video, Week } from "@/types";
+import type { Video, Week } from "@/types";
 import { searchTranscripts } from "@/lib/search";
 import { findVideoByCode, findClosestSegmentIndex } from "@/lib/curriculum";
 import { Sidebar } from "@/components/Sidebar";
@@ -20,10 +19,8 @@ import { GlobalSearchResults } from "@/components/GlobalSearchResults";
 import { AIGroupPage } from "@/components/AIGroupPage";
 import { PaywallModal } from "@/components/PaywallModal";
 import { useAuth } from "@/context/AuthContext";
-import { COURSE_REGISTRY } from "@/lib/courseRegistry";
+import { COURSE_REGISTRY, DEGREE_SLUGS, getCourseInfo } from "@/lib/courseRegistry";
 import { cn } from "@/lib/utils";
-
-const data = transcriptsData as unknown as TranscriptsData;
 
 type CourseTab = "transcripts" | "curriculum" | "notes";
 type TranscriptsMode = "welcome" | "transcript" | "search";
@@ -87,16 +84,7 @@ function TrackProgressButton({
   );
 }
 
-const COURSE_META: Record<string, { name: string; level: string; semester: string; degreeSlug: string }> = {
-  maths2: {
-    name: "Mathematics for Data Science II",
-    level: "Foundation",
-    semester: "Semester 2",
-    degreeSlug: "bs-data-science",
-  },
-};
-
-const DEGREE_SLUGS = new Set(["bs-data-science"]);
+const VALID_TABS = new Set<CourseTab>(["transcripts", "curriculum", "notes"]);
 
 function App() {
   const navigate = useNavigate();
@@ -110,9 +98,20 @@ function App() {
     (DEGREE_SLUGS.has(pathParts[0]) && pathParts[1]) ? "course" : "home";
   const activeCourse: string | null = appPage === "course" ? (pathParts[1] ?? null) : null;
 
+  // Derive tab from URL path segment — /degreeSlug/courseId/tab
+  const courseTab: CourseTab = (VALID_TABS.has(pathParts[2] as CourseTab) ? pathParts[2] : "transcripts") as CourseTab;
+
+  // Course data from registry — single source of truth
+  const courseInfo = activeCourse ? getCourseInfo(activeCourse) : undefined;
+  const data = courseInfo?.transcripts;
+  const courseCurriculum = courseInfo?.curriculum;
+  const courseNotes = courseInfo?.notes ?? [];
+  const weekThemes: Record<string, string> = useMemo(() =>
+    courseCurriculum ? Object.fromEntries(courseCurriculum.weeks.map((w) => [w.week, w.theme])) : {},
+  [courseCurriculum]);
+
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [courseTab, setCourseTab] = useState<CourseTab>("transcripts");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -137,6 +136,12 @@ function App() {
   const [progressCodes, setProgressCodes] = useState<Set<string>>(new Set());
   const [togglingCodes, setTogglingCodes] = useState<Set<string>>(new Set());
 
+  // ─── Tab URL navigation helper ─────────────────────────────────────────────
+  const setTabUrl = useCallback((tab: CourseTab, replace = false) => {
+    if (!activeCourse || !courseInfo) return;
+    navigate(`/${courseInfo.degreeSlug}/${activeCourse}/${tab}`, replace ? { replace: true } : undefined);
+  }, [navigate, activeCourse, courseInfo]);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
@@ -159,8 +164,8 @@ function App() {
   const handleSubscriptionToggle = useCallback(async () => {
     if (!user) { navigate("/login"); return; }
     if (subscriptionToggling || !activeCourse) return;
-    const courseInfo = COURSE_REGISTRY[activeCourse];
-    if (!courseInfo) return;
+    const info = COURSE_REGISTRY[activeCourse];
+    if (!info) return;
     setSubscriptionToggling(true);
     try {
       if (isSubscribed) {
@@ -176,7 +181,7 @@ function App() {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ courseId: activeCourse, degreeId: courseInfo.degreeId }),
+          body: JSON.stringify({ courseId: activeCourse, degreeId: info.degreeId }),
         });
         setIsSubscribed(true);
       }
@@ -190,7 +195,7 @@ function App() {
     fetch(`/api/progress?courseId=${activeCourse}`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => {
-        setProgressCodes(new Set((d.progress as { videoCode: string }[]).map((p) => p.videoCode)));
+        setProgressCodes(new Set((d.progress as { itemKey: string }[]).map((p) => p.itemKey)));
       })
       .catch(() => {});
   }, [activeCourse, user]);
@@ -210,7 +215,7 @@ function App() {
         method: wasDone ? "DELETE" : "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId: activeCourse, videoCode: code }),
+        body: JSON.stringify({ courseId: activeCourse, itemKey: code }),
       });
       if (res.status === 402) {
         // Paid status may have changed externally — show paywall
@@ -231,9 +236,9 @@ function App() {
   }, [searchQuery]);
 
   const searchResults = useMemo(() => {
-    if (!debouncedQuery.trim()) return [];
+    if (!debouncedQuery.trim() || !data) return [];
     return searchTranscripts(data, debouncedQuery, null);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, data]);
 
   const transcriptsMode: TranscriptsMode = useMemo(() => {
     if (debouncedQuery.trim()) return "search";
@@ -242,9 +247,9 @@ function App() {
   }, [debouncedQuery, selectedVideo]);
 
   const handleOpenCourse = useCallback((courseId: string, withQuery?: string) => {
-    const degreeSlug = COURSE_META[courseId]?.degreeSlug ?? "bs-data-science";
-    navigate(`/${degreeSlug}/${courseId}`);
-    setCourseTab("transcripts");
+    const info = getCourseInfo(courseId);
+    const degreeSlug = info?.degreeSlug ?? "bs-data-science";
+    navigate(`/${degreeSlug}/${courseId}/transcripts`);
     if (withQuery) {
       setSearchQuery(withQuery);
       setDebouncedQuery(withQuery);
@@ -274,8 +279,8 @@ function App() {
     setSearchQuery("");
     setDebouncedQuery("");
     setSidebarOpen(false);
-    setCourseTab("transcripts");
-  }, []);
+    setTabUrl("transcripts");
+  }, [setTabUrl]);
 
   const handleSearchResultSelect = useCallback((video: Video, week: Week, segmentIndex?: number) => {
     setSelectedVideo(video);
@@ -286,22 +291,21 @@ function App() {
   }, []);
 
   const handleNavigateToTranscript = useCallback((code: string, timestamp: string) => {
+    if (!data) return;
     const found = findVideoByCode(data, code);
     if (!found) return;
     const segmentIndex = found.video.available
       ? findClosestSegmentIndex(found.video, timestamp)
       : null;
     // Remember which tab the user came from so we can show a back button
-    setCourseTab((prev) => {
-      if (prev === "curriculum" || prev === "notes") setSourceTab(prev);
-      return "transcripts";
-    });
+    if (courseTab === "curriculum" || courseTab === "notes") setSourceTab(courseTab);
+    setTabUrl("transcripts");
     setSelectedVideo(found.video);
     setSelectedWeek(found.week);
     setHighlightSegmentIndex(segmentIndex);
     setSearchQuery("");
     setDebouncedQuery("");
-  }, []);
+  }, [data, courseTab, setTabUrl]);
 
   const clearSearch = () => {
     setSearchQuery("");
@@ -312,7 +316,7 @@ function App() {
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    if (val.trim()) setCourseTab("transcripts");
+    if (val.trim() && courseTab !== "transcripts") setTabUrl("transcripts", true);
   };
 
   const handleExpandSearch = () => {
@@ -325,8 +329,6 @@ function App() {
     setSearchQuery("");
     setDebouncedQuery("");
   };
-
-  const courseMeta = activeCourse ? COURSE_META[activeCourse] : null;
 
   // Dynamic page title + meta description per route
   useEffect(() => {
@@ -344,10 +346,10 @@ function App() {
         "Free AI Discussion Group — DytaDex AI",
         "Join a free weekly community discussion group on Artificial Intelligence topics. Open for everyone, hosted on WhatsApp. Powered by DytaDex AI."
       );
-    } else if (appPage === "course" && courseMeta) {
+    } else if (appPage === "course" && courseInfo) {
       setMeta(
-        `${courseMeta.name} — DytaDex AI`,
-        `Full transcripts, concept map and AI-generated notes for ${courseMeta.name} (${courseMeta.level}, ${courseMeta.semester}) from the BS in Data Science degree.`
+        `${courseInfo.name} — DytaDex AI`,
+        `Full transcripts, concept map and AI-generated notes for ${courseInfo.name} (${courseInfo.level}, ${courseInfo.semester}) from the BS in Data Science degree.`
       );
     } else {
       setMeta(
@@ -355,7 +357,7 @@ function App() {
         "Transcripts, concept maps, AI-generated notes and full-text search for every lecture in the BS in Data Science degree. Study smarter with DytaDex AI."
       );
     }
-  }, [appPage, courseMeta]);
+  }, [appPage, courseInfo]);
 
   const showMobileMenuBtn = appPage === "course" && !searchExpanded;
   const isGlobalSearch = appPage === "home" && debouncedQuery.trim().length > 0;
@@ -403,7 +405,7 @@ function App() {
           )}
 
           {/* Course breadcrumb */}
-          {!searchExpanded && appPage === "course" && courseMeta && (
+          {!searchExpanded && appPage === "course" && courseInfo && (
             <div className="hidden sm:flex items-center gap-1.5 min-w-0 flex-shrink">
               <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
               <button
@@ -414,7 +416,7 @@ function App() {
               </button>
               <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
               <span className="text-xs font-medium text-foreground truncate min-w-0">
-                {courseMeta.name}
+                {courseInfo.name}
               </span>
             </div>
           )}
@@ -542,7 +544,7 @@ function App() {
                 onClick={() => {
                   // Fresh manual navigation to Curriculum always starts at top
                   if (id === "curriculum") curriculumScrollPosRef.current = 0;
-                  setCourseTab(id);
+                  setTabUrl(id);
                   setSidebarOpen(false);
                   setSourceTab(null);
                 }}
@@ -615,7 +617,7 @@ function App() {
           </main>
         )}
 
-        {appPage === "course" && (
+        {appPage === "course" && data && (
           <>
             {courseTab === "transcripts" && (
               <aside
@@ -632,6 +634,9 @@ function App() {
                   selectedVideoId={selectedVideo?.id ?? null}
                   onSelectVideo={handleSelectVideo}
                   searchQuery={searchQuery}
+                  weekThemes={weekThemes}
+                  courseName={courseInfo?.shortName ?? courseInfo?.name}
+                  courseSubtitle={courseInfo?.shortDesc}
                   completedCodes={user ? progressCodes : undefined}
                   togglingCodes={togglingCodes}
                   onToggleVideo={user ? toggleProgress : undefined}
@@ -642,13 +647,19 @@ function App() {
             <main className="flex-1 overflow-hidden relative">
               {courseTab === "transcripts" && (
                 <>
-                  {transcriptsMode === "welcome" && (
+                  {transcriptsMode === "welcome" && courseCurriculum && (
                     <WelcomeScreen
                       data={data}
+                      curriculum={courseCurriculum}
+                      courseName={courseInfo?.name ?? ""}
+                      courseSubtitle={courseInfo?.shortDesc}
+                      level={courseInfo?.level}
+                      semester={courseInfo?.semester}
+                      totalNotes={courseInfo?.totalNotes ?? 0}
                       onSearchFocus={handleExpandSearch}
                       onSelectVideo={handleSelectVideo}
-                      onOpenNotes={() => setCourseTab("notes")}
-                      onOpenCurriculum={() => setCourseTab("curriculum")}
+                      onOpenNotes={() => setTabUrl("notes")}
+                      onOpenCurriculum={() => setTabUrl("curriculum")}
                     />
                   )}
                   {transcriptsMode === "transcript" && selectedVideo && selectedWeek && (
@@ -660,7 +671,7 @@ function App() {
                       sourceTab={sourceTab}
                       onGoBack={() => {
                         if (sourceTab) {
-                          setCourseTab(sourceTab);
+                          setTabUrl(sourceTab);
                           setSourceTab(null);
                         }
                       }}
@@ -675,8 +686,9 @@ function App() {
                   )}
                 </>
               )}
-              {courseTab === "curriculum" && (
+              {courseTab === "curriculum" && courseCurriculum && (
                 <CurriculumView
+                  curriculum={courseCurriculum}
                   onNavigateToTranscript={handleNavigateToTranscript}
                   sidebarOpen={sidebarOpen}
                   onSidebarClose={() => setSidebarOpen(false)}
@@ -689,6 +701,7 @@ function App() {
               )}
               {courseTab === "notes" && (
                 <NotesView
+                  notes={courseNotes}
                   sidebarOpen={sidebarOpen}
                   onSidebarClose={() => setSidebarOpen(false)}
                   onNavigateToTranscript={handleNavigateToTranscript}
@@ -706,7 +719,7 @@ function App() {
       {showPaywall && activeCourse && (
         <PaywallModal
           courseId={activeCourse}
-          courseName={COURSE_META[activeCourse]?.name ?? activeCourse}
+          courseName={courseInfo?.name ?? activeCourse}
           onClose={() => setShowPaywall(false)}
           onPurchaseSuccess={() => {
             setIsPaid(true);

@@ -1,12 +1,10 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { ExternalLink, BookOpen, FlaskConical, ChevronDown, ChevronRight, GraduationCap, Search, X, Star, CheckCircle2, Circle, Loader2 } from "lucide-react";
-import curriculumData from "@/data/maths2/curriculum.json";
 import type { CurriculumData, CurriculumConcept, CurriculumWeek } from "@/types";
 import { cn } from "@/lib/utils";
 
-const curriculum = curriculumData as unknown as CurriculumData;
-
 interface CurriculumViewProps {
+  curriculum: CurriculumData;
   onNavigateToTranscript: (code: string, timestamp: string) => void;
   sidebarOpen: boolean;
   onSidebarClose: () => void;
@@ -267,6 +265,7 @@ function WeekSection({
 }
 
 export function CurriculumView({
+  curriculum,
   onNavigateToTranscript, sidebarOpen, onSidebarClose, scrollRestorePos, onScrollSave,
   completedCodes, togglingCodes, onToggleVideo,
 }: CurriculumViewProps) {

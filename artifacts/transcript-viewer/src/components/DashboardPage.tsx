@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 interface ProgressItem {
   userId: string;
   courseId: string;
-  videoCode: string;
+  itemKey: string;
   completedAt: string;
 }
 
@@ -217,9 +217,9 @@ function CourseProgressCard({
   const totalConcepts = course.totalConcepts;
   const totalNotes = course.totalNotes;
 
-  const videoDone   = progress.filter((p) => p.videoCode.startsWith("v:")).length;
-  const conceptDone = progress.filter((p) => !p.videoCode.startsWith("v:") && !p.videoCode.startsWith("note:")).length;
-  const noteDone    = progress.filter((p) => p.videoCode.startsWith("note:")).length;
+  const videoDone   = progress.filter((p) => p.itemKey.startsWith("v:")).length;
+  const conceptDone = progress.filter((p) => !p.itemKey.startsWith("v:") && !p.itemKey.startsWith("note:")).length;
+  const noteDone    = progress.filter((p) => p.itemKey.startsWith("note:")).length;
 
   // Equal-weight: each selected type contributes 1/N to overall completion
   // fraction = average of (done_i / total_i) across selected types

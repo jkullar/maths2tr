@@ -79,3 +79,11 @@ export interface CurriculumData {
   total_problems: number;
   weeks: CurriculumWeek[];
 }
+
+export interface CourseNote {
+  id: string;
+  number: number;
+  title: string;
+  section: string;
+  content: string;
+}
